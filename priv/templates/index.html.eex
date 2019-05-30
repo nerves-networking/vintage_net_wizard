@@ -1,0 +1,56 @@
+<html>
+   <head>
+      <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+      <title>VintageNet Configuration</title>
+      <link rel="stylesheet" type="text/css" href="css/styles.css">
+   </head>
+   <body>
+      <div class="container">
+         <div id="header">
+            <div>
+               <h2>VintageNet Configuration</h2>
+            </div>
+         </div>
+         <div id="body">
+
+            <table class="netlist" id="wifi_cfg">
+               <thead><tr> <th colspan="4">Configured Networks</th></tr></thead>
+               <tbody></tbody>
+            </table>
+
+            <table class="netlist" id="wifi_scan">
+               <thead><tr><th colspan="4">Scanned Networks</th></tr></thead>
+               <tbody></tbody>
+            </table>
+
+            <table id="wifi_add" hidden="hidden">
+               <thead><tr><th colspan="2">Add Network</th></tr></thead>
+               <tbody>
+               </tbody>
+            </table>
+            
+            <div>
+               <button id="btn-save" style="float:right;" onclick="save()" >Save &amp; Connect</button>
+            </div>
+
+         </div>
+         <div id="footer">
+            <div>
+               <div id="mfg_info">
+                  <div><b>Gateway EUI</b>58-A0-CB-FF-FE-80-03-A6</div>
+                  <div><b>WiFi AP MAC</b>58:A0:CB:80:03:A6</div>
+                  <div><b>WiFi AP Pass</b>Ypou9XXf</div>
+                  <div><b>WiFi STA MAC</b>CC:50:E3:20:67:D8</div>
+                  <div><b>Serial Number</b>TBMH100915000371</div>
+                  <div><b>MFG date</b>2019-01-14 10:27:10</div>
+                  <div><b>FW Build</b>2018-12-06 09:30:37</div>
+                  <div><b>FW Version</b>2.0.0</div>
+                  <div><b>Core Version</b>2.0.0(minihub/debug)</div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <script src="js/app.js"></script>
+   </body>
+</html>
