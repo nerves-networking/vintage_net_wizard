@@ -1,17 +1,20 @@
 <html>
    <head>
       <meta http-equiv="content-type" content="text/html; charset=windows-1252">
-      <title>VintageNet Configuration</title>
+      <title>VintageNet Wizard</title>
       <link rel="stylesheet" type="text/css" href="css/styles.css">
    </head>
    <body>
       <div class="container">
          <div id="header">
             <div>
-               <h2>VintageNet Configuration</h2>
+               <h2>VintageNet Wizard</h2>
             </div>
          </div>
          <div id="body">
+            <div id="instructions">
+               Add one or more networks to the configured list and then press "Save &amp; Connect"
+            </div>
 
             <table class="netlist" id="wifi_cfg">
                <thead><tr> <th colspan="4">Configured Networks</th></tr></thead>
@@ -37,15 +40,10 @@
          <div id="footer">
             <div>
                <div id="mfg_info">
-                  <div><b>Gateway EUI</b>58-A0-CB-FF-FE-80-03-A6</div>
-                  <div><b>WiFi AP MAC</b>58:A0:CB:80:03:A6</div>
-                  <div><b>WiFi AP Pass</b>Ypou9XXf</div>
-                  <div><b>WiFi STA MAC</b>CC:50:E3:20:67:D8</div>
-                  <div><b>Serial Number</b>TBMH100915000371</div>
-                  <div><b>MFG date</b>2019-01-14 10:27:10</div>
-                  <div><b>FW Build</b>2018-12-06 09:30:37</div>
-                  <div><b>FW Version</b>2.0.0</div>
-                  <div><b>Core Version</b>2.0.0(minihub/debug)</div>
+                  <div><b>Device serial number</b><%= serial_number %></div>
+                  <div><b>Firmware</b><%= nerves_fw_product %></div>
+                  <div><b>Firmware version</b><%= nerves_fw_version %></div>
+                  <div><b>Firmware UUID</b><%= nerves_fw_uuid %></div>
                </div>
             </div>
          </div>
