@@ -18,6 +18,8 @@ defmodule VintageNet.Wizard.Web.Router do
   end
 
   defp render_page(conn, page, info \\ []) do
+    info = info ++ firmware_info() ++ serial_number_info()
+
     page
     |> template_file()
     |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
@@ -29,5 +31,21 @@ defmodule VintageNet.Wizard.Web.Router do
   defp template_file(page) do
     Path.join([:code.priv_dir(:vintage_net_wizard), "templates", "#{page}.eex"])
     # Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
+  end
+
+  defp firmware_info() do
+    Nerves.Runtime.KV.get_all_active()
+    |> Enum.filter(fn {k, _v} -> String.starts_with?(k, "nerves_fw_") end)
+    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+  end
+
+  defp serial_number_info() do
+    case System.cmd("boardid", []) do
+      {id, 0} ->
+        [serial_number: String.trim(id)]
+
+      _error ->
+        [serial_number: "Unknown"]
+    end
   end
 end

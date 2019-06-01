@@ -39,7 +39,7 @@ config :vintage_net,
        type: VintageNet.Technology.WiFi,
        wifi: %{
          mode: :host,
-         ssid: "test ssid",
+         ssid: "VintageNet Wizard",
          key_mgmt: :none,
          scan_ssid: 1,
          ap_scan: 1,
