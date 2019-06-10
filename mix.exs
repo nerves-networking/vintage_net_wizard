@@ -46,10 +46,12 @@ defmodule VintageNet.Wizard.MixProject do
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.6", targets: @all_targets},
       {:vintage_net, path: "../vintage_net", targets: @all_targets},
+      {:busybox, "~> 0.1", targets: @all_targets},
 
       # Dependencies for specific targets
       {:farmbot_system_rpi0, "~> 1.7.2-farmbot.0", targets: :rpi0},
-      {:farmbot_system_rpi3, "~> 1.7.2-farmbot.0", targets: :rpi3}
+      {:farmbot_system_rpi3, "~> 1.7.2-farmbot.0", targets: :rpi3},
+      {:nerves_system_rpi3a, "~> 1.7", targets: :rpi3a}
     ]
   end
 end
