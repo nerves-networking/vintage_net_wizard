@@ -7,8 +7,11 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   def websocket_init(_state) do
+    VintageNet.subscribe(["interface", "wlan0", "scan"])
+
     send(self(), :scan)
     send(self(), :after_connect)
+
     IO.inspect(self(), label: "WS PID")
     {:ok, %{wifi_cfg: %{}, scan: %{}}}
   end
@@ -113,6 +116,24 @@ defmodule VintageNet.Wizard.Web.Socket do
         Process.send_after(self(), :scan, 3000)
         {:ok, %{state | scan: %{}}}
     end
+  end
+
+  def websocket_info(
+        {VintageNet, ["interface", "wlan0", "scan"], _old_value, scan_results, _meta},
+        state
+      ) do
+    scan =
+      Map.new(scan_results, fn %{
+                                 bssid: bssid,
+                                 ssid: ssid,
+                                 frequency: frequency,
+                                 flags: flags,
+                                 signal: signal
+                               } ->
+        {bssid, %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}}
+      end)
+
+    {:ok, %{state | scan: scan}}
   end
 
   def websocket_info(_info, state) do
