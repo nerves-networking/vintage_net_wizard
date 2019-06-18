@@ -7,12 +7,11 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   def websocket_init(_state) do
-    VintageNet.subscribe(["interface", "wlan0", "scan"])
+    subscribe()
 
     send(self(), :scan)
     send(self(), :after_connect)
 
-    IO.inspect(self(), label: "WS PID")
     {:ok, %{wifi_cfg: %{}, scan: %{}}}
   end
 
@@ -22,14 +21,14 @@ defmodule VintageNet.Wizard.Web.Socket do
         websocket_handle({:json, json}, state)
 
       _ ->
-        Logger.debug("discarding info: #{message}")
+        _ = Logger.debug("discarding info: #{message}")
         {:ok, state}
     end
   end
 
   def websocket_handle({:json, %{"type" => "wifi_cfg", "data" => data}}, state) do
     if available = state.scan[data["bssid"]] do
-      Logger.info("data is in scan: #{data["bssid"]}")
+      _ = Logger.info("data is in scan: #{inspect(data)}")
 
       payload = %{
         type: :wifi_cfg,
@@ -38,7 +37,7 @@ defmodule VintageNet.Wizard.Web.Socket do
 
       {:reply, {:text, Jason.encode!(payload)}, %{state | wifi_cfg: data}}
     else
-      Logger.error("data is not in scan: #{inspect(data)}")
+      _ = Logger.error("data is not in scan: #{inspect(data)}")
 
       {:ok, %{state | wifi_cfg: data}}
     end
@@ -71,69 +70,40 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   def websocket_info(:scan, state) do
-    case scan() do
-      {:ok, ssids} ->
-        payload =
-          Enum.map(ssids, fn %{
-                               bssid: bssid,
-                               ssid: ssid,
-                               frequency: frequency,
-                               flags: flags,
-                               signal: signal
-                             } ->
-            json =
-              Jason.encode!(%{
-                type: :wifi_scan,
-                data: %{
-                  bssid: bssid,
-                  ssid: ssid,
-                  frequency: frequency,
-                  flags: flags,
-                  signal: signal
-                }
-              })
+    :ok = scan()
+    Process.send_after(self(), :scan, 3000)
 
-            {:text, json}
-          end)
-
-        scan =
-          Map.new(ssids, fn %{
-                              bssid: bssid,
-                              ssid: ssid,
-                              frequency: frequency,
-                              flags: flags,
-                              signal: signal
-                            } ->
-            {bssid,
-             %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}}
-          end)
-
-        # Process.send_after(self(), :scan, 1000)
-        {:reply, payload, %{state | scan: scan}}
-
-      error ->
-        Logger.error("Could not scan for ssids: #{inspect(error)}")
-        Process.send_after(self(), :scan, 3000)
-        {:ok, %{state | scan: %{}}}
-    end
+    {:ok, %{state | scan: %{}}}
   end
 
   def websocket_info(
-        {VintageNet, ["interface", "wlan0", "scan"], _old_value, scan_results, _meta},
+        {VintageNet, ["interface", "wlan0", "access_points"], _old_value, scan_results, _meta},
         state
       ) do
-    scan =
-      Map.new(scan_results, fn %{
-                                 bssid: bssid,
-                                 ssid: ssid,
-                                 frequency: frequency,
-                                 flags: flags,
-                                 signal: signal
-                               } ->
-        {bssid, %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}}
+    payload =
+      Enum.map(scan_results, fn {bssid,
+                                 %{
+                                   ssid: ssid,
+                                   frequency: frequency,
+                                   flags: flags,
+                                   signal: signal
+                                 }} ->
+        json =
+          Jason.encode!(%{
+            type: :wifi_scan,
+            data: %{
+              bssid: bssid,
+              ssid: ssid,
+              frequency: frequency,
+              flags: flags,
+              signal: signal
+            }
+          })
+
+        {:text, json}
       end)
 
-    {:ok, %{state | scan: scan}}
+    {:reply, payload, %{state | scan: scan_results}}
   end
 
   def websocket_info(_info, state) do
@@ -145,45 +115,52 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   if Mix.target() == :host do
+    defp subscribe(), do: :ok
+
     defp scan do
-      {:ok,
-       [
+      send(
+        self(),
+        {VintageNet, ["interface", "wlan0", "access_points"], %{},
          %{
-           bssid: "04:18:d6:47:1a:6a",
-           flags: [:wpa2_psk_ccmp, :ess],
-           frequency: 2462,
-           signal: -89,
-           ssid: "WirelessorPCU"
-         },
-         %{
-           bssid: "16:18:d6:47:1a:6a",
-           flags: [:wpa2_psk_ccmp, :ess],
-           frequency: 2462,
-           signal: -90,
-           ssid: ""
-         },
-         %{
-           bssid: "06:18:d6:47:1a:6a",
-           flags: [:wpa2_psk_ccmp, :ess],
-           frequency: 2462,
-           signal: -90,
-           ssid: "WirelessorPCU - Guest"
-         },
-         %{
-           bssid: "26:9e:db:0d:4f:21",
-           flags: [],
-           frequency: 2462,
-           signal: -61,
-           ssid: "SETUP"
-         },
-         %{
-           bssid: "26:9e:db:0d:4f:22",
-           flags: [:wpa2_eap_ccmp, :ess],
-           frequency: 2462,
-           signal: -61,
-           ssid: "enterprise"
-         }
-       ]}
+           "04:18:d6:47:1a:6a" => %{
+             bssid: "04:18:d6:47:1a:6a",
+             flags: [:wpa2_psk_ccmp, :ess],
+             frequency: 2462,
+             signal: -89,
+             ssid: "WirelessPCU"
+           },
+           "16:18:d6:47:1a:6a" => %{
+             bssid: "16:18:d6:47:1a:6a",
+             flags: [:wpa2_psk_ccmp, :ess],
+             frequency: 2462,
+             signal: -90,
+             ssid: ""
+           },
+           "06:18:d6:47:1a:6a" => %{
+             bssid: "06:18:d6:47:1a:6a",
+             flags: [:wpa2_psk_ccmp, :ess],
+             frequency: 2462,
+             signal: -90,
+             ssid: "WirelessPCU - Guest"
+           },
+           "26:9e:db:0d:4f:21" => %{
+             bssid: "26:9e:db:0d:4f:21",
+             flags: [],
+             frequency: 2462,
+             signal: -61,
+             ssid: "SETUP"
+           },
+           "26:9e:db:0d:4f:22" => %{
+             bssid: "26:9e:db:0d:4f:22",
+             flags: [:wpa2_eap_ccmp, :ess],
+             frequency: 2462,
+             signal: -61,
+             ssid: "enterprise"
+           }
+         }, %{}}
+      )
+
+      :ok
     end
 
     defp load do
@@ -195,11 +172,15 @@ defmodule VintageNet.Wizard.Web.Socket do
       :ok
     end
   else
-    defp scan do
+    defp subscribe() do
+      VintageNet.subscribe(["interface", "wlan0", "access_points"])
+    end
+
+    defp scan() do
       VintageNet.scan("wlan0")
     end
 
-    defp load do
+    defp load() do
       []
     end
 
@@ -224,7 +205,7 @@ defmodule VintageNet.Wizard.Web.Socket do
           mode: :client,
           key_mgmt: :wpa_eap,
           identity: cfg["identity"],
-          password: cfg["identity"]
+          password: cfg["password"]
         },
         ipv4: %{method: :dhcp}
       })

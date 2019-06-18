@@ -24,28 +24,39 @@ defmodule VintageNet.Wizard.Web.Router do
     |> template_file()
     |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
     |> (fn {:safe, contents} -> send_resp(conn, 200, contents) end).()
-  rescue
-    e -> send_resp(conn, 500, "Failed to render page: #{page} inspect: #{Exception.message(e)}")
   end
 
   defp template_file(page) do
-    Path.join([:code.priv_dir(:vintage_net_wizard), "templates", "#{page}.eex"])
+    Path.join([:code.priv_dir(:vintage_net_wizard), "templates", page <> ".eex"])
     # Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
   end
 
   defp firmware_info() do
-    Nerves.Runtime.KV.get_all_active()
+    get_all_active_kv()
     |> Enum.filter(fn {k, _v} -> String.starts_with?(k, "nerves_fw_") end)
     |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
   end
 
   defp serial_number_info() do
-    case System.cmd("boardid", []) do
-      {id, 0} ->
-        [serial_number: String.trim(id)]
+    with boardid_path when not is_nil(boardid_path) <- System.find_executable("boardid"),
+         {id, 0} <- System.cmd(boardid_path, []) do
+      [serial_number: String.trim(id)]
+    else
+      _other -> [serial_number: "Unknown"]
+    end
+  end
 
-      _error ->
-        [serial_number: "Unknown"]
+  if Mix.target() == :host do
+    defp get_all_active_kv() do
+      [
+        {"nerves_fw_uuid", "1112222--33-3-3-3-"},
+        {"nerves_fw_version", "0.1.0"},
+        {"nerves_fw_product", "Cool product"}
+      ]
+    end
+  else
+    defp get_all_active_kv() do
+      Nerves.Runtime.KV.get_all_active()
     end
   end
 end
