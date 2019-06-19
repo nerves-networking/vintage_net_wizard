@@ -1,7 +1,7 @@
 defmodule VintageNet.Wizard.MixProject do
   use Mix.Project
 
-  @all_targets [:rpi0, :rpi3]
+  @all_targets [:rpi0, :rpi3, :rpi3a]
 
   def project do
     [
