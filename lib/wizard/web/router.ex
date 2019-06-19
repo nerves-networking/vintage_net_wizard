@@ -49,9 +49,9 @@ defmodule VintageNet.Wizard.Web.Router do
   if Mix.target() == :host do
     defp get_all_active_kv() do
       [
-        {"nerves_fw_uuid", "1112222--33-3-3-3-"},
+        {"nerves_fw_uuid", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"},
         {"nerves_fw_version", "0.1.0"},
-        {"nerves_fw_product", "Cool product"}
+        {"nerves_fw_product", "vintage_net_wizard"}
       ]
     end
   else
