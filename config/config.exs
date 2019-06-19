@@ -22,7 +22,7 @@ config :shoehorn,
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
 # configuring ring_logger.
 
-config :logger, backends: [RingLogger, :console]
+config :logger, backends: [RingLogger]
 
 config :vintage_net,
   regulatory_domain: "US",
