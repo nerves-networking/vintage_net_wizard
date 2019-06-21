@@ -7,13 +7,9 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   def websocket_init(_state) do
-    scan_results = VintageNet.get(["interface", "wlan0", "access_points"], [])
-    :ok = VintageNet.subscribe(["interface", "wlan0", "access_points"])
-
-    send(self(), :scan)
+    existing_scan = subscribe()
     send(self(), :after_connect)
-
-    {:ok, %{wifi_cfg: %{}, scan: scan_results}}
+    {:ok, %{wifi_cfg: %{}, scan: existing_scan}}
   end
 
   def websocket_handle({:text, message}, state) do
@@ -27,13 +23,20 @@ defmodule VintageNet.Wizard.Web.Socket do
     end
   end
 
+  # Message from JS trying to add a new network
   def websocket_handle({:json, %{"type" => "wifi_cfg", "data" => data}}, state) do
     if available = state.scan[data["bssid"]] do
       _ = Logger.info("data is in scan: #{inspect(data)}")
 
       payload = %{
         type: :wifi_cfg,
-        data: available
+        data: %{
+          bssid: data["bssid"],
+          ssid: available.ssid,
+          frequency: frequency_text(available.frequency, available.band, available.channel),
+          flags: available.flags,
+          signal: available.signal_percent
+        }
       }
 
       {:reply, {:text, Jason.encode!(payload)}, %{state | wifi_cfg: data}}
@@ -44,50 +47,25 @@ defmodule VintageNet.Wizard.Web.Socket do
     end
   end
 
+  # Message from JS indicating the data should be saved
   def websocket_handle({:json, %{"type" => "save"}}, state) do
     save(state.wifi_cfg)
     {:ok, state}
   end
 
+  # Load currently configured networks
   def websocket_info(:after_connect, state) do
-    scan = VintageNet.get(["interface", "wlan0", "access_points"], [])
-    payload = scan_results_to_json(scan)
-    _ = Logger.info("Running :after_connect with #{inspect(state.scan)} and #{inspect(payload)}")
-
-    # Enum.map(load(), fn %{
-    #                       bssid: bssid,
-    #                       ssid: ssid,
-    #                       frequency: frequency,
-    #                       flags: flags,
-    #                       signal: signal
-    #                     } ->
-    #   json =
-    #     Jason.encode!(%{
-    #       type: :wifi_cfg,
-    #       data: %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}
-    #     })
-
-    #   {:text, json}
-    # end)
-
-    {:reply, payload, state}
-  end
-
-  def websocket_info(:scan, state) do
-    _ = scan()
-    Process.send_after(self(), :scan, 5_000)
-
-    {:ok, %{state | scan: %{}}}
+    loaded = load()
+    :ok = scan()
+    load_payload = load_results_to_json(loaded)
+    {:reply, load_payload, state}
   end
 
   def websocket_info(
         {VintageNet, ["interface", "wlan0", "access_points"], _old_value, scan_results, _meta},
         state
       ) do
-    Logger.info("Got: #{inspect(scan_results)}")
-
     payload = scan_results_to_json(scan_results)
-
     {:reply, payload, %{state | scan: scan_results}}
   end
 
@@ -120,6 +98,24 @@ defmodule VintageNet.Wizard.Web.Socket do
             flags: flags,
             signal: signal_percent
           }
+        })
+
+      {:text, json}
+    end)
+  end
+
+  defp load_results_to_json(load_results) do
+    Enum.map(load_results, fn %{
+                                bssid: bssid,
+                                ssid: ssid,
+                                frequency: frequency,
+                                flags: flags,
+                                signal: signal
+                              } ->
+      json =
+        Jason.encode!(%{
+          type: :wifi_cfg,
+          data: %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}
         })
 
       {:text, json}
