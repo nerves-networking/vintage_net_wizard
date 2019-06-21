@@ -45,7 +45,7 @@ defmodule VintageNet.Wizard.MixProject do
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.6", targets: @all_targets},
-      {:vintage_net, path: "../vintage_net", targets: @all_targets},
+      {:vintage_net, github: "nerves-networking/vintage_net", targets: @all_targets},
       {:busybox, "~> 0.1", targets: @all_targets},
 
       # Dependencies for specific targets

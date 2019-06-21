@@ -62,7 +62,7 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   def websocket_info(
-        {VintageNet, ["interface", "wlan0", "access_points"], _old_value, scan_results, _meta},
+        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _old_value, scan_results, _meta},
         state
       ) do
     payload = scan_results_to_json(scan_results)
@@ -155,7 +155,7 @@ defmodule VintageNet.Wizard.Web.Socket do
     defp scan do
       send(
         self(),
-        {VintageNet, ["interface", "wlan0", "access_points"], %{},
+        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], %{},
          %{
            "04:18:d6:47:1a:6a" => %{
              band: :wifi_2_4_ghz,
@@ -223,8 +223,8 @@ defmodule VintageNet.Wizard.Web.Socket do
     end
   else
     defp subscribe() do
-      existing_aps = VintageNet.get(["interface", "wlan0", "access_points"], [])
-      :ok = VintageNet.subscribe(["interface", "wlan0", "access_points"])
+      existing_aps = VintageNet.get(["interface", "wlan0", "wifi", "access_points"], [])
+      :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
       existing_aps
     end
 
