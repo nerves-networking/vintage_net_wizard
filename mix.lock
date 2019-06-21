@@ -30,4 +30,5 @@
   "system_registry": {:hex, :system_registry, "0.8.2", "df791dc276652fcfb53be4dab823e05f8269b96ac57c26f86a67838dbc0eefe7", [:mix], [], "hexpm"},
   "toolshed": {:hex, :toolshed, "0.2.10", "31e33f3bfbd88085a5f34844930a75e579940417873eb8a5c25b9525ad1a1372", [:mix], [{:nerves_runtime, "~> 0.8", [hex: :nerves_runtime, repo: "hexpm", optional: true]}], "hexpm"},
   "uboot_env": {:hex, :uboot_env, "0.1.1", "b01e3ec0973e99473234f27839e29e63b5b81eba6a136a18a78d049d4813d6c5", [:mix], [], "hexpm"},
+  "vintage_net": {:git, "https://github.com/nerves-networking/vintage_net.git", "85259292574dccc796eac1885cfce788f10dcd8d", []},
 }
