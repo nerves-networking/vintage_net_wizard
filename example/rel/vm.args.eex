@@ -4,8 +4,7 @@
 ##  The cookie needs to be configured prior to vm boot for
 ##  for read only filesystem.
 
-# -name vintage_net_wizard@0.0.0.0
--setcookie lyp2s2ihbpqeayht4agvsxya2hpepsgjfymu4dvznu225wz35lls7q2taj7lfkti
+-setcookie <%= @release.options[:cookie] %>
 
 ## Use Ctrl-C to interrupt the current shell rather than invoking the emulator's
 ## break handler and possibly exiting the VM.
