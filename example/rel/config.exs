@@ -25,8 +25,8 @@ end
 # when running `mix release`, the first release in the file
 # will be used by default
 
-release :vintage_net_wizard do
-  set(version: current_version(:vintage_net_wizard))
+release :wizard_example do
+  set(version: current_version(:wizard_example))
   set(strip_debug_info: true)
   plugin(Nerves)
   plugin(Shoehorn)
