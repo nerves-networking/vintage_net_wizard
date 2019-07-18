@@ -6,10 +6,10 @@ defmodule VintageNet.Wizard.Web.Socket do
     {:cowboy_websocket, req, state}
   end
 
-  def websocket_init(_state) do
-    existing_scan = subscribe()
+  def websocket_init([state]) do
     send(self(), :after_connect)
-    {:ok, %{wifi_cfg: %{}, scan: existing_scan}}
+
+    {:ok, %{access_points: state, wifi_cfg: nil}}
   end
 
   def websocket_handle({:text, message}, state) do
@@ -23,10 +23,12 @@ defmodule VintageNet.Wizard.Web.Socket do
     end
   end
 
-  # Message from JS trying to add a new network
-  def websocket_handle({:json, %{"type" => "wifi_cfg", "data" => data}}, state) do
-    if available = state.scan[data["bssid"]] do
-      _ = Logger.info("data is in scan: #{inspect(data)}")
+  def websocket_handle(
+        {:json, %{"type" => "wifi_cfg", "data" => data}},
+        %{access_points: access_points} = state
+      ) do
+    if Map.has_key?(access_points, data["bssid"]) do
+      available = access_points[data["bssid"]]
 
       payload = %{
         type: :wifi_cfg,
@@ -48,24 +50,32 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   # Message from JS indicating the data should be saved
-  def websocket_handle({:json, %{"type" => "save"}}, state) do
+  def websocket_handle(
+        {:json, %{"type" => "save"}},
+        state
+      ) do
     save(state.wifi_cfg)
     {:ok, state}
   end
 
-  # Load currently configured networks
-  def websocket_info(:after_connect, state) do
-    loaded = load()
-    :ok = scan()
-    load_payload = load_results_to_json(loaded)
-    {:reply, load_payload, state}
+  def websocket_handle(_, state) do
+    {:ok, state}
   end
 
+  def websocket_info(:after_connect, state) do
+    payload = scan_results_to_json(state.access_points)
+    {:reply, payload, state}
+  end
+
+  # Load currently configured networks
+
   def websocket_info(
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _old_value, scan_results, _meta},
+        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _old_value, scan_results,
+         _meta},
         state
       ) do
     payload = scan_results_to_json(scan_results)
+
     {:reply, payload, %{state | scan: scan_results}}
   end
 
