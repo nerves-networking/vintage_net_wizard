@@ -15,11 +15,11 @@ defmodule VintageNet.Wizard.Web.Endpoint do
     Supervisor.init(make_children(), strategy: :one_for_one)
   end
 
-  defp dispatch(initial_scan) do
+  defp dispatch(initial_state) do
     [
       {:_,
        [
-         {"/socket", Socket, [initial_scan]},
+         {"/socket", Socket, [initial_state]},
          {:_, Plug.Cowboy.Handler, {Router, []}}
        ]}
     ]
@@ -27,13 +27,19 @@ defmodule VintageNet.Wizard.Web.Endpoint do
 
   defp make_children() do
     if should_start_ap_mode?() do
-      {:ok, initial_scan} = switch_to_ap_mode()
+      scan_mode = get_scan_mode()
+      access_points = do_scan(scan_mode)
+
+      :ok = switch_to_ap_mode()
 
       [
         Plug.Cowboy.child_spec(
           scheme: :http,
           plug: Router,
-          options: [port: 4001, dispatch: dispatch(initial_scan)]
+          options: [
+            port: 4001,
+            dispatch: dispatch(%{scan_mode: scan_mode, access_points: access_points})
+          ]
         )
       ]
     else
@@ -74,14 +80,25 @@ defmodule VintageNet.Wizard.Web.Endpoint do
       }
     }
 
+    VintageNet.configure("wlan0", config)
+  end
+
+  defp do_scan(:continuous) do
+    VintageNet.scan("wlan0")
+    %{}
+  end
+
+  defp do_scan(:interrupt) do
     _ = VintageNet.scan("wlan0")
-
     :timer.sleep(2_000)
+    VintageNet.get(["interface", "wlan0", "wifi", "access_points"])
+  end
 
-    initial_scan = VintageNet.get(["interface", "wlan0", "wifi", "access_points"])
-
-    :ok = VintageNet.configure("wlan0", config)
-
-    {:ok, initial_scan}
+  defp get_scan_mode() do
+    if Application.get_env(:vintage_net_wizard, :scan_in_ap, true) do
+      :continuous
+    else
+      :interrupt
+    end
   end
 end
