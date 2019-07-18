@@ -55,14 +55,14 @@ defmodule VintageNet.Wizard.Web.Socket do
 
   # Load currently configured networks
   def websocket_info(:after_connect, state) do
-    loaded = load()
     :ok = scan()
-    load_payload = load_results_to_json(loaded)
-    {:reply, load_payload, state}
+    payload = scan_results_to_json(state.scan)
+    {:reply, payload, state}
   end
 
   def websocket_info(
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _old_value, scan_results, _meta},
+        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _old_value, scan_results,
+         _meta},
         state
       ) do
     payload = scan_results_to_json(scan_results)
@@ -98,24 +98,6 @@ defmodule VintageNet.Wizard.Web.Socket do
             flags: flags,
             signal: signal_percent
           }
-        })
-
-      {:text, json}
-    end)
-  end
-
-  defp load_results_to_json(load_results) do
-    Enum.map(load_results, fn %{
-                                bssid: bssid,
-                                ssid: ssid,
-                                frequency: frequency,
-                                flags: flags,
-                                signal: signal
-                              } ->
-      json =
-        Jason.encode!(%{
-          type: :wifi_cfg,
-          data: %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}
         })
 
       {:text, json}
@@ -213,10 +195,6 @@ defmodule VintageNet.Wizard.Web.Socket do
       :ok
     end
 
-    defp load do
-      []
-    end
-
     defp save(cfg) do
       IO.inspect(cfg, label: "CFG")
       :ok
@@ -230,10 +208,6 @@ defmodule VintageNet.Wizard.Web.Socket do
 
     defp scan() do
       VintageNet.scan("wlan0")
-    end
-
-    defp load() do
-      []
     end
 
     defp save(%{"key_mgmt" => "wpa_psk"} = cfg) do
