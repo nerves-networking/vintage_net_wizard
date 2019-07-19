@@ -12,7 +12,8 @@ defmodule VintageNet.Wizard.Application do
 
   def children(:host) do
     [
-      VintageNet.Wizard.Web.Endpoint
+      VintageNet.Wizard.Web.Endpoint,
+      {VintageNet.Wizard.Backend, [VintageNet.Wizard.Backend.Host]}
     ]
   end
 
