@@ -1,15 +1,16 @@
 defmodule VintageNet.Wizard.Web.Socket do
   require Logger
 
+  alias VintageNet.Wizard.Backend
+
   @behaviour :cowboy_websocket
   def init(req, state) do
     {:cowboy_websocket, req, state}
   end
 
   def websocket_init(_state) do
-    existing_scan = subscribe()
     send(self(), :after_connect)
-    {:ok, %{wifi_cfg: %{}, scan: existing_scan}}
+    {:ok, %{wifi_cfg: %{}, scan: %{}}}
   end
 
   def websocket_handle({:text, message}, state) do
@@ -49,24 +50,22 @@ defmodule VintageNet.Wizard.Web.Socket do
 
   # Message from JS indicating the data should be saved
   def websocket_handle({:json, %{"type" => "save"}}, state) do
-    save(state.wifi_cfg)
+    Backend.save(state.wifi_cfg)
     {:ok, state}
   end
 
   # Load currently configured networks
   def websocket_info(:after_connect, state) do
-    loaded = load()
-    :ok = scan()
-    load_payload = load_results_to_json(loaded)
-    {:reply, load_payload, state}
+    :ok = Backend.subscribe()
+    access_points = Backend.access_points()
+
+    payload = scan_results_to_json(access_points)
+    {:reply, payload, %{state | scan: access_points}}
   end
 
-  def websocket_info(
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _old_value, scan_results, _meta},
-        state
-      ) do
-    payload = scan_results_to_json(scan_results)
-    {:reply, payload, %{state | scan: scan_results}}
+  def websocket_info({WizardNet.Wizard, {:access_points, access_points}}, state) do
+    payload = scan_results_to_json(access_points)
+    {:reply, payload, %{state | scan: access_points}}
   end
 
   def websocket_info(info, state) do
@@ -104,24 +103,6 @@ defmodule VintageNet.Wizard.Web.Socket do
     end)
   end
 
-  defp load_results_to_json(load_results) do
-    Enum.map(load_results, fn %{
-                                bssid: bssid,
-                                ssid: ssid,
-                                frequency: frequency,
-                                flags: flags,
-                                signal: signal
-                              } ->
-      json =
-        Jason.encode!(%{
-          type: :wifi_cfg,
-          data: %{bssid: bssid, ssid: ssid, frequency: frequency, flags: flags, signal: signal}
-        })
-
-      {:text, json}
-    end)
-  end
-
   defp frequency_text(_frequency, :wifi_2_4_ghz, channel) do
     "2.4 GHz channel #{channel}"
   end
@@ -132,135 +113,5 @@ defmodule VintageNet.Wizard.Web.Socket do
 
   defp frequency_text(frequency, _band, _channel) do
     "#{frequency} MHz"
-  end
-
-  # Mix.target() == :host do
-  if false do
-    defp subscribe() do
-      # One existing AP...
-      %{
-        "04:18:d6:47:1a:6a" => %{
-          band: :wifi_2_4_ghz,
-          bssid: "04:18:d6:47:1a:6a",
-          channel: 6,
-          flags: [:wpa2_psk_ccmp, :ess],
-          frequency: 2462,
-          signal_dbm: -89,
-          signal_percent: 40,
-          ssid: "WirelessPCU"
-        }
-      }
-    end
-
-    defp scan do
-      send(
-        self(),
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], %{},
-         %{
-           "04:18:d6:47:1a:6a" => %{
-             band: :wifi_2_4_ghz,
-             bssid: "04:18:d6:47:1a:6a",
-             channel: 6,
-             flags: [:wpa2_psk_ccmp, :ess],
-             frequency: 2462,
-             signal_dbm: -89,
-             signal_percent: 10,
-             ssid: "WirelessPCU"
-           },
-           "16:18:d6:47:1a:6a" => %{
-             band: :wifi_2_4_ghz,
-             bssid: "16:18:d6:47:1a:6a",
-             channel: 6,
-             flags: [:wpa2_psk_ccmp, :ess],
-             frequency: 2462,
-             signal_dbm: -90,
-             signal_percent: 9,
-             ssid: ""
-           },
-           "06:18:d6:47:1a:6a" => %{
-             band: :wifi_2_4_ghz,
-             bssid: "06:18:d6:47:1a:6a",
-             channel: 6,
-             flags: [:wpa2_psk_ccmp, :ess],
-             frequency: 2462,
-             signal_dbm: -90,
-             signal_percent: 9,
-             ssid: "WirelessPCU - Guest"
-           },
-           "26:9e:db:0d:4f:21" => %{
-             band: :wifi_2_4_ghz,
-             bssid: "26:9e:db:0d:4f:21",
-             channel: 6,
-             flags: [],
-             frequency: 2462,
-             signal_dbm: -61,
-             signal_percent: 60,
-             ssid: "SETUP"
-           },
-           "26:9e:db:0d:4f:22" => %{
-             band: :wifi_2_4_ghz,
-             bssid: "26:9e:db:0d:4f:22",
-             channel: 6,
-             flags: [:wpa2_eap_ccmp, :ess],
-             frequency: 2462,
-             signal_dbm: -61,
-             signal_percent: 80,
-             ssid: "enterprise"
-           }
-         }, %{}}
-      )
-
-      :ok
-    end
-
-    defp load do
-      []
-    end
-
-    defp save(cfg) do
-      IO.inspect(cfg, label: "CFG")
-      :ok
-    end
-  else
-    defp subscribe() do
-      existing_aps = VintageNet.get(["interface", "wlan0", "wifi", "access_points"], [])
-      :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
-      existing_aps
-    end
-
-    defp scan() do
-      VintageNet.scan("wlan0")
-    end
-
-    defp load() do
-      []
-    end
-
-    defp save(%{"key_mgmt" => "wpa_psk"} = cfg) do
-      VintageNet.configure("wlan0", %{
-        type: VintageNet.Technology.WiFi,
-        wifi: %{
-          ssid: cfg["ssid"],
-          mode: :client,
-          key_mgmt: :wpa_psk,
-          psk: cfg["psk"]
-        },
-        ipv4: %{method: :dhcp}
-      })
-    end
-
-    defp save(%{"key_mgmt" => "wpa_eap"} = cfg) do
-      VintageNet.configure("wlan0", %{
-        type: VintageNet.Technology.WiFi,
-        wifi: %{
-          ssid: cfg["ssid"],
-          mode: :client,
-          key_mgmt: :wpa_eap,
-          identity: cfg["identity"],
-          password: cfg["password"]
-        },
-        ipv4: %{method: :dhcp}
-      })
-    end
   end
 end
