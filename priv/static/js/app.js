@@ -13,24 +13,21 @@ const signal_to_class = function (signal) {
 /**
  * Adds or updates an element on one of the ssid list tables.
  * data should contain the following keys:
- *   bssid
  *   flags
  *   frequency
  *   signal
  *   ssid
- * 
- * also i'm sorry
 */
 const handle_scanned_ssid = function (data, table_id) {
   var table = document.getElementById(table_id).getElementsByTagName('tbody')[0];
-  var row = table.getElementsByClassName(data.bssid)[0];
+  var row = table.getElementsByClassName(data.ssid)[0];
   if (row) {
-    //todo update some stuff here maybe? 
+    //todo update some stuff here maybe?
     return;
   } else {
     row = table.insertRow();
-    row.setAttribute("id", data.bssid);
-    row.setAttribute("class", "selectable ssid " + data.bssid);
+    row.setAttribute("id", data.ssid);
+    row.setAttribute("class", "selectable ssid " + data.ssid);
     row.addEventListener("click", function () {
       var wifiAddElem = document.getElementById("wifi_add");
       wifiAddElem.hidden = false;
@@ -43,13 +40,6 @@ const handle_scanned_ssid = function (data, table_id) {
       <input class="ssidinput" type="text" name="ssid" id="input-ssid">
       `;
       ssidRow.getElementsByClassName("ssidinput")[0].value = data.ssid;
-
-      var bssidRow = newTbody.insertRow();
-      bssidRow.innerHTML = `
-      <label for="input-bssid"> BSSID </label>
-      <input class="bssidinput" type="text" name="bssid" id="input-bssid">
-      `;
-      bssidRow.getElementsByClassName("bssidinput")[0].value = data.bssid;
 
       var frequencyRow = newTbody.insertRow();
       frequencyRow.innerHTML = `

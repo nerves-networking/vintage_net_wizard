@@ -78,29 +78,54 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   defp scan_results_to_json(scan_results) do
-    Enum.map(scan_results, fn {bssid,
-                               %{
-                                 ssid: ssid,
-                                 frequency: frequency,
-                                 band: band,
-                                 channel: channel,
-                                 flags: flags,
-                                 signal_percent: signal_percent
-                               }} ->
-      json =
-        Jason.encode!(%{
-          type: :wifi_scan,
-          data: %{
-            bssid: bssid,
-            ssid: ssid,
-            frequency: frequency_text(frequency, band, channel),
-            flags: flags,
-            signal: signal_percent
-          }
-        })
+    scan_results
+    |> Enum.map(&summarize_scan_results/1)
+    |> Enum.filter(&non_empty_ssid/1)
+    |> Enum.sort(fn %{signal_percent: a}, %{signal_percent: b} -> a >= b end)
+    |> Enum.uniq_by(fn %{ssid: ssid} -> ssid end)
+    |> Enum.map(&to_json/1)
+  end
 
-      {:text, json}
-    end)
+  defp summarize_scan_results(
+         {_bssid,
+          %{
+            ssid: ssid,
+            frequency: frequency,
+            band: band,
+            channel: channel,
+            flags: flags,
+            signal_percent: signal_percent
+          }}
+       ) do
+    %{
+      ssid: ssid,
+      frequency: frequency_text(frequency, band, channel),
+      flags: flags,
+      signal_percent: signal_percent
+    }
+  end
+
+  defp non_empty_ssid(%{ssid: ""}), do: false
+  defp non_empty_ssid(_other), do: true
+
+  defp to_json(%{
+         ssid: ssid,
+         frequency: frequency,
+         flags: flags,
+         signal_percent: signal_percent
+       }) do
+    json =
+      Jason.encode!(%{
+        type: :wifi_scan,
+        data: %{
+          ssid: ssid,
+          frequency: frequency,
+          flags: flags,
+          signal: signal_percent
+        }
+      })
+
+    {:text, json}
   end
 
   defp frequency_text(_frequency, :wifi_2_4_ghz, channel) do
