@@ -51,6 +51,7 @@ defmodule WizardExample.MixProject do
       {:vintage_net_wizard, path: "../", targets: @all_targets},
       {:vintage_net, "~> 0.3", targets: @all_targets},
       {:nerves_system_rpi0, "~> 1.8", targets: :rpi0},
+      {:nerves_system_rpi3, "~> 1.8", targets: :rpi3},
       {:nerves_system_rpi3a, "~> 1.8", targets: :rpi3a}
     ]
   end
