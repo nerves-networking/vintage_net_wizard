@@ -16,6 +16,3 @@
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
 
-# Ignore package tarball (built via "mix hex.build").
-vintage_net_wizard-*.tar
-
