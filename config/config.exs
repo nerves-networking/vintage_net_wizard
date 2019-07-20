@@ -9,4 +9,3 @@ config :vintage_net,
   resolvconf: "/dev/null",
   persistence_dir: "./persistence",
   bin_ip: "false"
-
