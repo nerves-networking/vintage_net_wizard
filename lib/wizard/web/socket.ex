@@ -69,7 +69,7 @@ defmodule VintageNet.Wizard.Web.Socket do
   end
 
   def websocket_info(info, state) do
-    Logger.info("Dropping #{inspect(info)}")
+    _ = Logger.info("Dropping #{inspect(info)}")
     {:ok, state}
   end
 
