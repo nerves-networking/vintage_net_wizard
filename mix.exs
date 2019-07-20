@@ -15,8 +15,7 @@ defmodule VintageNet.Wizard.MixProject do
   def application do
     [
       mod: {VintageNet.Wizard.Application, []},
-      extra_applications: [:logger, :runtime_tools, :eex],
-      included_applications: [:vintage_net, :nerves_runtime]
+      extra_applications: [:logger, :runtime_tools, :eex]
     ]
   end
 
