@@ -21,6 +21,21 @@ defmodule VintageNetWizard.Backend do
   @callback access_points(state :: any()) :: map()
 
   @doc """
+  Check if the WiFi network is configured
+  """
+  @callback configured?() :: boolean()
+
+  @doc """
+  Save the configuration
+  """
+  @callback save(cfg :: map(), state :: any()) :: {:ok, state :: any()} | {:error, any()}
+
+  @doc """
+  Configure the wifi network
+  """
+  @callback configure(state :: any()) :: :ok
+
+  @doc """
   Handle any message the is recieved by another process
 
   If you want the socket to send data to the client
@@ -38,29 +53,44 @@ defmodule VintageNetWizard.Backend do
     GenServer.start_link(__MODULE__, backend, name: __MODULE__)
   end
 
+  @spec subscribe() :: :ok
   def subscribe() do
     GenServer.cast(__MODULE__, {:subscribe, self()})
   end
 
+  @spec access_points :: map()
   def access_points() do
     GenServer.call(__MODULE__, :access_points)
   end
 
+  @spec save(map()) :: :ok | {:error, any()}
   def save(cfg) do
-    IO.inspect(cfg, label: "CFG")
-    :ok
+    GenServer.call(__MODULE__, {:save, cfg})
   end
 
+  @spec configured?() :: boolean()
+  def configured?() do
+    GenServer.call(__MODULE__, :configured?)
+  end
+
+  @spec configure() :: :ok
+  def configure() do
+    GenServer.cast(__MODULE__, :configure)
+  end
+
+  @impl true
   def init(backend) do
     {:ok, backend_state} = apply(backend, :init, [])
     {:ok, %State{backend: backend, backend_state: backend_state}, {:continue, :scan}}
   end
 
+  @impl true
   def handle_continue(:scan, %State{backend: backend} = state) do
     :ok = apply(backend, :scan, [])
     {:noreply, state}
   end
 
+  @impl true
   def handle_call(
         :access_points,
         _from,
@@ -70,10 +100,35 @@ defmodule VintageNetWizard.Backend do
     {:reply, access_points, state}
   end
 
+  def handle_call(
+        {:save, cfg},
+        _from,
+        %State{backend: backend, backend_state: backend_state} = state
+      ) do
+    case apply(backend, :save, [cfg, backend_state]) do
+      {:ok, new_backend_state} ->
+        {:reply, :ok, %{state | backend_state: new_backend_state}}
+
+      error ->
+        {:reply, error, state}
+    end
+  end
+
+  def handle_call(:configured?, _from, %State{backend: backend} = state) do
+    {:reply, apply(backend, :configured?, []), state}
+  end
+
+  @impl true
   def handle_cast({:subscribe, subscriber}, state) do
     {:noreply, %{state | subscriber: subscriber}}
   end
 
+  def handle_cast(:configure, %State{backend: backend, backend_state: backend_state} = state) do
+    :ok = apply(backend, :configure, [backend_state])
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info(
         info,
         %State{subscriber: subscriber, backend: backend, backend_state: backend_state} = state

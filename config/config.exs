@@ -9,3 +9,5 @@ config :vintage_net,
   resolvconf: "/dev/null",
   persistence_dir: "./persistence",
   bin_ip: "false"
+
+import_config "#{Mix.env()}.exs"
