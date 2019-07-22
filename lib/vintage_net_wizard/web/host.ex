@@ -68,7 +68,16 @@ defmodule VintageNetWizard.Backend.Host do
   end
 
   @impl true
+  def configured?(), do: false
+
+  @impl true
+  def configure(_state), do: :ok
+
+  @impl true
   def access_points(state), do: state
+
+  @impl true
+  def save(_cfg, state), do: {:ok, state}
 
   @impl true
   def handle_info(

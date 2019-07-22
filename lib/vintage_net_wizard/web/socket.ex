@@ -50,7 +50,7 @@ defmodule VintageNetWizard.Web.Socket do
 
   # Message from JS indicating the data should be saved
   def websocket_handle({:json, %{"type" => "save"}}, state) do
-    Backend.save(state.wifi_cfg)
+    _ = Backend.save(state.wifi_cfg)
     {:ok, state}
   end
 

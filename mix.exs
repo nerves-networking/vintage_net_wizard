@@ -8,6 +8,7 @@ defmodule VintageNetWizard.MixProject do
       app: :vintage_net_wizard,
       version: @version,
       elixir: "~> 1.8",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: dialyzer(),
@@ -27,6 +28,9 @@ defmodule VintageNetWizard.MixProject do
   defp description do
     "WiFi Setup Wizard that uses VintageNet"
   end
+
+  def elixirc_paths(:test), do: ["test/support", "lib"]
+  def elixirc_paths(_), do: ["lib"]
 
   defp package do
     %{

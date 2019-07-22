@@ -12,8 +12,8 @@ defmodule VintageNetWizard.Application do
 
   def children(:host) do
     [
-      VintageNetWizard.Web.Endpoint,
-      {VintageNetWizard.Backend, [VintageNetWizard.Backend.Host]}
+      {VintageNetWizard.Backend, [Application.get_env(:vintage_net_wizard, :backend)]},
+      VintageNetWizard.Web.Endpoint
     ]
   end
 
