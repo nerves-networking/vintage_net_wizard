@@ -3,8 +3,7 @@ defmodule WizardExample.MixProject do
 
   @app :wizard_example
   @version "0.1.0"
-
-  @all_targets [:rpi0, :rpi3, :rpi3a]
+  @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :x86_64]
 
   def project do
     [
@@ -13,7 +12,7 @@ defmodule WizardExample.MixProject do
       elixir: "~> 1.9",
       archives: [nerves_bootstrap: "~> 1.6"],
       start_permanent: Mix.env() == :prod,
-      build_embedded: false,
+      build_embedded: true,
       aliases: [loadconfig: [&bootstrap/1]],
       deps: deps(),
       releases: [{@app, release()}],
@@ -49,10 +48,16 @@ defmodule WizardExample.MixProject do
       {:nerves_runtime, "~> 0.10", targets: @all_targets},
       {:busybox, "~> 0.1", targets: @all_targets},
       {:vintage_net_wizard, path: "../", targets: @all_targets},
-      {:vintage_net, "~> 0.3", targets: @all_targets},
-      {:nerves_system_rpi0, "~> 1.8", targets: :rpi0},
-      {:nerves_system_rpi3, "~> 1.8", targets: :rpi3},
-      {:nerves_system_rpi3a, "~> 1.8", targets: :rpi3a}
+
+      # Dependencies for specific targets
+      {:nerves_system_rpi, "~> 1.8", runtime: false, targets: :rpi},
+      {:nerves_system_rpi0, "~> 1.8", runtime: false, targets: :rpi0},
+      {:nerves_system_rpi2, "~> 1.8", runtime: false, targets: :rpi2},
+      {:nerves_system_rpi3, "~> 1.8", runtime: false, targets: :rpi3},
+      {:nerves_system_rpi3a, "~> 1.8", runtime: false, targets: :rpi3a},
+      {:nerves_system_rpi4, "~> 1.8", runtime: false, targets: :rpi4},
+      {:nerves_system_bbb, "~> 2.3", runtime: false, targets: :bbb},
+      {:nerves_system_x86_64, "~> 1.8", runtime: false, targets: :x86_64},
     ]
   end
 
@@ -61,7 +66,8 @@ defmodule WizardExample.MixProject do
       overwrite: true,
       cookie: "#{@app}_cookie",
       include_erts: &Nerves.Release.erts/0,
-      steps: [&Nerves.Release.init/1, :assemble]
+      steps: [&Nerves.Release.init/1, :assemble],
+      strip_beams: Mix.env() == :prod
     ]
   end
 end
