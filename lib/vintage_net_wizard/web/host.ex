@@ -1,5 +1,5 @@
-defmodule VintageNet.Wizard.Backend.Host do
-  @behaviour VintageNet.Wizard.Backend
+defmodule VintageNetWizard.Backend.Host do
+  @behaviour VintageNetWizard.Backend
 
   def init(), do: {:ok, %{}}
 

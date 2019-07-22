@@ -1,4 +1,4 @@
-defmodule VintageNet.Wizard.Backend do
+defmodule VintageNetWizard.Backend do
   use GenServer
 
   @callback init() :: {:ok, state :: any()}
@@ -60,7 +60,7 @@ defmodule VintageNet.Wizard.Backend do
       ) do
     case apply(backend, :handle_info, [info, backend_state]) do
       {:reply, message, new_backend_state} ->
-        maybe_send(subscriber, {VintageNet.Wizard, message})
+        maybe_send(subscriber, {VintageNetWizard, message})
         {:noreply, %{state | backend_state: new_backend_state}}
 
       {:noreply, new_backend_state} ->

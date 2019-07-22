@@ -1,7 +1,7 @@
-defmodule VintageNet.Wizard.Web.Socket do
+defmodule VintageNetWizard.Web.Socket do
   require Logger
 
-  alias VintageNet.Wizard.Backend
+  alias VintageNetWizard.Backend
 
   @behaviour :cowboy_websocket
   def init(req, state) do

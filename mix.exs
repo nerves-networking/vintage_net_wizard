@@ -1,4 +1,4 @@
-defmodule VintageNet.Wizard.MixProject do
+defmodule VintageNetWizard.MixProject do
   use Mix.Project
 
   @version "0.1.0"
@@ -19,7 +19,7 @@ defmodule VintageNet.Wizard.MixProject do
 
   def application do
     [
-      mod: {VintageNet.Wizard.Application, []},
+      mod: {VintageNetWizard.Application, []},
       extra_applications: [:logger, :runtime_tools, :eex]
     ]
   end

@@ -1,8 +1,8 @@
-defmodule VintageNet.Wizard.Web.Endpoint do
+defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNet.Wizard.Web.{Router, Socket}
+  alias VintageNetWizard.Web.{Router, Socket}
   use Supervisor
 
   @doc false

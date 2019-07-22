@@ -1,4 +1,4 @@
-defmodule VintageNet.Wizard.Web.Router do
+defmodule VintageNetWizard.Web.Router do
   @moduledoc false
 
   use Plug.Router

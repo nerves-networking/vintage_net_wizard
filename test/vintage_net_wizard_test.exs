@@ -1,6 +1,6 @@
-defmodule VintageNet.WizardTest do
+defmodule VintageNetWizardTest do
   use ExUnit.Case
-  doctest VintageNet.Wizard
+  doctest VintageNetWizard
 
   test "need some tests" do
     assert true
