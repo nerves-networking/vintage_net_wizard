@@ -1,12 +1,32 @@
 defmodule VintageNetWizard.Backend do
+  @moduledoc """
+  Backends define the boundaries of getting access points,
+  handling incoming messages, and scanning the network
+  """
   use GenServer
 
+  @doc """
+  Do any initialization work like subscribing to messages
+  """
   @callback init() :: {:ok, state :: any()}
 
+  @doc """
+  Scan the network
+  """
   @callback scan() :: :ok
 
+  @doc """
+  Get all the access points that the backend knowns about
+  """
   @callback access_points(state :: any()) :: map()
 
+  @doc """
+  Handle any message the is recieved by another process
+
+  If you want the socket to send data to the client
+  return `{:reply, message, state}`, otherwise return
+  `{:noreply, state}`
+  """
   @callback handle_info(any(), state :: any()) ::
               {:reply, any(), state :: any()} | {:noreply, state :: any()}
 
