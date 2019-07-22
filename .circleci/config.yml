@@ -4,8 +4,8 @@ install_elixir: &install_elixir
   run:
     name: Install Elixir
     command: |
-      wget https://repo.hex.pm/builds/elixir/v$ELIXIR_VERSION.zip
-      unzip -d /usr/local/elixir v$ELIXIR_VERSION.zip
+      wget https://repo.hex.pm/builds/elixir/v${ELIXIR_VERSION}.zip
+      unzip -d /usr/local/elixir v${ELIXIR_VERSION}.zip
       echo 'export PATH=/usr/local/elixir/bin:$PATH' >> $BASH_ENV
 
 install_hex_rebar: &install_hex_rebar
@@ -21,6 +21,13 @@ install_system_deps: &install_system_deps
     command: |
       apt update
       apt install -y unzip libmnl-dev libnl-genl-3-dev
+
+install_nerves_bootstrap: &install_nerves_bootstrap
+  run:
+    name: Install nerves_bootstrap
+    command: |
+      cd /tmp
+      mix archive.install hex nerves_bootstrap "~> 1.0" --force
 
 install_mdl: &install_mdl
   run:
@@ -78,9 +85,30 @@ jobs:
       - run: mix compile
       - run: mix test
 
+  build_example_elixir_1_9_otp_22:
+    docker:
+      - image: nervesproject/nerves_system_br:1.8.4
+        environment:
+          MIX_TARGET: rpi0
+          ELIXIR_VERSION: 1.9.1-otp-22
+          LC_ALL: C.UTF-8
+    <<: *defaults
+    steps:
+      - checkout
+      - <<: *install_elixir
+      - <<: *install_hex_rebar
+      - <<: *install_nerves_bootstrap
+      - run:
+          name: Build example
+          command: |
+              cd example
+              mix deps.get
+              mix firmware
+
 workflows:
   version: 2
   build_test:
     jobs:
       - build_elixir_1_9_otp_22
       - build_elixir_1_8_otp_22
+      - build_example_elixir_1_9_otp_22
