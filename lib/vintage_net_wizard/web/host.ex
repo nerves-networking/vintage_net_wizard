@@ -1,8 +1,10 @@
 defmodule VintageNetWizard.Backend.Host do
   @behaviour VintageNetWizard.Backend
 
+  @impl true
   def init(), do: {:ok, %{}}
 
+  @impl true
   def scan() do
     access_points = %{
       "04:18:d6:47:1a:6a" => %{
@@ -65,8 +67,10 @@ defmodule VintageNetWizard.Backend.Host do
     :ok
   end
 
+  @impl true
   def access_points(state), do: state
 
+  @impl true
   def handle_info(
         {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _, access_points, _},
         _
