@@ -58,7 +58,7 @@ defmodule VintageNetWizard.Backend do
     GenServer.cast(__MODULE__, {:subscribe, self()})
   end
 
-  @spec access_points :: map()
+  @spec access_points() :: map()
   def access_points() do
     GenServer.call(__MODULE__, :access_points)
   end
@@ -80,14 +80,13 @@ defmodule VintageNetWizard.Backend do
 
   @impl true
   def init(backend) do
-    {:ok, backend_state} = apply(backend, :init, [])
-    {:ok, %State{backend: backend, backend_state: backend_state}, {:continue, :scan}}
-  end
+    case apply(backend, :init, []) do
+      {:ok, backend_state} ->
+        {:ok, %State{backend: backend, backend_state: backend_state}}
 
-  @impl true
-  def handle_continue(:scan, %State{backend: backend} = state) do
-    :ok = apply(backend, :scan, [])
-    {:noreply, state}
+      :stop ->
+        {:ok, %State{backend: backend}}
+    end
   end
 
   @impl true
