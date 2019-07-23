@@ -13,3 +13,18 @@ selecting and configuring available WiFi networks.
 ## Screenshots
 
 ![see it in action](assets/screenshot00.gif)
+
+## Configuration
+
+VintageNetWizard has the option to configuration which `backend` to use. Backends
+are used to switch out functionally of the networking logic. The default backend
+is `VintageNetWizard.Backend.Default` which uses `VintageNet` to handle scanning
+and network configuration.
+
+If you want to do local development primarily testing the JavaScript frontend you
+can use `VintageNetWizard.Backend.Mock` to do so.
+
+```elixir
+config :vintage_net_wizard,
+  backend: VintageNetWizard.Backend.Mock
+```

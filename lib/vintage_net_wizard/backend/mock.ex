@@ -1,11 +1,8 @@
-defmodule VintageNetWizard.Backend.Host do
+defmodule VintageNetWizard.Backend.Mock do
   @behaviour VintageNetWizard.Backend
 
   @impl true
-  def init(), do: {:ok, %{}}
-
-  @impl true
-  def scan() do
+  def init() do
     access_points = %{
       "04:18:d6:47:1a:6a" => %{
         band: :wifi_2_4_ghz,
@@ -59,11 +56,11 @@ defmodule VintageNetWizard.Backend.Host do
       }
     }
 
-    send(
-      self(),
-      {VintageNet, ["interface", "wlan0", "wifi", "access_points"], %{}, access_points, %{}}
-    )
+    {:ok, access_points}
+  end
 
+  @impl true
+  def scan() do
     :ok
   end
 
@@ -80,10 +77,7 @@ defmodule VintageNetWizard.Backend.Host do
   def save(_cfg, state), do: {:ok, state}
 
   @impl true
-  def handle_info(
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _, access_points, _},
-        _
-      ) do
-    {:reply, {:access_points, access_points}, access_points}
+  def handle_info(_, state) do
+    {:noreply, state}
   end
 end
