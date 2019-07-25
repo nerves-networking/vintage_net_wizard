@@ -16,6 +16,20 @@ selecting and configuring available WiFi networks.
 
 ## Configuration
 
+### Port
+
+VintageNetWizard can be configured to listen on a particular port. By default it
+will listen on port `80`.
+
+Doing local development the server will start on port `4001`
+
+```elixir
+config :vintage_net_wizard,
+  port: 4001
+```
+
+### Backends
+
 VintageNetWizard has the option to configuration which `backend` to use. Backends
 are used to switch out functionally of the networking logic. The default backend
 is `VintageNetWizard.Backend.Default` which uses `VintageNet` to handle scanning

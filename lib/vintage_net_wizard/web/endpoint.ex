@@ -12,8 +12,8 @@ defmodule VintageNetWizard.Web.Endpoint do
   end
 
   @impl Supervisor
-  def init(_args) do
-    Supervisor.init(make_children(), strategy: :one_for_one)
+  def init([port]) do
+    Supervisor.init(make_children(port), strategy: :one_for_one)
   end
 
   defp dispatch do
@@ -26,7 +26,7 @@ defmodule VintageNetWizard.Web.Endpoint do
     ]
   end
 
-  defp make_children() do
+  defp make_children(port) do
     if Backend.configured?() do
       []
     else
@@ -34,7 +34,7 @@ defmodule VintageNetWizard.Web.Endpoint do
         Plug.Cowboy.child_spec(
           scheme: :http,
           plug: Router,
-          options: [port: 4001, dispatch: dispatch()]
+          options: [port: port, dispatch: dispatch()]
         )
       ]
     end
