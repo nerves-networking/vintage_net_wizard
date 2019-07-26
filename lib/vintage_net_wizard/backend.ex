@@ -5,6 +5,8 @@ defmodule VintageNetWizard.Backend do
   """
   use GenServer
 
+  alias VintageNetWizard.WiFiConfiguration
+
   @doc """
   Do any initialization work like subscribing to messages
   """
@@ -28,7 +30,8 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Save the configuration
   """
-  @callback save(cfg :: map(), state :: any()) :: {:ok, state :: any()} | {:error, any()}
+  @callback save([WiFiConfiguration.t()], state :: any()) ::
+              {:ok, state :: any()} | {:error, any()}
 
   @doc """
   Configure the wifi network
@@ -63,7 +66,7 @@ defmodule VintageNetWizard.Backend do
     GenServer.call(__MODULE__, :access_points)
   end
 
-  @spec save(map()) :: :ok | {:error, any()}
+  @spec save([WiFiConfiguration.t()]) :: :ok | {:error, any()}
   def save(cfg) do
     GenServer.call(__MODULE__, {:save, cfg})
   end
