@@ -1,7 +1,7 @@
 defmodule VintageNetWizard.Web.Socket do
   require Logger
 
-  alias VintageNetWizard.Backend
+  alias VintageNetWizard.{Backend, WiFiConfiguration}
 
   @behaviour :cowboy_websocket
   def init(req, state) do
@@ -26,7 +26,9 @@ defmodule VintageNetWizard.Web.Socket do
 
   # Message from JS trying to add a new network
   def websocket_handle({:json, %{"type" => "wifi_cfg", "data" => data}}, state) do
-    case get_access_point_by_name(data["ssid"]) do
+    {:ok, wifi_config} = WiFiConfiguration.from_map(data)
+
+    case get_access_point_by_name(wifi_config.ssid) do
       nil ->
         {:ok, state}
 
@@ -42,7 +44,7 @@ defmodule VintageNetWizard.Web.Socket do
           }
         }
 
-        _ = Backend.save(data)
+        _ = Backend.save([wifi_config])
 
         {:reply, {:text, Jason.encode!(payload)}, state}
     end

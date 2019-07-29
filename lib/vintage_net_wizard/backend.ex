@@ -28,15 +28,9 @@ defmodule VintageNetWizard.Backend do
   @callback configured?() :: boolean()
 
   @doc """
-  Save the configuration
-  """
-  @callback save([WiFiConfiguration.t()], state :: any()) ::
-              {:ok, state :: any()} | {:error, any()}
-
-  @doc """
   Configure the wifi network
   """
-  @callback configure(state :: any()) :: :ok
+  @callback configure([WiFiConfiguration.t()], state :: any()) :: :ok
 
   @doc """
   Handle any message the is recieved by another process
@@ -49,7 +43,7 @@ defmodule VintageNetWizard.Backend do
               {:reply, any(), state :: any()} | {:noreply, state :: any()}
 
   defmodule State do
-    defstruct subscriber: nil, backend: nil, backend_state: nil
+    defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
   end
 
   def start_link([backend]) do
@@ -67,8 +61,8 @@ defmodule VintageNetWizard.Backend do
   end
 
   @spec save([WiFiConfiguration.t()]) :: :ok | {:error, any()}
-  def save(cfg) do
-    GenServer.call(__MODULE__, {:save, cfg})
+  def save(cfgs) do
+    GenServer.call(__MODULE__, {:save, cfgs})
   end
 
   @spec configured?() :: boolean()
@@ -85,7 +79,7 @@ defmodule VintageNetWizard.Backend do
   def init(backend) do
     case apply(backend, :init, []) do
       {:ok, backend_state} ->
-        {:ok, %State{backend: backend, backend_state: backend_state}}
+        {:ok, %State{configurations: [], backend: backend, backend_state: backend_state}}
 
       :stop ->
         {:ok, %State{backend: backend}}
@@ -102,18 +96,8 @@ defmodule VintageNetWizard.Backend do
     {:reply, access_points, state}
   end
 
-  def handle_call(
-        {:save, cfg},
-        _from,
-        %State{backend: backend, backend_state: backend_state} = state
-      ) do
-    case apply(backend, :save, [cfg, backend_state]) do
-      {:ok, new_backend_state} ->
-        {:reply, :ok, %{state | backend_state: new_backend_state}}
-
-      error ->
-        {:reply, error, state}
-    end
+  def handle_call({:save, cfgs}, _from, state) do
+    {:reply, :ok, %{state | configurations: cfgs}}
   end
 
   def handle_call(:configured?, _from, %State{backend: backend} = state) do
@@ -125,8 +109,12 @@ defmodule VintageNetWizard.Backend do
     {:noreply, %{state | subscriber: subscriber}}
   end
 
-  def handle_cast(:configure, %State{backend: backend, backend_state: backend_state} = state) do
-    :ok = apply(backend, :configure, [backend_state])
+  def handle_cast(
+        :configure,
+        %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
+          state
+      ) do
+    :ok = apply(backend, :configure, [wifi_configs, backend_state])
     {:noreply, state}
   end
 
