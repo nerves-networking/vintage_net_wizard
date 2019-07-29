@@ -1,7 +1,7 @@
 defmodule VintageNetWizard.Web.Socket do
   require Logger
 
-  alias VintageNetWizard.{Backend, WiFiConfiguration}
+  alias VintageNetWizard.{Network, WiFiConfiguration}
 
   @behaviour :cowboy_websocket
   def init(req, state) do
@@ -44,7 +44,7 @@ defmodule VintageNetWizard.Web.Socket do
           }
         }
 
-        _ = Backend.save([wifi_config])
+        _ = Network.save([wifi_config])
 
         {:reply, {:text, Jason.encode!(payload)}, state}
     end
@@ -52,13 +52,13 @@ defmodule VintageNetWizard.Web.Socket do
 
   # Message from JS indicating the data should be saved
   def websocket_handle({:json, %{"type" => "apply"}}, state) do
-    _ = Backend.apply()
+    _ = Network.apply()
     {:ok, state}
   end
 
   def websocket_info(:after_connect, state) do
-    :ok = Backend.subscribe()
-    access_points = Backend.access_points()
+    :ok = Network.subscribe()
+    access_points = Network.access_points()
     {:reply, scan_results_to_json(access_points), state}
   end
 
@@ -140,7 +140,7 @@ defmodule VintageNetWizard.Web.Socket do
   end
 
   defp get_access_point_by_name(ap_name) do
-    Enum.find(Backend.access_points(), fn {_, ap} ->
+    Enum.find(Network.access_points(), fn {_, ap} ->
       ap_name == ap.ssid
     end)
   end

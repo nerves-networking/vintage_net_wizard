@@ -27,7 +27,7 @@ config :shoehorn,
 config :logger, backends: [RingLogger]
 
 config :vintage_net_wizard,
-  backend: VintageNetWizard.Backend.Default
+  backend: VintageNetWizard.Network.Default
 
 config :vintage_net,
   regulatory_domain: "US",

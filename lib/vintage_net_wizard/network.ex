@@ -1,4 +1,4 @@
-defmodule VintageNetWizard.Backend do
+defmodule VintageNetWizard.Network do
   @moduledoc """
   Backends define the boundaries of getting access points,
   handling incoming messages, and scanning the network

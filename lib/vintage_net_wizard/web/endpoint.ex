@@ -3,7 +3,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   Supervisor for the Web part of the VintageNet Wizard.
   """
   alias VintageNetWizard.Web.{Router, Socket}
-  alias VintageNetWizard.Backend
+  alias VintageNetWizard.Network
   use Supervisor
 
   @doc false
@@ -27,7 +27,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   end
 
   defp make_children(port) do
-    if Backend.configured?() do
+    if Network.configured?() do
       []
     else
       [

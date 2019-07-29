@@ -1,5 +1,5 @@
-defmodule VintageNetWizard.Backend.Default do
-  @behaviour VintageNetWizard.Backend
+defmodule VintageNetWizard.Network.Default do
+  @behaviour VintageNetWizard.Network
 
   require Logger
 

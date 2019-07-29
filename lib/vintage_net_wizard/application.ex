@@ -4,11 +4,11 @@ defmodule VintageNetWizard.Application do
   use Application
 
   def start(_type, _args) do
-    backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
+    network = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Network.Default)
     port = Application.get_env(:vintage_net_wizard, :port, 80)
 
     children = [
-      {VintageNetWizard.Backend, [backend]},
+      {VintageNetWizard.Network, [network]},
       {VintageNetWizard.Web.Endpoint, [port]}
     ]
 

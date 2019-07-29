@@ -1,5 +1,5 @@
-defmodule VintageNetWizard.Backend.Mock do
-  @behaviour VintageNetWizard.Backend
+defmodule VintageNetWizard.Network.Mock do
+  @behaviour VintageNetWizard.Network
 
   @impl true
   def init() do
