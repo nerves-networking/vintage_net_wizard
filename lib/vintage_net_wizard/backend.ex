@@ -28,9 +28,9 @@ defmodule VintageNetWizard.Backend do
   @callback configured?() :: boolean()
 
   @doc """
-  Configure the wifi network
+  Apply the WiFi configurations
   """
-  @callback configure([WiFiConfiguration.t()], state :: any()) :: :ok
+  @callback apply([WiFiConfiguration.t()], state :: any()) :: :ok
 
   @doc """
   Handle any message the is recieved by another process
@@ -70,9 +70,9 @@ defmodule VintageNetWizard.Backend do
     GenServer.call(__MODULE__, :configured?)
   end
 
-  @spec configure() :: :ok
-  def configure() do
-    GenServer.cast(__MODULE__, :configure)
+  @spec apply() :: :ok
+  def apply() do
+    GenServer.cast(__MODULE__, :apply)
   end
 
   @impl true
@@ -110,11 +110,11 @@ defmodule VintageNetWizard.Backend do
   end
 
   def handle_cast(
-        :configure,
+        :apply,
         %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
           state
       ) do
-    :ok = apply(backend, :configure, [wifi_configs, backend_state])
+    :ok = apply(backend, :apply, [wifi_configs, backend_state])
     {:noreply, state}
   end
 

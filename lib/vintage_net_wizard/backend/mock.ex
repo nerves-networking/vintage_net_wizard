@@ -68,7 +68,7 @@ defmodule VintageNetWizard.Backend.Mock do
   def configured?(), do: false
 
   @impl true
-  def configure(_cfgs, _state), do: :ok
+  def apply(_cfgs, _state), do: :ok
 
   @impl true
   def access_points(state), do: state

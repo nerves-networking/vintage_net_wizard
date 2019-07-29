@@ -153,7 +153,7 @@ socket.onmessage = function (event) {
 
 const save = function () {
   payload = {
-    type: "save",
+    type: "apply",
     data: {}
   }
   socket.send(JSON.stringify(payload));
