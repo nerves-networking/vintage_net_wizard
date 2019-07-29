@@ -38,14 +38,27 @@ defmodule VintageNetWizard.WiFiConfiguration do
   def decode(json) do
     case Jason.decode(json) do
       {:ok, params} ->
-        from_params(params)
+        from_map(params)
 
       {:error, decode_error} ->
         {:error, :json_decode, decode_error}
     end
   end
 
-  defp from_params(params) do
+  @doc """
+  Try to make a WiFiConfiguration from a map.
+
+  Required fields:
+
+    - "ssid" - The SSID of the access point
+    - "key_mgmt" - The key management to use
+
+  Options fields:
+
+    - "password" - The passowrd for the access point
+  """
+  @spec from_map(map()) :: {:ok, t()} | {:error, param_error(), value :: any()}
+  def from_map(params) do
     with {:ok, ssid} <- ssid_from_params(params),
          {:ok, key_mgmt} <- key_mgmt_from_params(params),
          password <- params["password"] do

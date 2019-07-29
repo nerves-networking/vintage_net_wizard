@@ -11,7 +11,7 @@ defmodule VintageNetWizard.Backend.Default do
       :ok = VintageNet.subscribe(["interface", "wlan0", "state"])
       :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
       :ok = switch_to_ap_mode()
-      {:ok, %{access_points: %{}, cfg: %{}}}
+      {:ok, %{access_points: %{}}}
     end
   end
 
@@ -36,19 +36,14 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl true
-  def save(cfg, state) do
-    {:ok, %{state | cfg: cfg}}
-  end
-
-  @impl true
-  def configure(%{cfg: cfg}) do
+  def configure([cfg], _) do
     VintageNet.configure("wlan0", %{
       type: VintageNet.Technology.WiFi,
       wifi: %{
-        ssid: cfg["ssid"],
-        psk: cfg["psk"],
+        ssid: cfg.ssid,
+        psk: cfg.password,
         mode: :client,
-        key_mgmt: :wpa_psk
+        key_mgmt: cfg.key_mgmt
       },
       ipv4: %{method: :dhcp}
     })

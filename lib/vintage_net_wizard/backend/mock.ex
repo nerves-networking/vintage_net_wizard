@@ -22,7 +22,7 @@ defmodule VintageNetWizard.Backend.Mock do
         frequency: 2462,
         signal_dbm: -90,
         signal_percent: 9,
-        ssid: ""
+        ssid: "CIA"
       },
       "06:18:d6:47:1a:6a" => %{
         band: :wifi_2_4_ghz,
@@ -68,13 +68,10 @@ defmodule VintageNetWizard.Backend.Mock do
   def configured?(), do: false
 
   @impl true
-  def configure(_state), do: :ok
+  def configure(_cfgs, _state), do: :ok
 
   @impl true
   def access_points(state), do: state
-
-  @impl true
-  def save(_cfg, state), do: {:ok, state}
 
   @impl true
   def handle_info(_, state) do

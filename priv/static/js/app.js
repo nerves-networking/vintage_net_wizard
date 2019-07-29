@@ -58,8 +58,8 @@ const handle_scanned_ssid = function (data, table_id) {
         key_mgmtRow.getElementsByClassName("key_mgmtinput")[0].value = "wpa_psk";
         var pskRow = newTbody.insertRow();
         pskRow.innerHTML = `
-        <label for="input-psk"> Passphrase </label>
-        <input type="password" name="psk" id="input-psk">
+        <label for="input-password"> Passphrase </label>
+        <input type="password" name="password" id="input-password">
         `;
       }
 
