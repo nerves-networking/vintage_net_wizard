@@ -36,7 +36,7 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl true
-  def configure([cfg], _) do
+  def apply([cfg], _) do
     VintageNet.configure("wlan0", %{
       type: VintageNet.Technology.WiFi,
       wifi: %{
