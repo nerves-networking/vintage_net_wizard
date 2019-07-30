@@ -16,10 +16,7 @@ defmodule VintageNetWizard.Test.Backend do
   def configured?(), do: true
 
   @impl true
-  def save(_cfg, state), do: {:ok, state}
-
-  @impl true
-  def configure(_state), do: :ok
+  def apply(_cfgs, _state), do: :ok
 
   @impl true
   def handle_info(_, state), do: {:noreply, state}
