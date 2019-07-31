@@ -65,6 +65,11 @@ defmodule VintageNetWizard.Backend do
     GenServer.call(__MODULE__, {:save, cfgs})
   end
 
+  @spec configurations() :: [WiFiConfiguration.t()]
+  def configurations() do
+    GenServer.call(__MODULE__, :configurations)
+  end
+
   @spec configured?() :: boolean()
   def configured?() do
     GenServer.call(__MODULE__, :configured?)
@@ -98,6 +103,10 @@ defmodule VintageNetWizard.Backend do
 
   def handle_call({:save, cfgs}, _from, state) do
     {:reply, :ok, %{state | configurations: cfgs}}
+  end
+
+  def handle_call(:configurations, _from, %State{configurations: cfgs} = state) do
+    {:reply, cfgs, state}
   end
 
   def handle_call(:configured?, _from, %State{backend: backend} = state) do
