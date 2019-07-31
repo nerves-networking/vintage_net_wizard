@@ -13,6 +13,8 @@ defmodule VintageNetWizard.Web.Router do
     render_page(conn, "index.html")
   end
 
+  forward("/api/v1", to: VintageNetWizard.Web.Api)
+
   match _ do
     send_resp(conn, 404, "oops")
   end
