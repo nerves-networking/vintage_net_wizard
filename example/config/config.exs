@@ -26,40 +26,10 @@ config :shoehorn,
 
 config :logger, backends: [RingLogger]
 
-config :vintage_net_wizard,
-  backend: VintageNetWizard.Backend.Default
-
 config :vintage_net,
   regulatory_domain: "US",
   config: [
-    # {"eth0",
-    #  %{
-    #    type: VintageNet.Technology.Ethernet,
-    #    ipv4: %{
-    #      method: :dhcp
-    #    }
-    #  }},
-    {"wlan0",
-     %{
-       type: VintageNet.Technology.WiFi,
-       wifi: %{
-         mode: :host,
-         ssid: "VintageNet Wizard",
-         key_mgmt: :none,
-         scan_ssid: 1,
-         ap_scan: 1,
-         bgscan: :simple
-       },
-       ipv4: %{
-         method: :static,
-         address: "192.168.24.1",
-         netmask: "255.255.255.0"
-       },
-       dhcpd: %{
-         start: "192.168.24.2",
-         end: "192.168.24.10"
-       }
-     }}
+    {"wlan0", %{type: VintageNet.Technology.WiFi}}
   ]
 
 # if Mix.target() != :host do
