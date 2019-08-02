@@ -55,6 +55,11 @@ defmodule VintageNetWizard.Backend do
     GenServer.cast(__MODULE__, {:subscribe, self()})
   end
 
+  @spec scan() :: :ok
+  def scan() do
+    GenServer.cast(__MODULE__, :scan)
+  end
+
   @spec access_points() :: map()
   def access_points() do
     GenServer.call(__MODULE__, :access_points)
@@ -124,6 +129,11 @@ defmodule VintageNetWizard.Backend do
           state
       ) do
     :ok = apply(backend, :apply, [wifi_configs, backend_state])
+    {:noreply, state}
+  end
+
+  def handle_cast(:scan, %State{backend: backend} = state) do
+    :ok = apply(backend, :scan, [])
     {:noreply, state}
   end
 
