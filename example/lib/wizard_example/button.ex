@@ -19,7 +19,7 @@ defmodule WizardExample.Button do
   end
 
   def handle_info(:timeout, state) do
-    VintageNetWizard.into_ap_mode()
+    :ok = VintageNetWizard.run_wizard()
     {:noreply, state}
   end
 

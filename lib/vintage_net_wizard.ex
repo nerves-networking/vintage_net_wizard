@@ -4,6 +4,20 @@ defmodule VintageNetWizard do
   """
 
   @doc """
+  Run the wizard.
+
+  This means the WiFi module will be put into access point
+  mode and the web server will be started
+  """
+  @spec run_wizard() :: :ok | {:error, any()}
+  def run_wizard() do
+    with :ok <- into_ap_mode(),
+         {:ok, _server} <- start_server() do
+      :ok
+    end
+  end
+
+  @doc """
   Change the WiFi module into access point mode
   """
   def into_ap_mode() do
@@ -30,4 +44,8 @@ defmodule VintageNetWizard do
 
     VintageNet.configure("wlan0", config)
   end
+
+  defdelegate start_server(), to: VintageNetWizard.Web.Endpoint
+
+  defdelegate stop_server(), to: VintageNetWizard.Web.Endpoint
 end

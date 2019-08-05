@@ -10,7 +10,7 @@ defmodule VintageNetWizard.Backend.Default do
     else
       :ok = VintageNet.subscribe(["interface", "wlan0", "state"])
       :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
-      :ok = switch_to_ap_mode()
+      :ok = VintageNetWizard.run_wizard()
       {:ok, %{access_points: %{}}}
     end
   end
@@ -37,16 +37,19 @@ defmodule VintageNetWizard.Backend.Default do
 
   @impl true
   def apply([cfg], _) do
-    VintageNet.configure("wlan0", %{
-      type: VintageNet.Technology.WiFi,
-      wifi: %{
-        ssid: cfg.ssid,
-        psk: cfg.password,
-        mode: :client,
-        key_mgmt: cfg.key_mgmt
-      },
-      ipv4: %{method: :dhcp}
-    })
+    :ok =
+      VintageNet.configure("wlan0", %{
+        type: VintageNet.Technology.WiFi,
+        wifi: %{
+          ssid: cfg.ssid,
+          psk: cfg.password,
+          mode: :client,
+          key_mgmt: cfg.key_mgmt
+        },
+        ipv4: %{method: :dhcp}
+      })
+
+    VintageNetWizard.stop_server()
   end
 
   @impl true
@@ -65,30 +68,5 @@ defmodule VintageNetWizard.Backend.Default do
 
   def handle_info({VintageNet, ["interface", "wlan0", "state"], _, _, _meta}, state) do
     {:noreply, state}
-  end
-
-  defp switch_to_ap_mode() do
-    config = %{
-      type: VintageNet.Technology.WiFi,
-      wifi: %{
-        mode: :host,
-        ssid: "VintageNet Wizard",
-        key_mgmt: :none,
-        scan_ssid: 1,
-        ap_scan: 1,
-        bgscan: :simple
-      },
-      ipv4: %{
-        method: :static,
-        address: "192.168.24.1",
-        netmask: "255.255.255.0"
-      },
-      dhcpd: %{
-        start: "192.168.24.2",
-        end: "192.168.24.10"
-      }
-    }
-
-    VintageNet.configure("wlan0", config)
   end
 end

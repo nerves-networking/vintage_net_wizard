@@ -56,6 +56,8 @@ defmodule VintageNetWizard.Backend.Mock do
       }
     }
 
+    {:ok, _} = VintageNetWizard.start_server()
+
     {:ok, access_points}
   end
 
@@ -68,7 +70,9 @@ defmodule VintageNetWizard.Backend.Mock do
   def configured?(), do: false
 
   @impl true
-  def apply(_cfgs, _state), do: :ok
+  def apply(_cfgs, _state) do
+    :ok = VintageNetWizard.stop_server()
+  end
 
   @impl true
   def access_points(state), do: state
