@@ -1,7 +1,8 @@
 defmodule VintageNetWizard.Backend.Default do
+  @moduledoc """
+  A default backend for target devices 
+  """
   @behaviour VintageNetWizard.Backend
-
-  require Logger
 
   @impl true
   def init() do

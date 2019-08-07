@@ -8,7 +8,7 @@ defmodule VintageNetWizard.Application do
 
     children = [
       {VintageNetWizard.Web.Endpoint, []},
-      {VintageNetWizard.Backend, [backend]}
+      {VintageNetWizard.Backend, backend}
     ]
 
     opts = [strategy: :one_for_one, name: VintageNetWizard.Supervisor]
