@@ -1,4 +1,5 @@
 defmodule VintageNetWizard.Web.Socket do
+  @moduledoc false
   require Logger
 
   alias VintageNetWizard.{Backend, WiFiConfiguration}

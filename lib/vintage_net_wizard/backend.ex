@@ -43,43 +43,67 @@ defmodule VintageNetWizard.Backend do
               {:reply, any(), state :: any()} | {:noreply, state :: any()}
 
   defmodule State do
+    @moduledoc false
     defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
   end
 
-  def start_link([backend]) do
+  @spec start_link(backend :: module()) :: GenServer.on_start()
+  def start_link(backend) do
     GenServer.start_link(__MODULE__, backend, name: __MODULE__)
   end
 
+  @doc """
+  Subscribe to messages from the backend
+  """
   @spec subscribe() :: :ok
   def subscribe() do
     GenServer.cast(__MODULE__, {:subscribe, self()})
   end
 
+  @doc """
+  Scan the network for access points
+  """
   @spec scan() :: :ok
   def scan() do
     GenServer.cast(__MODULE__, :scan)
   end
 
+  @doc """
+  List out access points found from the scan
+  """
   @spec access_points() :: map()
   def access_points() do
     GenServer.call(__MODULE__, :access_points)
   end
 
+  @doc """
+  Save a list of `WiFiConfiguration` to the backend
+  """
   @spec save([WiFiConfiguration.t()]) :: :ok | {:error, any()}
   def save(cfgs) do
     GenServer.call(__MODULE__, {:save, cfgs})
   end
 
+  @doc """
+  Get a list of the current configurations
+  """
   @spec configurations() :: [WiFiConfiguration.t()]
   def configurations() do
     GenServer.call(__MODULE__, :configurations)
   end
 
+  @doc """
+  Ask the backend if the WiFi is configured
+  """
   @spec configured?() :: boolean()
   def configured?() do
     GenServer.call(__MODULE__, :configured?)
   end
 
+  @doc """
+  Apply the configuraions saved in the backend to
+  the system.
+  """
   @spec apply() :: :ok
   def apply() do
     GenServer.cast(__MODULE__, :apply)

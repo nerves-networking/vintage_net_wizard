@@ -1,4 +1,10 @@
 defmodule VintageNetWizard.Backend.Mock do
+  @moduledoc """
+  A default backend for host machines.
+
+  This is useful for testing and local
+  JavaScript development
+  """
   @behaviour VintageNetWizard.Backend
 
   @impl true
