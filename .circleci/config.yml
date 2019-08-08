@@ -87,7 +87,7 @@ jobs:
 
   build_example_elixir_1_9_otp_22:
     docker:
-      - image: nervesproject/nerves_system_br:1.8.4
+      - image: nervesproject/nerves_system_br:1.8.5
         environment:
           MIX_TARGET: rpi0
           ELIXIR_VERSION: 1.9.1-otp-22
