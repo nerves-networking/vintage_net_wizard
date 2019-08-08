@@ -21,7 +21,7 @@ defmodule VintageNetWizard.MixProject do
   def application do
     [
       mod: {VintageNetWizard.Application, []},
-      extra_applications: [:logger, :runtime_tools, :eex]
+      extra_applications: [:logger, :eex]
     ]
   end
 
