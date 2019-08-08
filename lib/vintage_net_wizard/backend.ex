@@ -6,6 +6,7 @@ defmodule VintageNetWizard.Backend do
   use GenServer
 
   alias VintageNetWizard.WiFiConfiguration
+  alias VintageNet.WiFi.AccessPoint
 
   @doc """
   Do any initialization work like subscribing to messages
@@ -20,7 +21,7 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Get all the access points that the backend knowns about
   """
-  @callback access_points(state :: any()) :: map()
+  @callback access_points(state :: any()) :: [AccessPoint.t()]
 
   @doc """
   Check if the WiFi network is configured
@@ -71,7 +72,7 @@ defmodule VintageNetWizard.Backend do
   @doc """
   List out access points found from the scan
   """
-  @spec access_points() :: map()
+  @spec access_points() :: [AccessPoint.t()]
   def access_points() do
     GenServer.call(__MODULE__, :access_points)
   end

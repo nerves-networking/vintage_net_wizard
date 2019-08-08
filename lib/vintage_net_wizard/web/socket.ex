@@ -33,7 +33,7 @@ defmodule VintageNetWizard.Web.Socket do
       nil ->
         {:ok, state}
 
-      {_, access_point} ->
+      access_point ->
         payload = %{
           type: :wifi_cfg,
           data: %{
@@ -86,17 +86,14 @@ defmodule VintageNetWizard.Web.Socket do
     |> Enum.map(&to_json/1)
   end
 
-  defp summarize_scan_results(
-         {_bssid,
-          %{
-            ssid: ssid,
-            frequency: frequency,
-            band: band,
-            channel: channel,
-            flags: flags,
-            signal_percent: signal_percent
-          }}
-       ) do
+  defp summarize_scan_results(%{
+         ssid: ssid,
+         frequency: frequency,
+         band: band,
+         channel: channel,
+         flags: flags,
+         signal_percent: signal_percent
+       }) do
     %{
       ssid: ssid,
       frequency: frequency_text(frequency, band, channel),
@@ -141,7 +138,7 @@ defmodule VintageNetWizard.Web.Socket do
   end
 
   defp get_access_point_by_name(ap_name) do
-    Enum.find(Backend.access_points(), fn {_, ap} ->
+    Enum.find(Backend.access_points(), fn ap ->
       ap_name == ap.ssid
     end)
   end

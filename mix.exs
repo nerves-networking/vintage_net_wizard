@@ -56,7 +56,7 @@ defmodule VintageNetWizard.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_html, "~> 2.13"},
       {:jason, "~> 1.0"},
-      {:vintage_net, "~> 0.4"},
+      {:vintage_net, "~> 0.5"},
       {:nerves_runtime, "~> 0.10"},
       {:ex_doc, "~> 0.19", only: :docs, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false}
