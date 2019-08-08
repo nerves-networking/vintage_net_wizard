@@ -9,8 +9,8 @@ defmodule VintageNetWizard.Backend.Mock do
 
   @impl true
   def init() do
-    access_points = %{
-      "04:18:d6:47:1a:6a" => %{
+    access_points = [
+      %{
         band: :wifi_2_4_ghz,
         bssid: "04:18:d6:47:1a:6a",
         channel: 6,
@@ -20,7 +20,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 10,
         ssid: "WirelessPCU"
       },
-      "16:18:d6:47:1a:6a" => %{
+      %{
         band: :wifi_2_4_ghz,
         bssid: "16:18:d6:47:1a:6a",
         channel: 6,
@@ -30,7 +30,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 9,
         ssid: "CIA"
       },
-      "06:18:d6:47:1a:6a" => %{
+      %{
         band: :wifi_2_4_ghz,
         bssid: "06:18:d6:47:1a:6a",
         channel: 6,
@@ -40,7 +40,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 9,
         ssid: "WirelessPCU - Guest"
       },
-      "26:9e:db:0d:4f:21" => %{
+      %{
         band: :wifi_2_4_ghz,
         bssid: "26:9e:db:0d:4f:21",
         channel: 6,
@@ -50,7 +50,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 60,
         ssid: "SETUP"
       },
-      "26:9e:db:0d:4f:22" => %{
+      %{
         band: :wifi_2_4_ghz,
         bssid: "26:9e:db:0d:4f:22",
         channel: 6,
@@ -60,7 +60,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 80,
         ssid: "enterprise"
       }
-    }
+    ]
 
     {:ok, _} = VintageNetWizard.start_server()
 

@@ -58,29 +58,10 @@ defmodule VintageNetWizard.Web.Api do
 
   defp to_json(access_points) do
     access_points
-    |> Enum.map(fn {_, ap} -> summarize(ap) end)
     |> Enum.filter(&non_empty_ssid/1)
     |> Enum.sort(fn %{signal_percent: a}, %{signal_percent: b} -> a >= b end)
     |> Enum.uniq_by(fn %{ssid: ssid} -> ssid end)
     |> Jason.encode()
-  end
-
-  defp summarize(%{
-         ssid: ssid,
-         frequency: frequency,
-         band: band,
-         channel: channel,
-         flags: flags,
-         signal_percent: signal_percent
-       }) do
-    %{
-      ssid: ssid,
-      signal_percent: signal_percent,
-      frequency: frequency,
-      band: band,
-      channel: channel,
-      flags: flags
-    }
   end
 
   defp non_empty_ssid(%{ssid: ""}), do: false
