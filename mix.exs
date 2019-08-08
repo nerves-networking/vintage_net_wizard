@@ -34,6 +34,15 @@ defmodule VintageNetWizard.MixProject do
 
   defp package do
     %{
+      files: [
+        "assets",
+        "json-api.md",
+        "lib",
+        "LICENSE",
+        "mix.exs",
+        "priv",
+        "README.md"
+      ],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/nerves-networking/vintage_net_wizard"}
     }
