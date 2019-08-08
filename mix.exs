@@ -36,6 +36,7 @@ defmodule VintageNetWizard.MixProject do
     %{
       files: [
         "assets",
+        "CHANGELOG.md",
         "json-api.md",
         "lib",
         "LICENSE",
