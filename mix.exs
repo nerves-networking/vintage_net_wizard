@@ -13,6 +13,7 @@ defmodule VintageNetWizard.MixProject do
       deps: deps(),
       dialyzer: dialyzer(),
       docs: docs(),
+      aliases: [docs: ["docs", &copy_images/1]],
       package: package(),
       description: description()
     ]
@@ -76,5 +77,10 @@ defmodule VintageNetWizard.MixProject do
       source_ref: "v#{@version}",
       source_url: "https://github.com/nerves-networking/vintage_net_wizard"
     ]
+  end
+
+  # Copy the images referenced by docs, since ex_doc doesn't do this.
+  defp copy_images(_) do
+    File.cp_r("assets", "doc/assets")
   end
 end
