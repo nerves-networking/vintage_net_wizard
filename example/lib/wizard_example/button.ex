@@ -1,6 +1,10 @@
 defmodule WizardExample.Button do
   use GenServer
 
+  @moduledoc """
+  This GenServer starts the wizard if a button is depressed for long enough.
+  """
+
   alias Circuits.GPIO
 
   @doc """
@@ -20,16 +24,21 @@ defmodule WizardExample.Button do
     {:ok, %{pin: gpio_pin, gpio: gpio}}
   end
 
-  def handle_info({:circuits_gpio, gpio_pin, _, 1}, %{pin: gpio_pin} = state) do
+  @impl true
+  def handle_info({:circuits_gpio, gpio_pin, _timestamp, 1}, %{pin: gpio_pin} = state) do
+    # Button pressed. Start a timer to launch the wizard when it's long enough
     {:noreply, state, 5_000}
   end
 
-  def handle_info(:timeout, state) do
-    :ok = VintageNetWizard.run_wizard()
+  @impl true
+  def handle_info({:circuits_gpio, gpio_pin, _timestamp, 0}, %{pin: gpio_pin} = state) do
+    # Button released. The GenServer timer is implicitly cancelled by receiving this message.
     {:noreply, state}
   end
 
-  def handle_info(_, state) do
+  @impl true
+  def handle_info(:timeout, state) do
+    :ok = VintageNetWizard.run_wizard()
     {:noreply, state}
   end
 end
