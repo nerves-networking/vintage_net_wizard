@@ -72,7 +72,7 @@ defmodule VintageNetWizard.MixProject do
 
   defp docs do
     [
-      extras: ["README.md"],
+      extras: ["README.md", "json-api.md"],
       main: "readme",
       source_ref: "v#{@version}",
       source_url: "https://github.com/nerves-networking/vintage_net_wizard"
