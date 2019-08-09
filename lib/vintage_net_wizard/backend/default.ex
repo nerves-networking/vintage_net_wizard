@@ -9,7 +9,7 @@ defmodule VintageNetWizard.Backend.Default do
     if configured?() do
       :stop
     else
-      :ok = VintageNet.subscribe(["interface", "wlan0", "state"])
+      :ok = VintageNet.subscribe(["interface", "wlan0", "connection"])
       :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
       :ok = VintageNetWizard.run_wizard()
       {:ok, %{access_points: %{}}}
@@ -61,13 +61,8 @@ defmodule VintageNetWizard.Backend.Default do
     {:reply, {:access_points, access_points}, %{state | access_points: access_points}}
   end
 
-  def handle_info({VintageNet, ["interface", "wlan0", "state"], _, :configured, _meta}, state) do
+  def handle_info({VintageNet, ["interface", "wlan0", "connection"], _, :lan, _}, state) do
     :ok = scan()
-
-    {:noreply, state}
-  end
-
-  def handle_info({VintageNet, ["interface", "wlan0", "state"], _, _, _meta}, state) do
     {:noreply, state}
   end
 end
