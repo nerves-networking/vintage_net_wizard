@@ -15,6 +15,7 @@ defmodule WizardExample.MixProject do
       build_embedded: true,
       aliases: [loadconfig: [&bootstrap/1]],
       deps: deps(),
+      dialyzer: dialyzer(),
       releases: [{@app, release()}],
       preferred_cli_target: [run: :host, test: :host]
     ]
@@ -43,12 +44,13 @@ defmodule WizardExample.MixProject do
       {:shoehorn, "~> 0.6"},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.10", targets: @all_targets},
       {:busybox, "~> 0.1", targets: @all_targets},
-      {:vintage_net_wizard, path: "../", targets: @all_targets},
-      {:circuits_gpio, "~> 0.4.1", targets: @all_targets}, 
+      {:vintage_net_wizard, path: "..", targets: @all_targets},
+      {:circuits_gpio, "~> 0.4.1", targets: @all_targets},
 
       # Dependencies for specific targets
       {:nerves_system_rpi, "~> 1.8", runtime: false, targets: :rpi},
@@ -58,7 +60,7 @@ defmodule WizardExample.MixProject do
       {:nerves_system_rpi3a, "~> 1.8", runtime: false, targets: :rpi3a},
       {:nerves_system_rpi4, "~> 1.8", runtime: false, targets: :rpi4},
       {:nerves_system_bbb, "~> 2.3", runtime: false, targets: :bbb},
-      {:nerves_system_x86_64, "~> 1.8", runtime: false, targets: :x86_64},
+      {:nerves_system_x86_64, "~> 1.8", runtime: false, targets: :x86_64}
     ]
   end
 
@@ -69,6 +71,12 @@ defmodule WizardExample.MixProject do
       include_erts: &Nerves.Release.erts/0,
       steps: [&Nerves.Release.init/1, :assemble],
       strip_beams: Mix.env() == :prod
+    ]
+  end
+
+  defp dialyzer() do
+    [
+      flags: [:race_conditions, :unmatched_returns, :error_handling, :underspecs]
     ]
   end
 end

@@ -98,12 +98,18 @@ jobs:
       - <<: *install_elixir
       - <<: *install_hex_rebar
       - <<: *install_nerves_bootstrap
-      - run:
-          name: Build example
-          command: |
-              cd example
-              mix deps.get
-              mix firmware
+      - restore_cache:
+          keys:
+            - v1-example-mix-cache-{{ checksum "mix.lock" }}
+      - run: cd example && mix deps.get
+      - run: cd example && mix firmware
+      - run: cd example && mix format --check-formatted
+      - run: cd example && mix dialyzer --halt-exit-status
+      - save_cache:
+          key: v1-example-mix-cache-{{ checksum "mix.lock" }}
+          paths:
+            - example/_build
+            - example/deps
 
 workflows:
   version: 2

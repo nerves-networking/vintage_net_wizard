@@ -1,6 +1,7 @@
 defmodule WizardExample.Application do
   use Application
 
+  @spec start(Application.start_type(), any()) :: {:error, any} | {:ok, pid()}
   def start(_type, _args) do
     opts = [strategy: :one_for_one, name: WizardExample.Supervisor]
 
