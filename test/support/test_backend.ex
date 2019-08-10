@@ -10,7 +10,7 @@ defmodule VintageNetWizard.Test.Backend do
   def scan(), do: :ok
 
   @impl true
-  def access_points(_), do: %{}
+  def access_points(_), do: []
 
   @impl true
   def configured?(), do: true
