@@ -14,7 +14,6 @@ const signal_to_class = function (signal) {
  * Adds or updates an element on one of the ssid list tables.
  * data should contain the following keys:
  *   flags
- *   frequency
  *   signal
  *   ssid
 */
@@ -40,13 +39,6 @@ const handle_scanned_ssid = function (data, table_id) {
       <input class="ssidinput" type="text" name="ssid" id="input-ssid">
       `;
       ssidRow.getElementsByClassName("ssidinput")[0].value = data.ssid;
-
-      var frequencyRow = newTbody.insertRow();
-      frequencyRow.innerHTML = `
-      <label for="input-frequency"> Frequency </label>
-      <input class="frequencyinput" type="text" name="frequency" id="input-frequency">
-      `;
-      frequencyRow.getElementsByClassName("frequencyinput")[0].value = data.frequency;
 
       var key_mgmtRow = newTbody.insertRow();
       key_mgmtRow.innerHTML = `
