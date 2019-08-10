@@ -34,7 +34,7 @@ defmodule VintageNetWizard.Backend do
   @callback apply([WiFiConfiguration.t()], state :: any()) :: :ok
 
   @doc """
-  Handle any message the is recieved by another process
+  Handle any message the is received by another process
 
   If you want the socket to send data to the client
   return `{:reply, message, state}`, otherwise return
@@ -102,7 +102,7 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
-  Apply the configuraions saved in the backend to
+  Apply the configurations saved in the backend to
   the system.
   """
   @spec apply() :: :ok
