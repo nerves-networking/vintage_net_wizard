@@ -43,6 +43,11 @@ defmodule VintageNetWizard.Backend do
   @callback handle_info(any(), state :: any()) ::
               {:reply, any(), state :: any()} | {:noreply, state :: any()}
 
+  @doc """
+  Return information about the device for populating the web UI footer
+  """
+  @callback device_info() :: [{String.t(), String.t()}]
+
   defmodule State do
     @moduledoc false
     defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
@@ -67,6 +72,14 @@ defmodule VintageNetWizard.Backend do
   @spec scan() :: :ok
   def scan() do
     GenServer.cast(__MODULE__, :scan)
+  end
+
+  @doc """
+  Return information about the device for the web page's footer
+  """
+  @spec device_info() :: [{String.t(), String.t()}]
+  def device_info() do
+    GenServer.call(__MODULE__, :device_info)
   end
 
   @doc """
@@ -133,6 +146,10 @@ defmodule VintageNetWizard.Backend do
 
   def handle_call({:save, cfgs}, _from, state) do
     {:reply, :ok, %{state | configurations: cfgs}}
+  end
+
+  def handle_call(:device_info, _from, %State{backend: backend} = state) do
+    {:reply, apply(backend, :device_info, []), state}
   end
 
   def handle_call(:configurations, _from, %State{configurations: cfgs} = state) do

@@ -84,6 +84,16 @@ defmodule VintageNetWizard.Backend.Mock do
   def access_points(state), do: state
 
   @impl true
+  def device_info() do
+    [
+      {"Firmware", "vintage_net_wizard"},
+      {"Firmware version", "0.1.0"},
+      {"Firmware UUID", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"},
+      {"Device serial number", "12345678"}
+    ]
+  end
+
+  @impl true
   def handle_info(_, state) do
     {:noreply, state}
   end

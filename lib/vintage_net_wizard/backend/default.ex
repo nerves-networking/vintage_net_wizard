@@ -1,6 +1,6 @@
 defmodule VintageNetWizard.Backend.Default do
   @moduledoc """
-  A default backend for target devices 
+  A default backend for target devices
   """
   @behaviour VintageNetWizard.Backend
 
@@ -23,6 +23,33 @@ defmodule VintageNetWizard.Backend.Default do
 
   @impl true
   def access_points(%{access_points: access_points}), do: access_points
+
+  @impl true
+  def device_info() do
+    kv =
+      Nerves.Runtime.KV.get_all_active()
+      |> kv_to_map
+
+    [
+      {"Firmware", kv["nerves_fw_product"]},
+      {"Firmware version", kv["nerves_fw_version"]},
+      {"Firmware UUID", kv["nerves_fw_uuid"]},
+      {"Device serial number", serial_number()}
+    ]
+  end
+
+  defp kv_to_map(key_values) do
+    for kv <- key_values, into: %{}, do: kv
+  end
+
+  defp serial_number() do
+    with boardid_path when not is_nil(boardid_path) <- System.find_executable("boardid"),
+         {id, 0} <- System.cmd(boardid_path, []) do
+      String.trim(id)
+    else
+      _other -> "Unknown"
+    end
+  end
 
   @impl true
   def configured?() do

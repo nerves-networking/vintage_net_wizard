@@ -20,4 +20,7 @@ defmodule VintageNetWizard.Test.Backend do
 
   @impl true
   def handle_info(_, state), do: {:noreply, state}
+
+  @impl true
+  def device_info(), do: []
 end

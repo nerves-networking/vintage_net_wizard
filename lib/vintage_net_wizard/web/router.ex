@@ -4,6 +4,8 @@ defmodule VintageNetWizard.Web.Router do
   use Plug.Router
   use Plug.Debugger, otp_app: :vintage_net_wizard
 
+  alias VintageNetWizard.Backend
+
   plug(Plug.Logger, log: :debug)
   plug(Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/")
   plug(:match)
@@ -20,7 +22,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp render_page(conn, page, info \\ []) do
-    info = info ++ firmware_info() ++ serial_number_info()
+    info = [device_info: Backend.device_info()] ++ info
 
     page
     |> template_file()
@@ -29,36 +31,6 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp template_file(page) do
-    Path.join([:code.priv_dir(:vintage_net_wizard), "templates", page <> ".eex"])
-    # Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
-  end
-
-  defp firmware_info() do
-    get_all_active_kv()
-    |> Enum.filter(fn {k, _v} -> String.starts_with?(k, "nerves_fw_") end)
-    |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-  end
-
-  defp serial_number_info() do
-    with boardid_path when not is_nil(boardid_path) <- System.find_executable("boardid"),
-         {id, 0} <- System.cmd(boardid_path, []) do
-      [serial_number: String.trim(id)]
-    else
-      _other -> [serial_number: "Unknown"]
-    end
-  end
-
-  if Mix.target() == :host do
-    defp get_all_active_kv() do
-      [
-        {"nerves_fw_uuid", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"},
-        {"nerves_fw_version", "0.1.0"},
-        {"nerves_fw_product", "vintage_net_wizard"}
-      ]
-    end
-  else
-    defp get_all_active_kv() do
-      Nerves.Runtime.KV.get_all_active()
-    end
+    Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
   end
 end

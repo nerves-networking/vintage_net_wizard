@@ -31,7 +31,7 @@
                <tbody>
                </tbody>
             </table>
-            
+
             <div>
                <button id="btn-save" style="float:right;" onclick="save()" >Save &amp; Connect</button>
             </div>
@@ -40,10 +40,10 @@
          <div id="footer">
             <div>
                <div id="mfg_info">
-                  <div><b>Device serial number</b><%= serial_number %></div>
-                  <div><b>Firmware</b><%= nerves_fw_product %></div>
-                  <div><b>Firmware version</b><%= nerves_fw_version %></div>
-                  <div><b>Firmware UUID</b><%= nerves_fw_uuid %></div>
+                  <%= for {key, value} <- device_info do %>
+                     <div><b><%= key %></b><%= value %></div>
+                  <% end %>
+
                </div>
             </div>
          </div>
