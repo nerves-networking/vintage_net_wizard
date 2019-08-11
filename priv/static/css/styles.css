@@ -254,19 +254,19 @@ h2 {
 	clear: both
 }
 
-#mfg_info {
+#device_info {
 	display: block;
 	margin-bottom: 20px;
 	min-width: 36rem
 }
 
-#mfg_info>div {
+#device_info>div {
 	padding: 2px 10px;
 	line-height: 1.2;
 	display: block
 }
 
-#mfg_info>div>b {
+#device_info>div>b {
 	width: 10rem;
 	font-weight: bold;
 	display: inline-block
@@ -354,7 +354,7 @@ tbody tr.selectable:hover {
 	#footer>div {
 		max-width: 100%
 	}
-	#mfg_info {
+	#device_info {
 		width: 100%;
 		font-size: 1.2rem
 	}

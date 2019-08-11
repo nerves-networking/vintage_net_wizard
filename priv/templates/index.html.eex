@@ -39,11 +39,10 @@
          </div>
          <div id="footer">
             <div>
-               <div id="mfg_info">
+               <div id="device_info">
                   <%= for {key, value} <- device_info do %>
                      <div><b><%= key %></b><%= value %></div>
                   <% end %>
-
                </div>
             </div>
          </div>
