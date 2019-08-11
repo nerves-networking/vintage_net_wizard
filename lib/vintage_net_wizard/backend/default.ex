@@ -30,11 +30,14 @@ defmodule VintageNetWizard.Backend.Default do
       Nerves.Runtime.KV.get_all_active()
       |> kv_to_map
 
+    mac_addr = VintageNet.get(["interface", "wlan0", "mac_address"])
+
     [
+      {"Wi-Fi Address", mac_addr},
+      {"Serial number", serial_number()},
       {"Firmware", kv["nerves_fw_product"]},
       {"Firmware version", kv["nerves_fw_version"]},
-      {"Firmware UUID", kv["nerves_fw_uuid"]},
-      {"Device serial number", serial_number()}
+      {"Firmware UUID", kv["nerves_fw_uuid"]}
     ]
   end
 

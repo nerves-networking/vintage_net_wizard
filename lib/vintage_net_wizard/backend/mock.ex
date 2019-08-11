@@ -86,10 +86,11 @@ defmodule VintageNetWizard.Backend.Mock do
   @impl true
   def device_info() do
     [
+      {"Wi-Fi Address", "11:22:33:44:55:66"},
+      {"Serial number", "12345678"},
       {"Firmware", "vintage_net_wizard"},
       {"Firmware version", "0.1.0"},
-      {"Firmware UUID", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"},
-      {"Device serial number", "12345678"}
+      {"Firmware UUID", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"}
     ]
   end
 
