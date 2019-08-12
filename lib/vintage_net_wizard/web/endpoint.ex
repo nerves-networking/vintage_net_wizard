@@ -58,7 +58,6 @@ defmodule VintageNetWizard.Web.Endpoint do
     [
       {:_,
        [
-         {"/socket", Socket, []},
          {:_, Plug.Cowboy.Handler, {Router, []}}
        ]}
     ]
