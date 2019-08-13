@@ -11,6 +11,16 @@ defmodule VintageNetWizard.Backend.Mock do
   def init() do
     access_points = [
       %{
+        band: :wifi_5_ghz,
+        bssid: "8a:8a:20:88:7a:50",
+        channel: 149,
+        flags: [:wpa2_psk_ccmp, :ess],
+        frequency: 5745,
+        signal_dbm: -76,
+        signal_percent: 57,
+        ssid: "Let It Crash-5GHz"
+      },
+      %{
         band: :wifi_2_4_ghz,
         bssid: "04:18:d6:47:1a:6a",
         channel: 6,
@@ -18,7 +28,7 @@ defmodule VintageNetWizard.Backend.Mock do
         frequency: 2462,
         signal_dbm: -89,
         signal_percent: 10,
-        ssid: "WirelessPCU"
+        ssid: "Let It Crash-2GHz"
       },
       %{
         band: :wifi_2_4_ghz,
@@ -38,7 +48,7 @@ defmodule VintageNetWizard.Backend.Mock do
         frequency: 2462,
         signal_dbm: -90,
         signal_percent: 9,
-        ssid: "WirelessPCU - Guest"
+        ssid: "Red███ed W███"
       },
       %{
         band: :wifi_2_4_ghz,
@@ -48,7 +58,7 @@ defmodule VintageNetWizard.Backend.Mock do
         frequency: 2462,
         signal_dbm: -61,
         signal_percent: 60,
-        ssid: "SETUP"
+        ssid: "Airport WiFi"
       },
       %{
         band: :wifi_2_4_ghz,
@@ -58,7 +68,7 @@ defmodule VintageNetWizard.Backend.Mock do
         frequency: 2462,
         signal_dbm: -61,
         signal_percent: 80,
-        ssid: "enterprise"
+        ssid: "Wayne Enterprises"
       }
     ]
 
