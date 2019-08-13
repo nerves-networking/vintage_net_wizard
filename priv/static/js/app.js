@@ -24,7 +24,7 @@ const handle_scanned_ssid = function (data, table_id) {
     //todo update some stuff here maybe?
     return;
   } else {
-
+    table.innerHTML = "";
     data.forEach((ap) => {
       row = table.insertRow();
       row.setAttribute("id", ap.ssid);
@@ -95,9 +95,6 @@ const handle_scanned_ssid = function (data, table_id) {
       var securityElem = row.getElementsByClassName("securityCell")[0] || row.insertCell(0);
       securityElem.setAttribute("class", "securityCell");
 
-      console.log("data");
-      console.log(ap);
-
       if (ap.flag && ap.flags.length > 0) {
         securityElem.innerHTML = `
         <span>&#128274;</span>
@@ -130,10 +127,10 @@ const parseResponse = (response) => response.json();
 
 const getAccessPoints = () => {
   return fetch("/api/v1/access_points")
-           .then(parseResponse)
-           .then((json) => {
-             handle_scanned_ssid(json, "wifi_scan");
-         });
+    .then(parseResponse)
+    .then((json) => {
+      handle_scanned_ssid(json, "wifi_scan");
+    });
 }
 
 const save = () => {
@@ -143,17 +140,17 @@ const save = () => {
       "Content-Type": "application/json"
     }
   })
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Error applying the WiFi configuration");
-    }
-  });
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Error applying the WiFi configuration");
+      }
+    });
 }
 
 const addSsid = function () {
   var wifiAddElem = document.getElementById("wifi_add");
   var config = {}
-  
+
   // get every cell but the "add" button
   for (var i = 0; i < wifiAddElem.children[1].children.length - 1; i++) {
     elem = wifiAddElem.children[1].children[i].children[1];
@@ -167,13 +164,13 @@ const addSsid = function () {
     },
     body: JSON.stringify([config])
   })
-  .then((response) => {
-    if (response.ok) {
-      handle_scanned_ssid([config], "wifi_cfg");
-    } else{
-      throw new Error("Configuration not saved");
-    }
-  });
+    .then((response) => {
+      if (response.ok) {
+        handle_scanned_ssid([config], "wifi_cfg");
+      } else {
+        throw new Error("Configuration not saved");
+      }
+    });
 }
 
 
@@ -182,5 +179,5 @@ const addSsid = function () {
 getAccessPoints()
 
 // Every 3 minutes get the access points from the backend
-setInterval(getAccessPoints, 10000); 
+setInterval(getAccessPoints, 10000);
 
