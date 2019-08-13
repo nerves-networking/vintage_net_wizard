@@ -68,7 +68,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
     end
   end
 
-  defp key_mgmt_from_params(%{"key_mgmt" => nil}), do: {:error, :invalid_key_mgmt, nil}
+  defp key_mgmt_from_params(%{"key_mgmt" => ""}), do: {:ok, :none}
   defp key_mgmt_from_params(%{"key_mgmt" => key_mgmt}), do: key_mgmt_from_string(key_mgmt)
 
   defp key_mgmt_from_string("none"), do: {:ok, :none}
