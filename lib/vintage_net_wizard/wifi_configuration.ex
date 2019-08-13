@@ -16,7 +16,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
   @type param_error :: :invalid_key_mgmt | :invalid_ssid
 
   @type decode_error ::
-          {:error, :json_deocde, Jason.DecodeError.t()} | {:error, param_error(), value :: any()}
+          {:error, :json_decode, Jason.DecodeError.t()} | {:error, param_error(), value :: any()}
 
   @enforce_keys [:ssid]
   defstruct ssid: "", key_mgmt: :none, password: nil
@@ -55,7 +55,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
 
   Options fields:
 
-    - "password" - The passowrd for the access point
+    - "password" - The password for the access point
   """
   @spec from_map(map()) :: {:ok, t()} | {:error, param_error(), value :: any()}
   def from_map(params) do
@@ -68,7 +68,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
     end
   end
 
-  defp key_mgmt_from_params(%{"key_mgmt" => nil}), do: {:eror, :invalid_key_mgmt, nil}
+  defp key_mgmt_from_params(%{"key_mgmt" => nil}), do: {:error, :invalid_key_mgmt, nil}
   defp key_mgmt_from_params(%{"key_mgmt" => key_mgmt}), do: key_mgmt_from_string(key_mgmt)
 
   defp key_mgmt_from_string("none"), do: {:ok, :none}

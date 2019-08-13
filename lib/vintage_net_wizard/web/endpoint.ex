@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNetWizard.Web.{Router, Socket}
+  alias VintageNetWizard.Web.Router
 
   use DynamicSupervisor
 
