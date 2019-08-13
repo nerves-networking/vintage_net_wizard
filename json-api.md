@@ -39,12 +39,64 @@ Response Code: `200`
 ]
 ```
 
+## Configure SSID Priority
+
+This endpoint takes a list of SSIDs. Each SSID is tried in order until a
+successful connection is made. It is not required to list all configured SSIDs.
+
+Path: `/api/v1/ssids`
+
+Method: `PUT`
+
+Request: `Array String`
+
+Response: Empty
+
+Response Code: `204`
+
+### Example
+
+#### Request
+
+```json
+[
+  "Millennium Falcon",
+  "Death Star",
+  "TIE-fighter-01",
+  "lukes-lightsaber"
+]
+```
+
+## Configure an SSID
+
+Set connection parameters for an `SSID`.
+
+Path: `/api/v1/<ssid>/configuration`
+
+Method: `PUT`
+
+Request: `WiFiConfiguration`
+
+Response: Empty
+
+Response Code: `204`
+
+### Example
+
+#### Request
+
+`/api/v1/millennium-falcon/configuration`
+
+```json
+{
+  "key_mgmt": "wpa_psk",
+  "password": "Chewbacca"
+}
+```
+
 ## Get Configurations
 
 Get the current known configurations.
-
-The `password` field is write only, so it will always return as `null` even
-if the password was provided.
 
 Path: `/api/v1/configurations`
 
@@ -52,7 +104,7 @@ Method: `GET`
 
 Request: Empty
 
-Response: Array WiFiConfiguration
+Response: `Array WiFiConfiguration` - Passwords are filtered
 
 Response Code: 200
 
@@ -64,41 +116,7 @@ Response Code: 200
 [
   {
     "ssid": "Millennium Falcon",
-    "key_mgmt": "wpa_psk",
-    "password": null
-  }
-]
-```
-
-## Update configurations
-
-Make a PUT request to this endpoint to set the list of WiFi access points for
-the device. This list is temporary and is not applied when set. See
-[Apply](#Apply) to apply the configuration.
-
-Access points should be listed in the order that they should be tried on the
-device.
-
-Path: `/api/v1/configurations`
-
-Method: `PUT`
-
-Request: Array WiFiConfiguration
-
-Response: Empty
-
-Response Code: `204`
-
-### Examples
-
-#### Request
-
-```json
-[
-  {
-    "ssid": "Millennium Falcon",
-    "key_mgmt": "wpa_psk",
-    "password": "Chewbacca"
+    "key_mgmt": "wpa_psk"
   }
 ]
 ```
