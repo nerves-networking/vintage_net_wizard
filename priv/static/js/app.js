@@ -26,7 +26,6 @@ const handle_scanned_ssid = function (data, table_id) {
   } else {
 
     data.forEach((ap) => {
-
       row = table.insertRow();
       row.setAttribute("id", ap.ssid);
       row.setAttribute("class", "selectable ssid " + ap.ssid);
@@ -183,5 +182,5 @@ const addSsid = function () {
 getAccessPoints()
 
 // Every 3 minutes get the access points from the backend
-setInterval(getAccessPoints, 180000); 
+setInterval(getAccessPoints, 10000); 
 
