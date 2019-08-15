@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>VintageNet Wizard</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+  </head>
+  <body class="bg-light h-100 d-flex flex-column">
+     <div class="container">
+       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+
+       <p>Connected successfully.</p>
+
+       <p>
+        Press Next to exit the wizard and connect to the access point again. The wizard will
+        exit automatically after 60 seconds.
+       </p>
+     </div>
+     <footer class="py-3 bg-white shadow-sm w-100 text-muted">
+       <div class="container">
+         <%= for {info_name, info_data} <- device_info do %>
+           <div class="row">
+             <strong class="col-sm-2"><%= info_name %></strong>
+             <span class="col"><%= info_data %></span>
+           </div>
+         <% end %>
+     </footer>
+  </body>
+</html>

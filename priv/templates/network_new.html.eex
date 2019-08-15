@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>VintageNet Wizard</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+  </head>
+  <body class="bg-light h-100 d-flex flex-column">
+     <div class="container">
+       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+       <div class="row justify-content-center">
+         <form class="col-sm-8 mt-3" action="/networks/new" method="POST">
+           <div class="form-group">
+             <label for="name">SSID</label>
+             <input type="text" class="form-control" id="name" name="ssid" placeholder="Network name">
+           </div>
+
+           <div class="form-group">
+             <label for="security">Security</label>
+             <select id="security" name="security" class="custom-select js-security-select">
+               <option value="none" selected>None</option>
+               <option value="wpa">WPA Personal</option>
+             </select>
+           </div>
+
+           <button type="submit" class="btn btn-primary">Next</button>
+         </form>
+         </div>
+     </div> <!-- end form container -->
+
+    </div> <!-- end container -->
+     <footer class="py-3 bg-white shadow-sm w-100 text-muted">
+       <div class="container">
+         <%= for {info_name, info_data} <- device_info do %>
+           <div class="row">
+             <strong class="col-sm-2"><%= info_name %></strong>
+             <span class="col"><%= info_data %></span>
+           </div>
+         <% end %>
+     </footer>
+  </body>
+</html>

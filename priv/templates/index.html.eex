@@ -1,53 +1,78 @@
+<!DOCTYPE html>
 <html>
-   <head>
-      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-      <title>VintageNet Wizard</title>
-      <link rel="stylesheet" type="text/css" href="css/styles.css">
-   </head>
-   <body>
-      <div class="container">
-         <div id="header">
-            <div>
-               <h2>VintageNet Wizard</h2>
-            </div>
-         </div>
-         <div id="body">
-            <div id="instructions">
-               Add one or more networks to the configured list and then press "Save &amp; Connect"
-            </div>
+  <head>
+    <meta charset="UTF-8">
+    <title>VintageNet Wizard</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+  </head>
+  <body class="bg-light h-100 d-flex flex-column">
+     <div class="container">
+       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
 
-            <table class="netlist" id="wifi_cfg">
-               <thead><tr> <th colspan="4">Configured Networks</th></tr></thead>
-               <tbody></tbody>
-            </table>
+       Add one or more Wi-Fi access points to enable the device to connect to the network. Drag
+       the networks into the order you prefer.
 
-            <table class="netlist" id="wifi_scan">
-               <thead><tr><th colspan="4">Scanned Networks</th></tr></thead>
-               <tbody></tbody>
-            </table>
+       <div class="my-3 p-3 bg-white rounded shadow-sm">
+         <table class="table table-hover access-points-table">
+             <thead>
+                <tr>
+                  <th scope="col">SSID</th>
+                  <th scope="col">Security</th>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                </tr>
+             </thead>
+             <tbody class="configurations">
+               <%= for config <- configs do %>
+                 <tr class="configuration" data-security="wpa" data-ssid="<%= config.ssid %>">
+                   <td scope="row"><span class="handle font-weight-bold">↕&nbsp;&nbsp;<%= config.ssid %></span></td>
+                   <td><%= format_security.(config.key_mgmt) %></td>
+                   <td>
+                     <%= if config.key_mgmt == :none do %>
+                     <% else %>
+                       <a href="/ssid/<%= URI.encode(config.ssid) %>">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                           <path class="edit" d="M2 12.88V16h3.12L14 7.12 10.88 4 2 12.88zm14.76-8.51c.33-.33.33-.85 0-1.18l-1.95-1.95c-.33-.33-.85-.33-1.18 0L12 2.88 15.12 6l1.64-1.63z"/>
+                         </svg>
+                       </a>
+                     <% end %>
+                   </td>
+                   <td class="text-danger configuration-delete">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path class="delete" d="M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                     </svg>
+                    </td>
+                 </tr>
+               <% end %>
+           </tbody>
+         </table>
 
-            <table id="wifi_add" hidden="hidden">
-               <thead><tr><th colspan="2">Add Network</th></tr></thead>
-               <tbody>
-               </tbody>
-            </table>
+       </div>
 
-            <div>
-               <button id="btn-save" style="float:right;" onclick="save()" >Save &amp; Connect</button>
-            </div>
+       <a class="btn btn-primary" href="/networks">Add a New Network</a>
+       <a class="btn btn-primary" href="/apply">Apply configuration</a>
+     </div>
 
-         </div>
-         <div id="footer">
-            <div>
-               <div id="device_info">
-                  <%= for {key, value} <- device_info do %>
-                     <div><b><%= key %></b><%= value %></div>
-                  <% end %>
-               </div>
-            </div>
-         </div>
-      </div>
+     <footer class="py-3 bg-white shadow-sm w-100 text-muted">
+       <div class="container">
+         <%= for {info_name, info_data} <- device_info do %>
+           <div class="row">
+             <strong class="col-sm-2"><%= info_name %></strong>
+             <span class="col"><%= info_data %></span>
+           </div>
+         <% end %>
+     </footer>
 
-      <script src="js/app.js"></script>
-   </body>
+     <script src="/js/Sortable.min.js"></script>
+     <script src="/js/delete_configuration.js"></script>
+     <script>
+       Sortable.create(document.querySelector(".configurations"), {
+               handle: ".handle",
+               draggable: ".configuration",
+               animation: 150,
+               onEnd: (e) => console.log("update backend")
+       });
+     </script>
+  </body>
 </html>
