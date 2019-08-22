@@ -21,11 +21,13 @@ defmodule VintageNetWizard do
   Change the WiFi module into access point mode
   """
   def into_ap_mode() do
+    ssid = get_hostname()
+
     config = %{
       type: VintageNet.Technology.WiFi,
       wifi: %{
         mode: :host,
-        ssid: "VintageNet Wizard",
+        ssid: ssid,
         key_mgmt: :none,
         scan_ssid: 1,
         ap_scan: 1,
@@ -48,4 +50,9 @@ defmodule VintageNetWizard do
   defdelegate start_server(), to: VintageNetWizard.Web.Endpoint
 
   defdelegate stop_server(), to: VintageNetWizard.Web.Endpoint
+
+  defp get_hostname() do
+    {:ok, hostname} = :inet.gethostname()
+    to_string(hostname)
+  end
 end
