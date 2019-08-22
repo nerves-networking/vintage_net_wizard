@@ -35,12 +35,14 @@ defmodule VintageNetWizard do
       },
       ipv4: %{
         method: :static,
-        address: "192.168.24.1",
+        address: "192.168.0.1",
         netmask: "255.255.255.0"
       },
       dhcpd: %{
-        start: "192.168.24.2",
-        end: "192.168.24.10"
+        # These are defaults and are reproduced here as documentation
+        start: "192.168.0.20",
+        end: "192.168.0.254",
+        max_leases: 235
       }
     }
 
