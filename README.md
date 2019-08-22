@@ -130,5 +130,6 @@ mix burn
 ```
 
 Place the MicroSD card in the Raspberry Pi and power it out. You should see a
-WiFi access point appear shortly. Connect to the access point and then point
-your web browser at [http://192.168.24.1/](http://192.168.24.1/).
+WiFi access point appear with the SSID "nerves-wxyz" where "wxyz" are part of
+the serial number. Connect to the access point and then point your web browser
+at [http://192.168.24.1/](http://192.168.24.1/).
