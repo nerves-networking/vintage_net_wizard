@@ -57,13 +57,7 @@ defmodule VintageNetWizard.Backend.Default do
   @impl true
   def configured?() do
     config = VintageNet.get_configuration("wlan0")
-
-    with {:ok, wifi} <- Map.fetch(config, :wifi),
-         {:ok, _} <- Map.fetch(wifi, :ssid) do
-      true
-    else
-      :error -> false
-    end
+    get_in(config, [:wifi, :ssid]) != nil and get_in(config, [:wifi, :mode]) != :host
   end
 
   @impl true
