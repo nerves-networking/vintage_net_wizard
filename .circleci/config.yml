@@ -101,6 +101,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-example-mix-cache-{{ checksum "mix.lock" }}
+      - run: mkdir -p ~/.ssh && touch ~/.ssh/id_rsa.pub
       - run: cd example && mix deps.get
       - run: cd example && mix firmware
       - run: cd example && mix format --check-formatted
