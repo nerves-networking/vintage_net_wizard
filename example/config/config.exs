@@ -26,12 +26,6 @@ config :shoehorn,
 
 config :logger, backends: [RingLogger]
 
-config :vintage_net,
-  regulatory_domain: "US",
-  config: [
-    {"wlan0", %{type: VintageNet.Technology.WiFi}}
-  ]
-
-# if Mix.target() != :host do
-#   import_config "target.exs"
-# end
+if Mix.target() != :host do
+  import_config "target.exs"
+end

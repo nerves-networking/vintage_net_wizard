@@ -51,6 +51,8 @@ defmodule WizardExample.MixProject do
       {:busybox, "~> 0.1", targets: @all_targets},
       {:vintage_net_wizard, path: "..", targets: @all_targets},
       {:circuits_gpio, "~> 0.4.1", targets: @all_targets},
+      {:nerves_firmware_ssh, "~> 0.2", targets: @all_targets},
+      {:mdns_lite, "~> 0.1", targets: @all_targets},
 
       # Dependencies for specific targets
       {:nerves_system_rpi, "~> 1.8", runtime: false, targets: :rpi},
