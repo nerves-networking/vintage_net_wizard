@@ -87,7 +87,11 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info({VintageNet, ["interface", "wlan0", "connection"], _, :lan, _}, state) do
-    :ok = scan()
+    _ = scan()
+    {:noreply, state}
+  end
+
+  def handle_info({VintageNet, ["interface", "wlan0", "connection"], _, _, _}, state) do
     {:noreply, state}
   end
 end
