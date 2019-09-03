@@ -73,9 +73,9 @@
     row.setAttribute("data-ssid", ssid);
   }
 
-  function buildSignalTableData({ signal_percent }) {
+  function buildSignalTableData({ signal_percent, signal_dbm }) {
     const tdElem = document.createElement("td");
-    const textNode = document.createTextNode(`${signal_percent}%(-77dbm)`);
+    const textNode = document.createTextNode(`${signal_percent}%(${signal_dbm} dBm)`);
 
     tdElem.appendChild(textNode);
 
