@@ -6,12 +6,13 @@ const configurations = () => {
   for (let i = 0; i < deleteConfigs.length; i++) {
     deleteConfigs[i].addEventListener("click", (e) => {
       const td = e.currentTarget.parentElement;
-      fetch("/api/v1/configurations", {
-        method: "PUT",
+      const ssid = td.dataset.ssid;
+      fetch(`/api/v1/${ssid}/configuration`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify([])
+        body: JSON.stringify({})
        })
        .then(resp => {
          td.parentElement.removeChild(td);

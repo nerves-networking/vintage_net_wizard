@@ -18,6 +18,14 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, access_points)
   end
 
+  put "/ssids" do
+    conn
+    |> get_body()
+    |> Backend.set_priority_order()
+
+    send_json(conn, 204, "")
+  end
+
   get "/configurations" do
     {:ok, json} =
       Backend.configurations()
@@ -26,22 +34,31 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, json)
   end
 
-  put "/configurations" do
-    :ok =
-      conn
-      |> get_body()
-      |> Enum.map(fn cfg ->
-        {:ok, cfg} = WiFiConfiguration.from_map(cfg)
-        cfg
-      end)
-      |> Backend.save()
-
-    send_json(conn, 204, "")
-  end
-
   post "/apply" do
     :ok = Backend.apply()
     send_json(conn, 202, "")
+  end
+
+  put "/:ssid/configuration" do
+    {:ok, cfg} =
+      conn
+      |> get_body()
+      |> Map.put("ssid", ssid)
+      |> WiFiConfiguration.from_map()
+
+    case Backend.save(cfg) do
+      :ok ->
+        send_json(conn, 204, "")
+
+      {:error, :no_config_for_ssid} ->
+        send_json(conn, 404, "")
+    end
+  end
+
+  delete "/:ssid/configuration" do
+    :ok = Backend.delete_configuration(ssid)
+
+    send_json(conn, 200, "")
   end
 
   defp send_json(conn, status_code, json) do

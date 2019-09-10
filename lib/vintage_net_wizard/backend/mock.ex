@@ -86,7 +86,7 @@ defmodule VintageNetWizard.Backend.Mock do
   def configured?(), do: false
 
   @impl true
-  def apply(_cfgs, _state) do
+  def apply(_configs, _state) do
     :ok = VintageNetWizard.stop_server()
   end
 

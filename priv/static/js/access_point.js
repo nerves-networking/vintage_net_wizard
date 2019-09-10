@@ -95,23 +95,23 @@
 
   function attachClickEvent(networkTR, type) {
     networkTR.addEventListener("click", ({ target }) => {
+      const ssid = target.parentElement.dataset.ssid
       if (type === "addConfig") {
-        fetch("/api/v1/configurations", {
+        fetch(`/api/v1/${ssid}/configuration`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify([{
-            ssid: target.parentElement.dataset.ssid,
+          body: JSON.stringify({
             password: "",
             key_mgmt: "none"
-          }])
+          })
         })
         .then(resp => {
           window.location.href = "/";
         })
       } else {
-        window.location.href = "/ssid/" + encodeURI(target.parentElement.dataset.ssid);
+        window.location.href = "/ssid/" + encodeURI(ssid);
       }
     });
   }

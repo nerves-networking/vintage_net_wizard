@@ -43,6 +43,7 @@ defmodule WizardExample.MixProject do
       {:nerves, "~> 1.5.0", runtime: false},
       {:shoehorn, "~> 0.6"},
       {:ring_logger, "~> 0.6"},
+      {:ramoops_logger, "~> 0.3.0"},
       {:toolshed, "~> 0.2"},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
 

@@ -30,7 +30,7 @@ defmodule VintageNetWizard.Web.Router do
         key_mgmt: :wpa_psk
       )
 
-    :ok = Backend.save([wifi_config])
+    :ok = Backend.save(wifi_config)
 
     redirect(conn, "/")
   end

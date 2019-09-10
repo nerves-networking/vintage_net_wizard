@@ -67,11 +67,27 @@
      <script src="/js/Sortable.min.js"></script>
      <script src="/js/delete_configuration.js"></script>
      <script>
+       function handleSort({to}) {
+         let newOrder = [];
+         for (let i = 0; i < to.children.length; i++) {
+          newOrder[i] = to.children[i].dataset.ssid;
+         }
+
+         fetch("/api/v1/ssids", {
+           method: "PUT",
+           headers: {
+             "Content-Type": "application/json"
+           },
+           body: JSON.stringify(newOrder)
+         })
+       }
+
+       
        Sortable.create(document.querySelector(".configurations"), {
                handle: ".handle",
                draggable: ".configuration",
                animation: 150,
-               onEnd: (e) => console.log("update backend")
+               onEnd: handleSort
        });
      </script>
   </body>

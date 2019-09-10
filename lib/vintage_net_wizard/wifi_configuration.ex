@@ -8,10 +8,11 @@ defmodule VintageNetWizard.WiFiConfiguration do
   @type t :: %__MODULE__{
           ssid: String.t(),
           key_mgmt: key_mgmt(),
-          password: String.t() | nil
+          password: String.t() | nil,
+          priority: non_neg_integer() | nil
         }
 
-  @type opt :: {:key_mgmt, atom()} | {:password, binary()}
+  @type opt :: {:key_mgmt, atom()} | {:password, binary()} | {:priority, non_neg_integer()}
 
   @type param_error :: :invalid_key_mgmt | :invalid_ssid
 
@@ -19,7 +20,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
           {:error, :json_decode, Jason.DecodeError.t()} | {:error, param_error(), value :: any()}
 
   @enforce_keys [:ssid]
-  defstruct ssid: "", key_mgmt: :none, password: nil
+  defstruct ssid: "", key_mgmt: :none, password: nil, priority: nil
 
   @doc """
   Make a new WiFiConfiguration struct
@@ -68,6 +69,26 @@ defmodule VintageNetWizard.WiFiConfiguration do
     end
   end
 
+  @doc """
+  Take a `WiFiConfiguration.t()` and turn into a map that
+  is used to configure `VintageNet`
+  """
+  @spec to_vintage_net_configuration(t()) :: map()
+  def to_vintage_net_configuration(%__MODULE__{
+        ssid: ssid,
+        password: psk,
+        key_mgmt: key_mgmt,
+        priority: priority
+      }) do
+    %{
+      ssid: ssid,
+      psk: psk,
+      mode: :client,
+      key_mgmt: key_mgmt
+    }
+    |> maybe_put_priority(priority)
+  end
+
   defp key_mgmt_from_params(%{"key_mgmt" => ""}), do: {:ok, :none}
   defp key_mgmt_from_params(%{"key_mgmt" => key_mgmt}), do: key_mgmt_from_string(key_mgmt)
 
@@ -78,11 +99,14 @@ defmodule VintageNetWizard.WiFiConfiguration do
   defp ssid_from_params(%{"ssid" => nil}), do: {:error, :invalid_ssid, nil}
   defp ssid_from_params(%{"ssid" => ssid}), do: {:ok, ssid}
 
+  defp maybe_put_priority(vn_config, nil), do: vn_config
+  defp maybe_put_priority(vn_config, priority), do: Map.put(vn_config, :priority, priority)
+
   defimpl Jason.Encoder do
     alias VintageNetWizard.WiFiConfiguration
 
     def encode(%WiFiConfiguration{ssid: ssid, key_mgmt: key_mgmt}, opts) do
-      config = %{ssid: ssid, key_mgmt: key_mgmt, password: nil}
+      config = %{ssid: ssid, key_mgmt: key_mgmt}
       Jason.Encode.map(config, opts)
     end
   end

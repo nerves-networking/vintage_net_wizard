@@ -83,6 +83,14 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
+  Delete the configuration by `ssid`
+  """
+  @spec delete_configuration(String.t()) :: :ok
+  def delete_configuration(ssid) do
+    GenServer.cast(__MODULE__, {:delete_configuration, ssid})
+  end
+
+  @doc """
   List out access points found from the scan
   """
   @spec access_points() :: [AccessPoint.t()]
@@ -91,11 +99,20 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
-  Save a list of `WiFiConfiguration` to the backend
+  Pass list of SSIDs (`priority_order`), sort the configurations
+  to match that order.
   """
-  @spec save([WiFiConfiguration.t()]) :: :ok | {:error, any()}
-  def save(cfgs) do
-    GenServer.call(__MODULE__, {:save, cfgs})
+  @spec set_priority_order([String.t()]) :: :ok
+  def set_priority_order(priority_order) do
+    GenServer.call(__MODULE__, {:set_priority_order, priority_order})
+  end
+
+  @doc """
+  Save a `WiFiConfiguration` to the backend
+  """
+  @spec save(WiFiConfiguration.t()) :: :ok | {:error, any()}
+  def save(config) do
+    GenServer.call(__MODULE__, {:save, config})
   end
 
   @doc """
@@ -127,7 +144,7 @@ defmodule VintageNetWizard.Backend do
   def init(backend) do
     case apply(backend, :init, []) do
       {:ok, backend_state} ->
-        {:ok, %State{configurations: [], backend: backend, backend_state: backend_state}}
+        {:ok, %State{configurations: %{}, backend: backend, backend_state: backend_state}}
 
       :stop ->
         {:ok, %State{backend: backend}}
@@ -144,8 +161,26 @@ defmodule VintageNetWizard.Backend do
     {:reply, access_points, state}
   end
 
-  def handle_call({:save, cfgs}, _from, state) do
-    {:reply, :ok, %{state | configurations: cfgs}}
+  def handle_call(
+        {:set_priority_order, priority_order},
+        _from,
+        %State{configurations: configurations} = state
+      ) do
+    indexed_priority_order = Enum.with_index(priority_order)
+
+    new_configurations =
+      Enum.map(configurations, fn {ssid, config} ->
+        priority = get_priority_for_ssid(indexed_priority_order, ssid)
+
+        {ssid, %{config | priority: priority}}
+      end)
+      |> Enum.into(%{})
+
+    {:reply, :ok, %{state | configurations: new_configurations}}
+  end
+
+  def handle_call({:save, config}, _from, %{configurations: cfgs} = state) do
+    {:reply, :ok, %{state | configurations: Map.put(cfgs, config.ssid, config)}}
   end
 
   def handle_call(:device_info, _from, %State{backend: backend} = state) do
@@ -153,7 +188,7 @@ defmodule VintageNetWizard.Backend do
   end
 
   def handle_call(:configurations, _from, %State{configurations: cfgs} = state) do
-    {:reply, cfgs, state}
+    {:reply, build_config_list(cfgs), state}
   end
 
   def handle_call(:configured?, _from, %State{backend: backend} = state) do
@@ -170,13 +205,17 @@ defmodule VintageNetWizard.Backend do
         %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
           state
       ) do
-    :ok = apply(backend, :apply, [wifi_configs, backend_state])
+    :ok = apply(backend, :apply, [build_config_list(wifi_configs), backend_state])
     {:noreply, state}
   end
 
   def handle_cast(:scan, %State{backend: backend} = state) do
     :ok = apply(backend, :scan, [])
     {:noreply, state}
+  end
+
+  def handle_cast({:delete_configuration, ssid}, %State{configurations: cfgs} = state) do
+    {:noreply, %{state | configurations: Map.drop(cfgs, [ssid])}}
   end
 
   @impl true
@@ -194,6 +233,23 @@ defmodule VintageNetWizard.Backend do
     end
   end
 
+  defp build_config_list(cfgs) do
+    cfgs
+    |> Enum.into([], &elem(&1, 1))
+    |> Enum.sort(&(&1.priority <= &2.priority))
+  end
+
   defp maybe_send(nil, _message), do: :ok
   defp maybe_send(pid, message), do: send(pid, message)
+
+  defp get_priority_for_ssid(priority_order_list, ssid) do
+    priority_index =
+      Enum.find(priority_order_list, fn
+        {^ssid, _} -> true
+        _ -> false
+      end)
+      |> elem(1)
+
+    priority_index + 1
+  end
 end
