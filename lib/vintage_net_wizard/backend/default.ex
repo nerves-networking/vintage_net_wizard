@@ -4,6 +4,8 @@ defmodule VintageNetWizard.Backend.Default do
   """
   @behaviour VintageNetWizard.Backend
 
+  alias VintageNetWizard.WiFiConfiguration
+
   @impl true
   def init() do
     if configured?() do
@@ -61,17 +63,15 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl true
-  def apply([cfg], _) do
+  def apply(configs, _) do
+    vintage_net_config = Enum.map(configs, &WiFiConfiguration.to_vintage_net_configuration/1)
+
     :ok =
       VintageNet.configure("wlan0", %{
         type: VintageNet.Technology.WiFi,
         wifi: %{
-          ssid: cfg.ssid,
-          psk: cfg.password,
-          mode: :client,
-          key_mgmt: cfg.key_mgmt
-        },
-        ipv4: %{method: :dhcp}
+          networks: vintage_net_config
+        }
       })
 
     VintageNetWizard.stop_server()

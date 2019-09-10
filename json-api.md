@@ -94,6 +94,20 @@ Response Code: `204`
 }
 ```
 
+## Delete an SSID configuration
+
+Delete the configuration attached to an SSID
+
+Path: `/api/v1/<ssid>/configuration`
+
+Method: `DELETE`
+
+Request: Empty
+
+Response: Empty
+
+Response Code: `200`
+
 ## Get Configurations
 
 Get the current known configurations.

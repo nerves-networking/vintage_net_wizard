@@ -14,5 +14,9 @@ if RingLogger in Application.get_env(:logger, :backends, []) do
   """
 end
 
+if RamoopsLogger.available_log?() do
+  IO.puts("Oops! There's something in the oops log. Check with RamoopsLogger.dump()")
+end
+
 # Be careful when adding to this file. Nearly any error can crash the VM and
 # cause a reboot.
