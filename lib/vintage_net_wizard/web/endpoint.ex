@@ -6,6 +6,8 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   use DynamicSupervisor
 
+  @ssl_dir Path.join(:code.priv_dir(:vintage_net_wizard), "ssl")
+
   @doc false
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
@@ -20,14 +22,9 @@ defmodule VintageNetWizard.Web.Endpoint do
   """
   @spec start_server() :: GenServer.on_start() | {:error, :already_started}
   def start_server() do
-    port = Application.get_env(:vintage_net_wizard, :port, 80)
+    use_ssl? = Application.get_env(:vintage_net_wizard, :ssl)
 
-    spec =
-      Plug.Cowboy.child_spec(
-        scheme: :http,
-        plug: Router,
-        options: [port: port, dispatch: dispatch()]
-      )
+    spec = maybe_use_ssl(use_ssl?)
 
     case DynamicSupervisor.start_child(__MODULE__, spec) do
       {:error, :max_children} -> {:error, :already_started}
@@ -61,5 +58,29 @@ defmodule VintageNetWizard.Web.Endpoint do
          {:_, Plug.Cowboy.Handler, {Router, []}}
        ]}
     ]
+  end
+
+  defp maybe_use_ssl(_use_ssl = true) do
+    Plug.Cowboy.child_spec(
+      plug: Router,
+      scheme: :https,
+      options: [
+        dispatch: dispatch(),
+        certfile: Application.get_env(:vintage_net_wizard, :certfile, "#{@ssl_dir}/cert.pem"),
+        keyfile: Application.get_env(:vintage_net_wizard, :keyfile, "#{@ssl_dir}/key.pem"),
+        port: Application.get_env(:vintage_net_wizard, :port, 443)
+      ]
+    )
+  end
+
+  defp maybe_use_ssl(_no_ssl) do
+    Plug.Cowboy.child_spec(
+      plug: Router,
+      scheme: :http,
+      options: [
+        dispatch: dispatch(),
+        port: Application.get_env(:vintage_net_wizard, :port, 80)
+      ]
+    )
   end
 end
