@@ -79,6 +79,24 @@ following to your `config.exs`:
 config :vintage_net_wizard,
   port: 4001
 ```
+### SSL
+
+To use SSL with the web UI, simply set the configuration flag:
+
+```elixir
+config :vintage_net_wizard, ssl: true
+```
+
+This will default to use a self-signed certificate and key on port `443`.
+You can also specify your own ceritificate, key, and port in the config:
+
+```elixir
+config :vintage_net_wizard,
+  ssl: true,
+  certfile: "path/to/cert.pem",
+  keyfile: "path/to/key.pem",
+  port: 4443
+```
 
 ### Backends
 
@@ -129,7 +147,7 @@ mix firmware
 mix burn
 ```
 
-Place the MicroSD card in the Raspberry Pi and power it out. You should see a
+Place the MicroSD card in the Raspberry Pi and power it on. You should see a
 WiFi access point appear with the SSID "nerves-wxyz" where "wxyz" are part of
 the serial number. Connect to the access point and then point your web browser
 at [http://192.168.0.1/](http://192.168.0.1/).
