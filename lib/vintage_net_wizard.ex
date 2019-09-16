@@ -29,22 +29,27 @@ defmodule VintageNetWizard do
     config = %{
       type: VintageNet.Technology.WiFi,
       wifi: %{
-        mode: :host,
-        ssid: ssid,
-        key_mgmt: :none,
-        scan_ssid: 1,
         ap_scan: 1,
-        bgscan: :simple
+        bgscan: :simple,
+        networks: [
+          %{
+            mode: :host,
+            ssid: ssid,
+            key_mgmt: :none,
+            scan_ssid: 1
+          }
+        ]
       },
       ipv4: %{
         method: :static,
-        address: "192.168.0.1",
+        address: {192, 168, 0, 1},
+        prefix_length: 24,
         netmask: "255.255.255.0"
       },
       dhcpd: %{
         # These are defaults and are reproduced here as documentation
-        start: "192.168.0.20",
-        end: "192.168.0.254",
+        start: {192, 168, 0, 20},
+        end: {192, 168, 0, 254},
         max_leases: 235
       }
     }

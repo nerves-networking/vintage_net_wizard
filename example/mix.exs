@@ -47,6 +47,8 @@ defmodule WizardExample.MixProject do
       {:toolshed, "~> 0.2"},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
 
+      {:vintage_net, "~> 0.1", path: "~/nerves/vintage_net", override: true, targets: @all_targets},
+
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.10", targets: @all_targets},
       {:busybox, "~> 0.1", targets: @all_targets},
