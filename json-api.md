@@ -135,15 +135,47 @@ Response Code: 200
 ]
 ```
 
+## Get Configuration Status
+
+Get the current status of the configuration. This is useful after using
+the `/api/v1/apply` endpoint to figure out if the configurations that
+were provided work or not.
+
+Path: `/api/v1/configuration/status`
+
+Method: `GET`
+
+Request: Empty
+
+Response: `ConfigurationStatus`
+
+Response Code: 200
+
 ## Apply
 
 A POST to this endpoint applies the configuration and attempts to connect to the
-configured WiFi networks. To perform any additional configuration, the device
-will need to re-enter AP mode. This is done outside of this API.
+configured WiFi networks. This will return back to AP mode and you can use the
+`/api/v1/configuration/status` endpoint to get weather or not the configuration
+worked or not.
 
 Path: `/api/v1/apply`
 
 Method: `POST`
+
+Request: Empty
+
+Response: Empty
+
+Response Code: `202`
+
+## Complete the Configuration Process
+
+Finalize the configuration process. This will apply the configuration and
+not return to AP mode.
+
+Path: `/api/v1/complete`
+
+Method: `GET`
 
 Request: Empty
 
@@ -219,4 +251,12 @@ needed.
   "key_mgmt": KeyManagement,
   "password": Optional String
 }
+```
+
+### ConfigurationStatus
+
+```s
+not_configured - No configuration attempts have taken place
+good - A configuration was applied and is working
+bad - A configuration was applied and is not working
 ```

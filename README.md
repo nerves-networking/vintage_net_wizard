@@ -79,6 +79,7 @@ following to your `config.exs`:
 config :vintage_net_wizard,
   port: 4001
 ```
+
 ### SSL
 
 To use SSL with the web UI, simply set the configuration flag:

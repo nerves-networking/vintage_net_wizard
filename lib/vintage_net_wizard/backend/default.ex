@@ -1,32 +1,52 @@
 defmodule VintageNetWizard.Backend.Default do
-  @moduledoc """
-  A default backend for target devices
-  """
   @behaviour VintageNetWizard.Backend
 
   alias VintageNetWizard.WiFiConfiguration
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def init() do
     if configured?() do
-      :stop
+      %{state: :idle, data: %{access_points: %{}, configuration_status: :good}}
     else
       :ok = VintageNet.subscribe(["interface", "wlan0", "connection"])
       :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
       :ok = VintageNetWizard.run_wizard()
-      {:ok, %{access_points: %{}}}
+
+      %{
+        state: :configuring,
+        data: %{access_points: %{}, configuration_status: :not_configured}
+      }
     end
   end
 
-  @impl true
-  def scan() do
-    VintageNet.scan("wlan0")
+  @impl VintageNetWizard.Backend
+  def access_points(%{data: %{access_points: ap}}), do: ap
+
+  @impl VintageNetWizard.Backend
+  def apply(_, %{state: :idle}), do: {:error, :invalid_state}
+  def apply(_, %{state: :applying} = state), do: {:ok, state}
+
+  def apply(wifi_configurations, state) do
+    vintage_net_config =
+      Enum.map(wifi_configurations, &WiFiConfiguration.to_vintage_net_configuration/1)
+
+    :ok =
+      VintageNet.configure("wlan0", %{
+        type: VintageNet.Technology.WiFi,
+        wifi: %{
+          networks: vintage_net_config
+        }
+      })
+
+    {:ok, %{state | state: :applying}}
   end
 
-  @impl true
-  def access_points(%{access_points: access_points}), do: access_points
+  @impl VintageNetWizard.Backend
+  def configuration_status(%{data: %{configuration_status: configuration_status}}) do
+    configuration_status
+  end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def device_info() do
     kv =
       Nerves.Runtime.KV.get_all_active()
@@ -43,6 +63,60 @@ defmodule VintageNetWizard.Backend.Default do
     ]
   end
 
+  @impl VintageNetWizard.Backend
+  def handle_info(
+        {VintageNet, ["interface", "wlan0", "connection"], :disconnected, :lan, _},
+        %{state: :configuring, data: %{configuration_status: :not_configured}} = state
+      ) do
+    _ = scan(state)
+    {:noreply, state}
+  end
+
+  def handle_info(
+        {VintageNet, ["interface", "wlan0", "connection"], :disconnected, :lan, _},
+        %{state: :configuring} = state
+      ) do
+    {:noreply, state}
+  end
+
+  def handle_info(
+        {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
+        %{state: :applying, data: %{configuration_status: :good}} = state
+      ) do
+    {:noreply, %{state | state: :idle}}
+  end
+
+  def handle_info(
+        {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
+        %{state: :applying, data: data} = state
+      ) do
+    # sometimes writing configs and reloading and re-initializing
+    # wifi runs into a race condition. So, we wait a little
+    # before trying to re-initialize the interface.
+    Process.sleep(4_000)
+    :ok = VintageNetWizard.into_ap_mode()
+    data = Map.put(data, :configuration_status, :good)
+    {:noreply, %{state | state: :configuring, data: data}}
+  end
+
+  def handle_info(
+        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _, access_points, _},
+        %{data: data} = state
+      ) do
+    access_points = Enum.map(access_points, &Map.from_struct/1)
+    data = Map.put(data, :access_points, access_points)
+    {:reply, {:access_points, access_points}, %{state | data: data}}
+  end
+
+  def handle_info(_, state), do: {:noreply, state}
+
+  defp scan(%{state: :configuring}), do: :ok
+
+  defp configured?() do
+    config = VintageNet.get_configuration("wlan0")
+    get_in(config, [:wifi, :ssid]) != nil and get_in(config, [:wifi, :mode]) != :host
+  end
+
   defp kv_to_map(key_values) do
     for kv <- key_values, into: %{}, do: kv
   end
@@ -54,44 +128,5 @@ defmodule VintageNetWizard.Backend.Default do
     else
       _other -> "Unknown"
     end
-  end
-
-  @impl true
-  def configured?() do
-    config = VintageNet.get_configuration("wlan0")
-    get_in(config, [:wifi, :ssid]) != nil and get_in(config, [:wifi, :mode]) != :host
-  end
-
-  @impl true
-  def apply(configs, _) do
-    vintage_net_config = Enum.map(configs, &WiFiConfiguration.to_vintage_net_configuration/1)
-
-    :ok =
-      VintageNet.configure("wlan0", %{
-        type: VintageNet.Technology.WiFi,
-        wifi: %{
-          networks: vintage_net_config
-        }
-      })
-
-    VintageNetWizard.stop_server()
-  end
-
-  @impl true
-  def handle_info(
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _, access_points, _},
-        state
-      ) do
-    access_points = Enum.map(access_points, &Map.from_struct/1)
-    {:reply, {:access_points, access_points}, %{state | access_points: access_points}}
-  end
-
-  def handle_info({VintageNet, ["interface", "wlan0", "connection"], _, :lan, _}, state) do
-    _ = scan()
-    {:noreply, state}
-  end
-
-  def handle_info({VintageNet, ["interface", "wlan0", "connection"], _, _, _}, state) do
-    {:noreply, state}
   end
 end

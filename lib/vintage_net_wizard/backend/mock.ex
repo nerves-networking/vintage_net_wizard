@@ -74,24 +74,17 @@ defmodule VintageNetWizard.Backend.Mock do
 
     {:ok, _} = VintageNetWizard.start_server()
 
-    {:ok, access_points}
+    %{access_points: access_points, configuration_status: :not_configured}
   end
 
   @impl true
-  def scan() do
-    :ok
+  def apply(_configs, state) do
+    Process.send_after(self(), {__MODULE__, :stop_server}, 2_000)
+    {:ok, state}
   end
 
   @impl true
-  def configured?(), do: false
-
-  @impl true
-  def apply(_configs, _state) do
-    :ok = VintageNetWizard.stop_server()
-  end
-
-  @impl true
-  def access_points(state), do: state
+  def access_points(%{access_points: access_points}), do: access_points
 
   @impl true
   def device_info() do
@@ -105,7 +98,27 @@ defmodule VintageNetWizard.Backend.Mock do
   end
 
   @impl true
-  def handle_info(_, state) do
+  def handle_info({__MODULE__, :stop_server}, state) do
+    _ = Process.send_after(self(), {__MODULE__, :apply_config}, 2_000)
+    :ok = VintageNetWizard.stop_server()
     {:noreply, state}
+  end
+
+  def handle_info({__MODULE__, :apply_config}, %{configuration_status: :good} = state) do
+    {:noreply, state}
+  end
+
+  def handle_info({__MODULE__, :apply_config}, state) do
+    {:ok, _} = VintageNetWizard.start_server()
+    {:noreply, %{state | configuration_status: :good}}
+  end
+
+  def handle_info(_message, state) do
+    {:noreply, state}
+  end
+
+  @impl true
+  def configuration_status(%{configuration_status: configuration_status}) do
+    configuration_status
   end
 end

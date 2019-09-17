@@ -59,8 +59,18 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/apply" do
+    conn = render_page(conn, "apply.html")
     :ok = Backend.apply()
-    render_page(conn, "apply.html")
+
+    conn
+  end
+
+  get "/complete" do
+    conn = render_page(conn, "complete.html")
+    :ok = Backend.apply()
+    :ok = VintageNetWizard.stop_server()
+
+    conn
   end
 
   forward("/api/v1", to: VintageNetWizard.Web.Api)
