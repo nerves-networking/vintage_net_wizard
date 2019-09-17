@@ -8,15 +8,12 @@ defmodule VintageNetWizard.Backend do
   alias VintageNetWizard.WiFiConfiguration
   alias VintageNet.WiFi.AccessPoint
 
+  @type configuration_status :: :not_configured | :good | :bad
+
   @doc """
   Do any initialization work like subscribing to messages
   """
-  @callback init() :: {:ok, state :: any()}
-
-  @doc """
-  Scan the network
-  """
-  @callback scan() :: :ok
+  @callback init() :: state :: any()
 
   @doc """
   Get all the access points that the backend knowns about
@@ -24,14 +21,10 @@ defmodule VintageNetWizard.Backend do
   @callback access_points(state :: any()) :: [AccessPoint.t()]
 
   @doc """
-  Check if the WiFi network is configured
-  """
-  @callback configured?() :: boolean()
-
-  @doc """
   Apply the WiFi configurations
   """
-  @callback apply([WiFiConfiguration.t()], state :: any()) :: :ok
+  @callback apply([WiFiConfiguration.t()], state :: any()) ::
+              {:ok, state :: any()} | {:error, :invalid_state}
 
   @doc """
   Handle any message the is received by another process
@@ -47,6 +40,11 @@ defmodule VintageNetWizard.Backend do
   Return information about the device for populating the web UI footer
   """
   @callback device_info() :: [{String.t(), String.t()}]
+
+  @doc """
+  Return the configuration status of a configuration that has been applied
+  """
+  @callback configuration_status(state :: any()) :: configuration_status()
 
   defmodule State do
     @moduledoc false
@@ -67,14 +65,6 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
-  Scan the network for access points
-  """
-  @spec scan() :: :ok
-  def scan() do
-    GenServer.cast(__MODULE__, :scan)
-  end
-
-  @doc """
   Return information about the device for the web page's footer
   """
   @spec device_info() :: [{String.t(), String.t()}]
@@ -91,7 +81,7 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
-  List out access points found from the scan
+  List out access points
   """
   @spec access_points() :: [AccessPoint.t()]
   def access_points() do
@@ -105,6 +95,13 @@ defmodule VintageNetWizard.Backend do
   @spec set_priority_order([String.t()]) :: :ok
   def set_priority_order(priority_order) do
     GenServer.call(__MODULE__, {:set_priority_order, priority_order})
+  end
+
+  @doc """
+  Get the current state of the WiFi configuration
+  """
+  def configuration_state() do
+    GenServer.call(__MODULE__, :configuration_state)
   end
 
   @doc """
@@ -124,6 +121,13 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
+  Get the current configuration status
+  """
+  def configuration_status() do
+    GenServer.call(__MODULE__, :configuration_status)
+  end
+
+  @doc """
   Ask the backend if the WiFi is configured
   """
   @spec configured?() :: boolean()
@@ -137,18 +141,17 @@ defmodule VintageNetWizard.Backend do
   """
   @spec apply() :: :ok
   def apply() do
-    GenServer.cast(__MODULE__, :apply)
+    GenServer.call(__MODULE__, :apply)
   end
 
   @impl true
   def init(backend) do
-    case apply(backend, :init, []) do
-      {:ok, backend_state} ->
-        {:ok, %State{configurations: %{}, backend: backend, backend_state: backend_state}}
-
-      :stop ->
-        {:ok, %State{backend: backend}}
-    end
+    {:ok,
+     %State{
+       configurations: %{},
+       backend: backend,
+       backend_state: apply(backend, :init, [])
+     }}
   end
 
   @impl true
@@ -179,11 +182,24 @@ defmodule VintageNetWizard.Backend do
     {:reply, :ok, %{state | configurations: new_configurations}}
   end
 
+  def handle_call(
+        :configuration_status,
+        _from,
+        %State{backend: backend, backend_state: backend_state} = state
+      ) do
+    status = apply(backend, :configuration_status, [backend_state])
+    {:reply, status, state}
+  end
+
   def handle_call({:save, config}, _from, %{configurations: cfgs} = state) do
     {:reply, :ok, %{state | configurations: Map.put(cfgs, config.ssid, config)}}
   end
 
-  def handle_call(:device_info, _from, %State{backend: backend} = state) do
+  def handle_call(
+        :device_info,
+        _from,
+        %State{backend: backend} = state
+      ) do
     {:reply, apply(backend, :device_info, []), state}
   end
 
@@ -191,27 +207,24 @@ defmodule VintageNetWizard.Backend do
     {:reply, build_config_list(cfgs), state}
   end
 
-  def handle_call(:configured?, _from, %State{backend: backend} = state) do
-    {:reply, apply(backend, :configured?, []), state}
+  def handle_call(
+        :apply,
+        _from,
+        %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
+          state
+      ) do
+    case apply(backend, :apply, [build_config_list(wifi_configs), backend_state]) do
+      {:ok, new_backend_state} ->
+        {:reply, :ok, %{state | backend_state: new_backend_state}}
+
+      {:error, _} = error ->
+        {:reply, error, state}
+    end
   end
 
   @impl true
   def handle_cast({:subscribe, subscriber}, state) do
     {:noreply, %{state | subscriber: subscriber}}
-  end
-
-  def handle_cast(
-        :apply,
-        %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
-          state
-      ) do
-    :ok = apply(backend, :apply, [build_config_list(wifi_configs), backend_state])
-    {:noreply, state}
-  end
-
-  def handle_cast(:scan, %State{backend: backend} = state) do
-    :ok = apply(backend, :scan, [])
-    {:noreply, state}
   end
 
   def handle_cast({:delete_configuration, ssid}, %State{configurations: cfgs} = state) do
@@ -221,7 +234,11 @@ defmodule VintageNetWizard.Backend do
   @impl true
   def handle_info(
         info,
-        %State{subscriber: subscriber, backend: backend, backend_state: backend_state} = state
+        %State{
+          subscriber: subscriber,
+          backend: backend,
+          backend_state: backend_state
+        } = state
       ) do
     case apply(backend, :handle_info, [info, backend_state]) do
       {:reply, message, new_backend_state} ->

@@ -10,6 +10,13 @@ defmodule VintageNetWizard.Web.Api do
   plug(:match)
   plug(:dispatch)
 
+  get "/configuration/status" do
+    with status <- Backend.configuration_status(),
+         {:ok, json_status} <- Jason.encode(status) do
+      send_json(conn, 200, json_status)
+    end
+  end
+
   get "/access_points" do
     {:ok, access_points} =
       Backend.access_points()
@@ -24,6 +31,14 @@ defmodule VintageNetWizard.Web.Api do
     |> Backend.set_priority_order()
 
     send_json(conn, 204, "")
+  end
+
+  get "/complete" do
+    _ = send_json(conn, 202, "")
+    :ok = Backend.apply()
+    :ok = VintageNetWizard.stop_server()
+
+    conn
   end
 
   get "/configurations" do
