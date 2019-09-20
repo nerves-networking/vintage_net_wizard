@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
-     <div class="container">
+     <div class="container access-points-container">
        <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
 
        Add one or more Wi-Fi access points to enable the device to connect to the network. Drag

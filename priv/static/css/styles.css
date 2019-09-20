@@ -9,7 +9,8 @@ h1 a:hover {
 
 footer {
   margin: 0 auto;
-  position: absolute;
+  position: fixed;
+  left: 0;
   bottom: 0;
   font-size: 12px;
 }
@@ -30,3 +31,7 @@ footer {
   cursor: pointer;
 }
 
+.access-points-container {
+  margin-bottom: 220px;
+  clear: both;
+}

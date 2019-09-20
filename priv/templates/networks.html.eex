@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
-     <div class="container">
+     <div class="container access-points-container">
        <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
        Choose the Wi-Fi network you want to add from the list below.
        <div class="my-3 p-3 bg-white rounded shadow-sm">
@@ -35,6 +35,7 @@
              <span class="col"><%= info_data %></span>
            </div>
          <% end %>
+        </div>
      </footer>
      <script src="/js/access_point.js"></script>
   </body>
