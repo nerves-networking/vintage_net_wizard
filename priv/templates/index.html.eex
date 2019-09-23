@@ -51,7 +51,9 @@
        </div>
 
        <a class="btn btn-primary" href="/networks">Add a New Network</a>
-       <a class="btn btn-primary" href="/apply">Apply configuration</a>
+       <%= if length(configs) > 0 do %>
+         <a class="btn btn-primary" href="/apply">Apply configuration</a>
+       <% end %>
      </div>
 
      <footer class="py-3 bg-white shadow-sm w-100 text-muted">
