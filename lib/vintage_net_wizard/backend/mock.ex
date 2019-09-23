@@ -98,6 +98,11 @@ defmodule VintageNetWizard.Backend.Mock do
   end
 
   @impl true
+  def handle_info({__MODULE__, :stop_server}, %{configuration_status: :good} = state) do
+    _ = Process.send_after(self(), {__MODULE__, :apply_config}, 1_000)
+    {:noreply, state}
+  end
+
   def handle_info({__MODULE__, :stop_server}, state) do
     _ = Process.send_after(self(), {__MODULE__, :apply_config}, 2_000)
     :ok = VintageNetWizard.stop_server()
