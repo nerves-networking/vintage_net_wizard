@@ -44,7 +44,6 @@ defmodule VintageNetWizard.Backend.Default do
     data =
       state.data
       |> Map.put(:apply_configuration_timer, timer)
-      |> Map.put(:configuration_status, :not_configured)
 
     {:ok, %{state | state: :applying, data: data}}
   end
@@ -102,14 +101,17 @@ defmodule VintageNetWizard.Backend.Default do
 
   def handle_info(
         {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
-        %{state: :applying, data: %{configuration_status: :good}} = state
+        %{state: :applying, data: %{configuration_status: :good} = data} = state
       ) do
-    {:noreply, %{state | state: :idle}}
+    # Everything connected, so cancel our timeout
+    _ = Process.cancel_timer(data.apply_configuration_timer)
+
+    {:noreply, %{state | state: :idle, data: Map.delete(data, :apply_configuration_timer)}}
   end
 
   def handle_info(
         {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
-        %{state: :applying, data: data} = state
+        %{state: :applying, data: %{configuration_status: :not_configured} = data} = state
       ) do
     # Everything connected, so cancel our timeout
     _ = Process.cancel_timer(data.apply_configuration_timer)
