@@ -38,7 +38,15 @@ defmodule VintageNetWizard.Backend.Default do
         }
       })
 
-    {:ok, %{state | state: :applying}}
+    timeout = Application.get_env(:vintage_net_wizard, :configuration_timeout, 15_000)
+    timer = Process.send_after(self(), :configuration_timeout, timeout)
+
+    data =
+      state.data
+      |> Map.put(:apply_configuration_timer, timer)
+      |> Map.put(:configuration_status, :not_configured)
+
+    {:ok, %{state | state: :applying, data: data}}
   end
 
   @impl VintageNetWizard.Backend
@@ -64,6 +72,19 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
+  def handle_info(:configuration_timeout, %{data: data} = state) do
+    # If we get this timeout, something went wrong trying to apply
+    # the configuration, i.e. bad password or faulty network
+    :ok = VintageNetWizard.into_ap_mode()
+
+    data =
+      data
+      |> Map.put(:configuration_status, :bad)
+      |> Map.delete(:apply_configuration_timer)
+
+    {:noreply, %{state | state: :configuring, data: data}}
+  end
+
   def handle_info(
         {VintageNet, ["interface", "wlan0", "connection"], :disconnected, :lan, _},
         %{state: :configuring, data: %{configuration_status: :not_configured}} = state
@@ -90,12 +111,20 @@ defmodule VintageNetWizard.Backend.Default do
         {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
         %{state: :applying, data: data} = state
       ) do
+    # Everything connected, so cancel our timeout
+    _ = Process.cancel_timer(data.apply_configuration_timer)
+
     # sometimes writing configs and reloading and re-initializing
     # wifi runs into a race condition. So, we wait a little
     # before trying to re-initialize the interface.
     Process.sleep(4_000)
     :ok = VintageNetWizard.into_ap_mode()
-    data = Map.put(data, :configuration_status, :good)
+
+    data =
+      data
+      |> Map.put(:configuration_status, :good)
+      |> Map.delete(:apply_configuration_timer)
+
     {:noreply, %{state | state: :configuring, data: data}}
   end
 
