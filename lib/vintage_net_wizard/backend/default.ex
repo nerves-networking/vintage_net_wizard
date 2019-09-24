@@ -111,7 +111,7 @@ defmodule VintageNetWizard.Backend.Default do
 
   def handle_info(
         {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
-        %{state: :applying, data: %{configuration_status: :not_configured} = data} = state
+        %{state: :applying, data: data} = state
       ) do
     # Everything connected, so cancel our timeout
     _ = Process.cancel_timer(data.apply_configuration_timer)
