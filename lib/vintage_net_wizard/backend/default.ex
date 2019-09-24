@@ -12,10 +12,7 @@ defmodule VintageNetWizard.Backend.Default do
       :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
       :ok = VintageNetWizard.run_wizard()
 
-      %{
-        state: :configuring,
-        data: %{access_points: %{}, configuration_status: :not_configured}
-      }
+      initial_state()
     end
   end
 
@@ -69,6 +66,9 @@ defmodule VintageNetWizard.Backend.Default do
       {"Firmware UUID", kv["nerves_fw_uuid"]}
     ]
   end
+
+  @impl VintageNetWizard.Backend
+  def reset(), do: initial_state()
 
   @impl VintageNetWizard.Backend
   def handle_info(:configuration_timeout, %{data: data} = state) do
@@ -146,6 +146,13 @@ defmodule VintageNetWizard.Backend.Default do
   defp configured?() do
     config = VintageNet.get_configuration("wlan0")
     get_in(config, [:wifi, :ssid]) != nil and get_in(config, [:wifi, :mode]) != :host
+  end
+
+  defp initial_state() do
+    %{
+      state: :configuring,
+      data: %{access_points: %{}, configuration_status: :not_configured}
+    }
   end
 
   defp kv_to_map(key_values) do

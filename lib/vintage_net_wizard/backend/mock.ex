@@ -9,6 +9,67 @@ defmodule VintageNetWizard.Backend.Mock do
 
   @impl true
   def init() do
+    # It either starts, already running, or will error. So
+    # don't need to care about the return
+    _ = VintageNetWizard.start_server()
+
+    initial_state()
+  end
+
+  @impl true
+  def apply(_configs, state) do
+    Process.send_after(self(), {__MODULE__, :stop_server}, 2_000)
+    {:ok, state}
+  end
+
+  @impl true
+  def access_points(%{access_points: access_points}), do: access_points
+
+  @impl true
+  def device_info() do
+    [
+      {"Wi-Fi Address", "11:22:33:44:55:66"},
+      {"Serial number", "12345678"},
+      {"Firmware", "vintage_net_wizard"},
+      {"Firmware version", "0.1.0"},
+      {"Firmware UUID", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"}
+    ]
+  end
+
+  @impl true
+  def reset(), do: initial_state()
+
+  @impl true
+  def handle_info({__MODULE__, :stop_server}, %{configuration_status: :good} = state) do
+    _ = Process.send_after(self(), {__MODULE__, :apply_config}, 1_000)
+    {:noreply, state}
+  end
+
+  def handle_info({__MODULE__, :stop_server}, state) do
+    _ = Process.send_after(self(), {__MODULE__, :apply_config}, 2_000)
+    :ok = VintageNetWizard.stop_server()
+    {:noreply, state}
+  end
+
+  def handle_info({__MODULE__, :apply_config}, %{configuration_status: :good} = state) do
+    {:noreply, state}
+  end
+
+  def handle_info({__MODULE__, :apply_config}, state) do
+    {:ok, _} = VintageNetWizard.start_server()
+    {:noreply, %{state | configuration_status: :good}}
+  end
+
+  def handle_info(_message, state) do
+    {:noreply, state}
+  end
+
+  @impl true
+  def configuration_status(%{configuration_status: configuration_status}) do
+    configuration_status
+  end
+
+  defp initial_state() do
     access_points = [
       %{
         band: :wifi_5_ghz,
@@ -72,58 +133,6 @@ defmodule VintageNetWizard.Backend.Mock do
       }
     ]
 
-    {:ok, _} = VintageNetWizard.start_server()
-
     %{access_points: access_points, configuration_status: :not_configured}
-  end
-
-  @impl true
-  def apply(_configs, state) do
-    Process.send_after(self(), {__MODULE__, :stop_server}, 2_000)
-    {:ok, state}
-  end
-
-  @impl true
-  def access_points(%{access_points: access_points}), do: access_points
-
-  @impl true
-  def device_info() do
-    [
-      {"Wi-Fi Address", "11:22:33:44:55:66"},
-      {"Serial number", "12345678"},
-      {"Firmware", "vintage_net_wizard"},
-      {"Firmware version", "0.1.0"},
-      {"Firmware UUID", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"}
-    ]
-  end
-
-  @impl true
-  def handle_info({__MODULE__, :stop_server}, %{configuration_status: :good} = state) do
-    _ = Process.send_after(self(), {__MODULE__, :apply_config}, 1_000)
-    {:noreply, state}
-  end
-
-  def handle_info({__MODULE__, :stop_server}, state) do
-    _ = Process.send_after(self(), {__MODULE__, :apply_config}, 2_000)
-    :ok = VintageNetWizard.stop_server()
-    {:noreply, state}
-  end
-
-  def handle_info({__MODULE__, :apply_config}, %{configuration_status: :good} = state) do
-    {:noreply, state}
-  end
-
-  def handle_info({__MODULE__, :apply_config}, state) do
-    {:ok, _} = VintageNetWizard.start_server()
-    {:noreply, %{state | configuration_status: :good}}
-  end
-
-  def handle_info(_message, state) do
-    {:noreply, state}
-  end
-
-  @impl true
-  def configuration_status(%{configuration_status: configuration_status}) do
-    configuration_status
   end
 end
