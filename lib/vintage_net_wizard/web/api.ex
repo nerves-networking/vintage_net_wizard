@@ -36,6 +36,7 @@ defmodule VintageNetWizard.Web.Api do
   get "/complete" do
     _ = send_json(conn, 202, "")
     :ok = Backend.apply()
+    :ok = Backend.reset()
     :ok = VintageNetWizard.stop_server()
 
     conn
