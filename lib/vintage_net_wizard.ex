@@ -9,11 +9,14 @@ defmodule VintageNetWizard do
   This means the WiFi module will be put into access point
   mode and the web server will be started
   """
-  @spec run_wizard() :: :ok | {:error, any()}
+  @spec run_wizard() :: :ok
   def run_wizard() do
     with :ok <- into_ap_mode(),
          {:ok, _server} <- start_server() do
       :ok
+    else
+      # Already running is still ok
+      {:error, :already_started} -> :ok
     end
   end
 

@@ -46,6 +46,12 @@ defmodule VintageNetWizard.Backend do
   """
   @callback configuration_status(state :: any()) :: configuration_status()
 
+  @doc """
+  Apply any actions required to set the backend back to an
+  initial default state
+  """
+  @callback reset() :: state :: any()
+
   defmodule State do
     @moduledoc false
     defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
@@ -144,6 +150,14 @@ defmodule VintageNetWizard.Backend do
     GenServer.call(__MODULE__, :apply)
   end
 
+  @doc """
+  Reset the backend to an initial default state.
+  """
+  @spec reset() :: :ok
+  def reset() do
+    GenServer.call(__MODULE__, :reset)
+  end
+
   @impl true
   def init(backend) do
     {:ok,
@@ -220,6 +234,11 @@ defmodule VintageNetWizard.Backend do
       {:error, _} = error ->
         {:reply, error, state}
     end
+  end
+
+  def handle_call(:reset, _from, %State{backend: backend} = state) do
+    new_state = apply(backend, :reset, [])
+    {:reply, :ok, %{state | configurations: %{}, backend_state: new_state}}
   end
 
   @impl true
