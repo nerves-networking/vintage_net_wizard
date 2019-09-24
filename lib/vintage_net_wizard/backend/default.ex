@@ -32,7 +32,8 @@ defmodule VintageNetWizard.Backend.Default do
         type: VintageNet.Technology.WiFi,
         wifi: %{
           networks: vintage_net_config
-        }
+        },
+        ipv4: %{method: :dhcp}
       })
 
     timeout = Application.get_env(:vintage_net_wizard, :configuration_timeout, 15_000)
