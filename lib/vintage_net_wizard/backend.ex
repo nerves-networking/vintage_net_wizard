@@ -145,7 +145,7 @@ defmodule VintageNetWizard.Backend do
   Apply the configurations saved in the backend to
   the system.
   """
-  @spec apply() :: :ok
+  @spec apply() :: :ok | {:error, :no_configurations}
   def apply() do
     GenServer.call(__MODULE__, :apply)
   end
@@ -219,6 +219,15 @@ defmodule VintageNetWizard.Backend do
 
   def handle_call(:configurations, _from, %State{configurations: cfgs} = state) do
     {:reply, build_config_list(cfgs), state}
+  end
+
+  def handle_call(
+        :apply,
+        _from,
+        %State{configurations: wifi_configs} = state
+      )
+      when wifi_configs == %{} do
+    {:reply, {:error, :no_configurations}, state}
   end
 
   def handle_call(
