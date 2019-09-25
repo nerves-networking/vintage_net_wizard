@@ -1,6 +1,17 @@
 # JSON API
 
-## Get Access Points
+## Endpoints
+
+* [Get Access Points](#get-access-points)
+* [Configure SSID Priority](#configure-ssid-priority)
+* [Configure an SSID](#configure-an-ssid)
+* [Delete an SSID configuration](#delete-an-ssid-configuration)
+* [Get Configurations](#get-configurations)
+* [Get Configuration Status](#get-configuration-status)
+* [Apply](#apply)
+* [Complete the Configuration Process](#complete-the-configuration-process)
+
+### Get Access Points
 
 This request returns a list of known access points and their properties. Hidden
 access points are not returned.
@@ -12,8 +23,6 @@ Method: `GET`
 Response: Array AccessPoint
 
 Response Code: `200`
-
-### Examples
 
 #### Response
 
@@ -39,7 +48,7 @@ Response Code: `200`
 ]
 ```
 
-## Configure SSID Priority
+### Configure SSID Priority
 
 This endpoint takes a list of SSIDs. Each SSID is tried in order until a
 successful connection is made. It is not required to list all configured SSIDs.
@@ -67,7 +76,7 @@ Response Code: `204`
 ]
 ```
 
-## Configure an SSID
+### Configure an SSID
 
 Set connection parameters for an `SSID`.
 
@@ -94,7 +103,7 @@ Response Code: `204`
 }
 ```
 
-## Delete an SSID configuration
+### Delete an SSID configuration
 
 Delete the configuration attached to an SSID
 
@@ -108,7 +117,7 @@ Response: Empty
 
 Response Code: `200`
 
-## Get Configurations
+### Get Configurations
 
 Get the current known configurations.
 
@@ -122,8 +131,6 @@ Response: `Array WiFiConfiguration` - Passwords are filtered
 
 Response Code: 200
 
-### Examples
-
 #### Request
 
 ```json
@@ -135,7 +142,7 @@ Response Code: 200
 ]
 ```
 
-## Get Configuration Status
+### Get Configuration Status
 
 Get the current status of the configuration. This is useful after using
 the `/api/v1/apply` endpoint to figure out if the configurations that
@@ -151,7 +158,7 @@ Response: `ConfigurationStatus`
 
 Response Code: 200
 
-## Apply
+### Apply
 
 A POST to this endpoint applies the configuration and attempts to connect to the
 configured WiFi networks. This will return back to AP mode and you can use the
@@ -168,19 +175,7 @@ Response: Empty
 
 Response Code: `202`
 
-### Error
-
-When you try to apply configurations when there are none you will get a `404`
-and the response of:
-
-```json
-{
-  "error": "no_configurations",
-  "message": "Please provide configurations to apply."
-}
-```
-
-## Complete the Configuration Process
+### Complete the Configuration Process
 
 Finalize the configuration process. This will apply the configuration and
 not return to AP mode.
