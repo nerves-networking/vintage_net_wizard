@@ -4,13 +4,12 @@ defmodule VintageNetWizard.Backend.Default do
   alias VintageNetWizard.WiFiConfiguration
 
   @impl VintageNetWizard.Backend
-  def init() do
-    if configured?() do
+  def init(wifi_configurations) do
+    if configured?(wifi_configurations) do
       %{state: :idle, data: %{access_points: %{}, configuration_status: :good}}
     else
       :ok = VintageNet.subscribe(["interface", "wlan0", "connection"])
       :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
-      :ok = VintageNetWizard.run_wizard()
 
       initial_state()
     end
@@ -70,6 +69,23 @@ defmodule VintageNetWizard.Backend.Default do
 
   @impl VintageNetWizard.Backend
   def reset(), do: initial_state()
+
+  @impl VintageNetWizard.Backend
+  def load_configurations() do
+    get_configurations()
+    |> Enum.map(&WiFiConfiguration.from_vintage_net_configuration/1)
+  end
+
+  # If we have only have one config
+  # then we need to check if it configured for
+  # AP mode. If so WiFi is condsidered not configured.
+  # Since Wizard controls the AP mode configuration,
+  # if there is more than one configuration we assume that WiFi
+  # has been configurd before.
+  @impl VintageNetWizard.Backend
+  def configured?([]), do: false
+  def configured?([config]), do: config.mode != :host
+  def configured?(_configs), do: true
 
   @impl VintageNetWizard.Backend
   def handle_info(:configuration_timeout, %{data: data} = state) do
@@ -144,11 +160,6 @@ defmodule VintageNetWizard.Backend.Default do
 
   defp scan(%{state: :configuring}), do: :ok
 
-  defp configured?() do
-    config = VintageNet.get_configuration("wlan0")
-    get_in(config, [:wifi, :ssid]) != nil and get_in(config, [:wifi, :mode]) != :host
-  end
-
   defp initial_state() do
     %{
       state: :configuring,
@@ -166,6 +177,19 @@ defmodule VintageNetWizard.Backend.Default do
       String.trim(id)
     else
       _other -> "Unknown"
+    end
+  end
+
+  defp get_configurations() do
+    case VintageNet.get_configuration("wlan0") do
+      %{wifi: %{networks: networks}} ->
+        networks
+
+      %{wifi: wifi} ->
+        wifi
+
+      _ ->
+        []
     end
   end
 end

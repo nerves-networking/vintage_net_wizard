@@ -7,25 +7,21 @@ defmodule VintageNetWizard.Backend.Mock do
   """
   @behaviour VintageNetWizard.Backend
 
-  @impl true
-  def init() do
-    # It either starts, already running, or will error. So
-    # don't need to care about the return
-    _ = VintageNetWizard.start_server()
-
+  @impl VintageNetWizard.Backend
+  def init(_) do
     initial_state()
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def apply(_configs, state) do
     Process.send_after(self(), {__MODULE__, :stop_server}, 2_000)
     {:ok, state}
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def access_points(%{access_points: access_points}), do: access_points
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def device_info() do
     [
       {"Wi-Fi Address", "11:22:33:44:55:66"},
@@ -39,7 +35,17 @@ defmodule VintageNetWizard.Backend.Mock do
   @impl true
   def reset(), do: initial_state()
 
-  @impl true
+  @impl VintageNetWizard.Backend
+  def load_configurations() do
+    []
+  end
+
+  @impl VintageNetWizard.Backend
+  def configured?(_) do
+    false
+  end
+
+  @impl VintageNetWizard.Backend
   def handle_info({__MODULE__, :stop_server}, %{configuration_status: :good} = state) do
     _ = Process.send_after(self(), {__MODULE__, :apply_config}, 1_000)
     {:noreply, state}
@@ -64,7 +70,7 @@ defmodule VintageNetWizard.Backend.Mock do
     {:noreply, state}
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def configuration_status(%{configuration_status: configuration_status}) do
     configuration_status
   end

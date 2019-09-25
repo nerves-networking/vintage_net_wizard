@@ -5,11 +5,21 @@ defmodule VintageNetWizard.WiFiConfiguration do
   """
   @type key_mgmt :: :none | :wpa_psk
 
+  @type mode :: :client | :host
+
+  @type vintage_configuration_params :: %{
+          key_mgmt: atom(),
+          mode: mode(),
+          psk: binary(),
+          ssid: binary()
+        }
+
   @type t :: %__MODULE__{
           ssid: String.t(),
           key_mgmt: key_mgmt(),
           password: String.t() | nil,
-          priority: non_neg_integer() | nil
+          priority: non_neg_integer() | nil,
+          mode: mode()
         }
 
   @type opt :: {:key_mgmt, atom()} | {:password, binary()} | {:priority, non_neg_integer()}
@@ -19,15 +29,18 @@ defmodule VintageNetWizard.WiFiConfiguration do
   @type decode_error ::
           {:error, :json_decode, Jason.DecodeError.t()} | {:error, param_error(), value :: any()}
 
-  @enforce_keys [:ssid]
-  defstruct ssid: "", key_mgmt: :none, password: nil, priority: nil
+  @enforce_keys [:ssid, :mode]
+  defstruct ssid: "", key_mgmt: :none, password: nil, priority: nil, mode: nil
 
   @doc """
   Make a new WiFiConfiguration struct
   """
   @spec new(binary(), [opt()]) :: t()
   def new(ssid, opts) do
-    opts = Keyword.merge(opts, ssid: ssid)
+    opts =
+      opts
+      |> Keyword.put_new(:mode, :client)
+      |> Keyword.merge(ssid: ssid)
 
     struct(__MODULE__, opts)
   end
@@ -87,6 +100,30 @@ defmodule VintageNetWizard.WiFiConfiguration do
       key_mgmt: key_mgmt
     }
     |> maybe_put_priority(priority)
+  end
+
+  @spec from_vintage_net_configuration(vintage_configuration_params()) :: t()
+  def from_vintage_net_configuration(
+        %{
+          ssid: ssid,
+          mode: :host,
+          key_mgmt: key_mgmt
+        } = vn_config
+      ) do
+    priority = Map.get(vn_config, :priority)
+    new(ssid, mode: :host, key_mgmt: key_mgmt, priority: priority)
+  end
+
+  def from_vintage_net_configuration(
+        %{
+          ssid: ssid,
+          psk: password,
+          mode: :client,
+          key_mgmt: key_mgmt
+        } = vn_config
+      ) do
+    priority = Map.get(vn_config, :priority)
+    new(ssid, password: password, key_mgmt: key_mgmt, priority: priority)
   end
 
   defp key_mgmt_from_params(%{"key_mgmt" => ""}), do: {:ok, :none}

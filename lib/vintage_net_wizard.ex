@@ -3,6 +3,8 @@ defmodule VintageNetWizard do
   Documentation for VintageNetWizard.
   """
 
+  alias VintageNetWizard.Backend
+
   @doc """
   Run the wizard.
 
@@ -11,7 +13,8 @@ defmodule VintageNetWizard do
   """
   @spec run_wizard() :: :ok
   def run_wizard() do
-    with :ok <- into_ap_mode(),
+    with :ok <- Backend.load_configurations(),
+         :ok <- into_ap_mode(),
          {:ok, _server} <- start_server() do
       :ok
     else

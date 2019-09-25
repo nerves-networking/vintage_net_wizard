@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Test.Backend do
   @behaviour VintageNetWizard.Backend
 
   @impl true
-  def init() do
+  def init(_) do
     {:ok, nil}
   end
 
@@ -13,7 +13,7 @@ defmodule VintageNetWizard.Test.Backend do
   def access_points(_), do: []
 
   @impl true
-  def configured?(), do: true
+  def configured?(_), do: true
 
   @impl true
   def apply(_cfgs, _state), do: :ok
@@ -23,4 +23,16 @@ defmodule VintageNetWizard.Test.Backend do
 
   @impl true
   def device_info(), do: []
+
+  @impl true
+  def configuration_status(_), do: :not_configured
+
+  @impl true
+  def reset(), do: nil
+
+  @impl true
+  def load_configurations(), do: []
+
+  @impl true
+  def configured?(_), do: false
 end

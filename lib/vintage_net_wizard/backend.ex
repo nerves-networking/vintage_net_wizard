@@ -13,7 +13,7 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Do any initialization work like subscribing to messages
   """
-  @callback init() :: state :: any()
+  @callback init([WiFiConfiguration.t()]) :: state :: any()
 
   @doc """
   Get all the access points that the backend knowns about
@@ -52,9 +52,19 @@ defmodule VintageNetWizard.Backend do
   """
   @callback reset() :: state :: any()
 
+  @doc """
+  Load any previous configurations from the backend
+  """
+  @callback load_configurations() :: [WiFiConfiguration.t()]
+
+  @doc """
+  Check if the backend should be considered configured
+  """
+  @callback configured?([WiFiConfiguration.t()]) :: boolean()
+
   defmodule State do
     @moduledoc false
-    defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
+    defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: %{}
   end
 
   @spec start_link(backend :: module()) :: GenServer.on_start()
@@ -151,6 +161,13 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
+  Load the configs that might already exist on the system
+  """
+  def load_configurations() do
+    GenServer.call(__MODULE__, :load_configurations)
+  end
+
+  @doc """
   Reset the backend to an initial default state.
   """
   @spec reset() :: :ok
@@ -160,11 +177,16 @@ defmodule VintageNetWizard.Backend do
 
   @impl true
   def init(backend) do
+    configurations =
+      backend
+      |> apply(:load_configurations, [])
+      |> Enum.into(%{}, fn config -> {config.ssid, config} end)
+
     {:ok,
      %State{
-       configurations: %{},
+       configurations: configurations,
        backend: backend,
-       backend_state: apply(backend, :init, [])
+       backend_state: apply(backend, :init, [build_config_list(configurations)])
      }}
   end
 
@@ -176,6 +198,15 @@ defmodule VintageNetWizard.Backend do
       ) do
     access_points = apply(backend, :access_points, [backend_state])
     {:reply, access_points, state}
+  end
+
+  def handle_call(:load_configurations, _from, %State{backend: backend} = state) do
+    configurations =
+      backend
+      |> apply(:load_configurations, [])
+      |> Enum.into(%{}, fn config -> {config.ssid, config} end)
+
+    {:reply, :ok, %{state | configurations: configurations}}
   end
 
   def handle_call(
@@ -217,8 +248,13 @@ defmodule VintageNetWizard.Backend do
     {:reply, apply(backend, :device_info, []), state}
   end
 
-  def handle_call(:configurations, _from, %State{configurations: cfgs} = state) do
-    {:reply, build_config_list(cfgs), state}
+  def handle_call(:configurations, _from, %State{configurations: configs} = state) do
+    configs =
+      configs
+      |> build_config_list()
+      |> Enum.reject(&(&1.mode == :host))
+
+    {:reply, configs, state}
   end
 
   def handle_call(
@@ -231,12 +267,29 @@ defmodule VintageNetWizard.Backend do
   end
 
   def handle_call(
+        :configured?,
+        _from,
+        %State{configurations: configurations, backend: backend} = state
+      ) do
+    configs =
+      configurations
+      |> build_config_list()
+      |> Enum.reject(&(&1.mode == :host))
+
+    {:reply, apply(backend, :configured?, [configs]), state}
+  end
+
+  def handle_call(
         :apply,
         _from,
-        %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
-          state
+        %State{backend: backend, configurations: configs, backend_state: backend_state} = state
       ) do
-    case apply(backend, :apply, [build_config_list(wifi_configs), backend_state]) do
+    configs =
+      configs
+      |> build_config_list()
+      |> Enum.reject(&(&1.mode == :host))
+
+    case apply(backend, :apply, [configs, backend_state]) do
       {:ok, new_backend_state} ->
         {:reply, :ok, %{state | backend_state: new_backend_state}}
 
@@ -248,6 +301,10 @@ defmodule VintageNetWizard.Backend do
   def handle_call(:reset, _from, %State{backend: backend} = state) do
     new_state = apply(backend, :reset, [])
     {:reply, :ok, %{state | configurations: %{}, backend_state: new_state}}
+  end
+
+  def handle_call(:configuration_state, _from, state) do
+    {:reply, state, state}
   end
 
   @impl true
