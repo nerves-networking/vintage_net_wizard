@@ -168,6 +168,18 @@ Response: Empty
 
 Response Code: `202`
 
+### Error
+
+When you try to apply configurations when there are none you will get a `404`
+and the response of:
+
+```json
+{
+  "error": "no_configurations",
+  "message": "Please provide configurations to apply."
+}
+```
+
 ## Complete the Configuration Process
 
 Finalize the configuration process. This will apply the configuration and

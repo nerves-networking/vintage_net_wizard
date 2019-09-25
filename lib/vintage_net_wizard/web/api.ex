@@ -51,8 +51,20 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   post "/apply" do
-    :ok = Backend.apply()
-    send_json(conn, 202, "")
+    case Backend.apply() do
+      :ok ->
+        send_json(conn, 202, "")
+
+      {:error, :no_configurations} ->
+        json =
+          %{
+            error: "no_configurations",
+            message: "Please provide configurations to apply."
+          }
+          |> Jason.encode!()
+
+        send_json(conn, 404, json)
+    end
   end
 
   put "/:ssid/configuration" do
