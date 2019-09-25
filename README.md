@@ -55,8 +55,7 @@ of brands).
 
 It is expected that you're using
 [`VintageNet`](https://github.com/nerves-networking/vintage_net) already. If
-you're not, see that project first. Another option is to take a look at the
-example.
+you're not, see that project first.
 
 `VintageNetWizard` is an OTP application so it's mostly self-contained. Add it
 to your `mix` dependencies like so:
@@ -66,8 +65,10 @@ to your `mix` dependencies like so:
 ```
 
 This will be sufficient to try it out on a device that hasn't been configured
-yet. You will want to add a mechanism for forcing WiFi configuration to happen.
-See the example application for connecting up a button.
+yet. You will want to add a mechanism for forcing the wizard the run WiFi
+configuration again, such as holding a button for 5+ seconds. Take a look at
+[Running the example](#running-the-example) section for steps on setting up
+a button and running a quick example firmware on a device
 
 ### Port
 
@@ -128,9 +129,9 @@ endpoint. Documentation for the API is in [json-api.md](json-api.md).
 
 ## Running the example
 
-The example builds a Nerves firmware image for a Raspberry Pi Zero W, Raspberry
-Pi 3 or Raspberry Pi 4 that demonstrates the wizard. The wizard will run on
-the first boot and after a button has been held down for 5 seconds.
+The example builds a Nerves firmware image for supported Nerves devices
+ that demonstrates the wizard. The wizard will run on
+the first boot and also after a button has been held down for 5 seconds.
 
 For the button to work, you'll need to wire up a button to GPIO 17/pin 11 and
 3v3/pin 1 on the Raspberry Pi's GPIO header. See the image below for the
@@ -140,8 +141,11 @@ location:
 
 If you don't have a button, you can use a jumper wire to temporarily connect 3v3
 power to pin 11. If you have a Raspberry Pi hat with a button connected to a
-different GPIO pin, edit
-[`lib/wizard_example/application.ex`](https://github.com/nerves-networking/vintage_net_wizard/blob/master/example/lib/wizard_example/application.ex).
+different GPIO pin, you can specify with pin to use in your config:
+
+```elixir
+config :vintage_net_wizard, gpio_pin: 27
+```
 
 The next step is to build the firmware. Make sure that you've installed Nerves
 and run the following:
