@@ -273,6 +273,12 @@ defmodule VintageNetWizard.Backend do
         maybe_send(subscriber, {VintageNetWizard, message})
         {:noreply, %{state | backend_state: new_backend_state}}
 
+      {:noreply, %{state: :idle, data: %{configuration_status: :good}} = new_backend_state} ->
+        # idle state with good configuration means we've completed setup
+        # and wizard has been shut down. So let's clear configurations
+        # so aren't hanging around in memory
+        {:noreply, %{state | configurations: %{}, backend_state: new_backend_state}}
+
       {:noreply, new_backend_state} ->
         {:noreply, %{state | backend_state: new_backend_state}}
     end

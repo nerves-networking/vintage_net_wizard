@@ -38,6 +38,9 @@ defmodule WizardExample.Button do
 
   @impl true
   def handle_info(:timeout, state) do
+    # Reset the backend to make sure we start wizard
+    # in a clean state
+    :ok = VintageNetWizard.Backend.reset()
     :ok = VintageNetWizard.run_wizard()
     {:noreply, state}
   end
