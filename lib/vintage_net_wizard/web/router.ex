@@ -16,10 +16,16 @@ defmodule VintageNetWizard.Web.Router do
   plug(:dispatch)
 
   get "/" do
-    render_page(conn, "index.html",
-      configs: Backend.configurations(),
-      format_security: &display_security_from_key_mgmt/1
-    )
+    case Backend.configurations() do
+      [] ->
+        redirect(conn, "/networks")
+
+      configs ->
+        render_page(conn, "index.html",
+          configs: configs,
+          format_security: &display_security_from_key_mgmt/1
+        )
+    end
   end
 
   post "/ssid/:ssid" do
