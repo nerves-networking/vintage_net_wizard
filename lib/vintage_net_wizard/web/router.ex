@@ -54,12 +54,18 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   post "/networks/new" do
+    ssid = Map.get(conn.body_params, "ssid")
+
     case Map.get(conn.body_params, "security") do
       "none" ->
+        :ok =
+          ssid
+          |> WiFiConfiguration.new(key_mgmt: :none)
+          |> Backend.save()
+
         redirect(conn, "/")
 
       "wpa" ->
-        ssid = Map.get(conn.body_params, "ssid")
         redirect(conn, "/ssid/#{ssid}")
     end
   end
