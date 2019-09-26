@@ -23,7 +23,7 @@ after reboots and power outages. To change the configuration later, a user needs
 to take a device-specific action like hold down a button for 5 seconds. This
 library has an example project for the Raspberry Pi for use as a demo.
 
-![see it in action](assets/screenshot00.gif)
+![see it in action](assets/vintage_net_wizard.gif)
 
 ## Features
 
