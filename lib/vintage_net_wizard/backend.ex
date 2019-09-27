@@ -83,7 +83,7 @@ defmodule VintageNetWizard.Backend do
   """
   @spec delete_configuration(String.t()) :: :ok
   def delete_configuration(ssid) do
-    GenServer.cast(__MODULE__, {:delete_configuration, ssid})
+    GenServer.call(__MODULE__, {:delete_configuration, ssid})
   end
 
   @doc """
@@ -242,13 +242,13 @@ defmodule VintageNetWizard.Backend do
     {:reply, :ok, %{state | configurations: %{}, backend_state: new_state}}
   end
 
+  def handle_call({:delete_configuration, ssid}, _from, %State{configurations: cfgs} = state) do
+    {:reply, :ok, %{state | configurations: Map.delete(cfgs, ssid)}}
+  end
+
   @impl true
   def handle_cast({:subscribe, subscriber}, state) do
     {:noreply, %{state | subscriber: subscriber}}
-  end
-
-  def handle_cast({:delete_configuration, ssid}, %State{configurations: cfgs} = state) do
-    {:noreply, %{state | configurations: Map.drop(cfgs, [ssid])}}
   end
 
   @impl true
