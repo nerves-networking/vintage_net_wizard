@@ -2,6 +2,7 @@ defmodule VintageNetWizard.MixProject do
   use Mix.Project
 
   @version "0.1.0"
+  @source_url "https://github.com/nerves-networking/vintage_net_wizard"
 
   def project do
     [
@@ -46,7 +47,7 @@ defmodule VintageNetWizard.MixProject do
         "README.md"
       ],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/nerves-networking/vintage_net_wizard"}
+      links: %{"GitHub" => @source_url}
     }
   end
 
@@ -75,7 +76,7 @@ defmodule VintageNetWizard.MixProject do
       extras: ["README.md", "json-api.md"],
       main: "readme",
       source_ref: "v#{@version}",
-      source_url: "https://github.com/nerves-networking/vintage_net_wizard"
+      source_url: @source_url
     ]
   end
 
