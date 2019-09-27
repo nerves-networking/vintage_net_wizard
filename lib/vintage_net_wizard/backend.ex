@@ -134,14 +134,6 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
-  Ask the backend if the WiFi is configured
-  """
-  @spec configured?() :: boolean()
-  def configured?() do
-    GenServer.call(__MODULE__, :configured?)
-  end
-
-  @doc """
   Apply the configurations saved in the backend to
   the system.
   """
