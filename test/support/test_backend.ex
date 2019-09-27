@@ -7,13 +7,7 @@ defmodule VintageNetWizard.Test.Backend do
   end
 
   @impl true
-  def scan(), do: :ok
-
-  @impl true
   def access_points(_), do: []
-
-  @impl true
-  def configured?(), do: true
 
   @impl true
   def apply(_cfgs, _state), do: :ok
@@ -23,4 +17,10 @@ defmodule VintageNetWizard.Test.Backend do
 
   @impl true
   def device_info(), do: []
+
+  @impl true
+  def reset(), do: %{}
+
+  @impl true
+  def configuration_status(_state), do: :not_configured
 end
