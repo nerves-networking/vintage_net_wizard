@@ -9,6 +9,7 @@ defmodule VintageNetWizard.MixProject do
       version: @version,
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
+      test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: dialyzer(),
@@ -59,7 +60,8 @@ defmodule VintageNetWizard.MixProject do
       {:vintage_net, "~> 0.6.0"},
       {:nerves_runtime, "~> 0.10"},
       {:ex_doc, "~> 0.19", only: :docs, runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.8", only: :test, runtime: false}
     ]
   end
 
