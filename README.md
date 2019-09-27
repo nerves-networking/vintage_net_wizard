@@ -64,11 +64,29 @@ to your `mix` dependencies like so:
    {:vintage_net_wizard, "~> 0.1"}
 ```
 
+The configuration wizard is not started by default to allow for more control
+over business specific situations. You will need to add a call in your code
+when you want the device placed into AP mode and the wizard started:
+
+```elixir
+defmodule MyApp do
+  use Application
+
+  def start(_type, _args) do
+    if should_start_wizard?() do
+      VintageNetWizard.run_wizard
+    end
+    # ...
+    Supervisor.start_link(children, opts)
+  end
+end
+```
+
 This will be sufficient to try it out on a device that hasn't been configured
 yet. You will want to add a mechanism for forcing the wizard the run WiFi
 configuration again, such as holding a button for 5+ seconds. Take a look at
 [Running the example](#running-the-example) section for steps on setting up
-a button and running a quick example firmware on a device
+a button and running a quick example firmware on a device.
 
 ### Port
 
