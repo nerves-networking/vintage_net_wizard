@@ -3,6 +3,8 @@ defmodule VintageNetWizard do
   Documentation for VintageNetWizard.
   """
 
+  alias VintageNetWizard.{Backend, Web.Endpoint}
+
   @doc """
   Run the wizard.
 
@@ -11,7 +13,8 @@ defmodule VintageNetWizard do
   """
   @spec run_wizard() :: :ok
   def run_wizard() do
-    with :ok <- into_ap_mode(),
+    with :ok <- Backend.reset(),
+         :ok <- into_ap_mode(),
          {:ok, _server} <- start_server() do
       :ok
     else
@@ -53,9 +56,9 @@ defmodule VintageNetWizard do
     VintageNet.configure("wlan0", config)
   end
 
-  defdelegate start_server(), to: VintageNetWizard.Web.Endpoint
+  defdelegate start_server(), to: Endpoint
 
-  defdelegate stop_server(), to: VintageNetWizard.Web.Endpoint
+  defdelegate stop_server(), to: Endpoint
 
   defp get_hostname() do
     {:ok, hostname} = :inet.gethostname()
