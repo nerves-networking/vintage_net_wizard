@@ -82,10 +82,10 @@ defmodule VintageNetWizard.WiFiConfiguration do
       }) do
     %{
       ssid: ssid,
-      psk: psk,
       mode: :client,
       key_mgmt: key_mgmt
     }
+    |> maybe_put_psk(psk)
     |> maybe_put_priority(priority)
   end
 
@@ -101,6 +101,9 @@ defmodule VintageNetWizard.WiFiConfiguration do
 
   defp maybe_put_priority(vn_config, nil), do: vn_config
   defp maybe_put_priority(vn_config, priority), do: Map.put(vn_config, :priority, priority)
+
+  defp maybe_put_psk(vn_config, nil), do: vn_config
+  defp maybe_put_psk(vn_config, psk), do: Map.put(vn_config, :psk, psk)
 
   defimpl Jason.Encoder do
     alias VintageNetWizard.WiFiConfiguration
