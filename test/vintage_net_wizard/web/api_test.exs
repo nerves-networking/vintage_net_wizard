@@ -41,6 +41,85 @@ defmodule VintageNetWizard.Web.ApiTest do
     Backend.delete_configuration("fake")
   end
 
+  test "returns error if passed a password is required" do
+    :ok = Backend.reset()
+
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_psk"
+      })
+
+    {conn, body} =
+      run_request(:put, "/fake/configuration", body: json_body, content_type: "application/json")
+
+    assert conn.status == 400
+
+    assert body == %{
+             "error" => "password_required",
+             "message" => "A password is required for wpa_psk access points."
+           }
+  end
+
+  test "returns error if passed a password is too short" do
+    :ok = Backend.reset()
+
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_psk",
+        password: "asdf"
+      })
+
+    {conn, body} =
+      run_request(:put, "/fake/configuration", body: json_body, content_type: "application/json")
+
+    assert conn.status == 400
+
+    assert body == %{
+             "error" => "password_too_short",
+             "message" => "The minimum length for a password is 8."
+           }
+  end
+
+  test "returns error if passed a password that has invalid characters" do
+    :ok = Backend.reset()
+
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_psk",
+        password: <<1, 2, 3, 4, 5, 6, 7, 8, 9>>
+      })
+
+    {conn, body} =
+      run_request(:put, "/fake/configuration", body: json_body, content_type: "application/json")
+
+    assert conn.status == 400
+
+    assert body == %{
+             "error" => "invalid_characters",
+             "message" => "The password provided has invalid characters."
+           }
+  end
+
+  test "returns error if passed a password is too long" do
+    :ok = Backend.reset()
+
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_psk",
+        password: "12345678901234567890123456789012345678901234567890123456789012345"
+      })
+
+    {conn, body} =
+      run_request(:put, "/fake/configuration", body: json_body, content_type: "application/json")
+
+    assert conn.status == 400
+
+    assert body == %{
+             "error" => "password_too_long",
+             "message" => "The maximum length for a password is 63."
+           }
+  end
+
   test "update configuration priority order" do
     fake1 = WiFiConfiguration.new("fake1", key_mgmt: :wpa_psk, password: "password", priority: 1)
     fake2 = WiFiConfiguration.new("fake2", key_mgmt: :wpa_psk, password: "password", priority: 2)

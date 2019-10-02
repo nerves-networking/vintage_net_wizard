@@ -103,6 +103,50 @@ Response Code: `204`
 }
 ```
 
+#### Errors
+
+If the configuration is passed is invalid the endpoint will return with a `400`
+status with one of the below errors:
+
+```json
+{
+  "error": "password_required",
+  "message": "A password is required for wpa_psk access points."
+}
+```
+
+If the configuration is provide a `key_mgmt` field and there is no provided
+password.
+
+```json
+{
+ "error": "password_too_short",
+ "message": "The minimum length for a password is 8."
+}
+```
+
+If the password is less than `8` characters long as outlined in the
+IEEE Std 802.11i-2004 specification.
+
+```json
+{
+  "error": "invalid_characters",
+  "message": "The password provided has invalid characters."
+}
+```
+
+If the password contains characters that are not valid ASCII.
+
+```json
+{
+  "error": "password_too_long",
+  "message": "The maximum length for a password is 63."
+}
+```
+
+If the password is greater than `63` characters long as outlined in the
+IEEE Std 802.11i-2004 specification.
+
 ### Delete an SSID configuration
 
 Delete the configuration attached to an SSID

@@ -29,20 +29,31 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   post "/ssid/:ssid" do
+    password = conn.body_params["password"]
+
     wifi_config =
       WiFiConfiguration.new(
         ssid,
-        password: conn.body_params["password"],
+        password: password,
         key_mgmt: :wpa_psk
       )
 
-    :ok = Backend.save(wifi_config)
+    case WiFiConfiguration.validate_password(wifi_config) do
+      :ok ->
+        :ok = Backend.save(wifi_config)
+        redirect(conn, "/")
 
-    redirect(conn, "/")
+      error ->
+        render_page(conn, "configure_password.html",
+          ssid: ssid,
+          error: password_error_message(error),
+          password: password
+        )
+    end
   end
 
   get "/ssid/:ssid" do
-    render_page(conn, "configure_password.html", ssid: ssid)
+    render_page(conn, "configure_password.html", ssid: ssid, password: "", error: "")
   end
 
   get "/networks" do
@@ -101,4 +112,15 @@ defmodule VintageNetWizard.Web.Router do
 
   defp display_security_from_key_mgmt(:none), do: ""
   defp display_security_from_key_mgmt(:wpa_psk), do: "WPA2 Personal"
+
+  defp password_error_message({:error, :password_required, _}), do: "Password required."
+
+  defp password_error_message({:error, :password_too_short}),
+    do: "Password is too short, must be greater than or equal to 8 characters."
+
+  defp password_error_message({:error, :password_too_long}),
+    do: "Password is too short, must be greater than or equal to 8 characters."
+
+  defp password_error_message({:error, :invalid_characters}),
+    do: "Password as invalid characters double check you typed it correctly."
 end

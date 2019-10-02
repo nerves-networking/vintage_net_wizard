@@ -3,23 +3,52 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
 
   alias VintageNetWizard.WiFiConfiguration
 
+  @too_long "12345678901234567890123456789012345678901234567890123456789012345"
+  @too_short "1234"
+  @invalid_characters <<1, 2, 3, 4, 5, 6, 7, 8>>
+
   test "decode json" do
     json = """
-    { "ssid": "test", "key_mgmt": "wpa_psk", "password": "asdf"}
+    { "ssid": "test", "key_mgmt": "wpa_psk", "password": "asdfasdf"}
     """
 
-    result = WiFiConfiguration.new("test", key_mgmt: :wpa_psk, password: "asdf")
+    result = WiFiConfiguration.new("test", key_mgmt: :wpa_psk, password: "asdfasdf")
 
     assert {:ok, result} == WiFiConfiguration.decode(json)
+  end
+
+  test "password validation" do
+    assert {:error, :password_too_short} ==
+             WiFiConfiguration.new("hello", key_mgmt: :wpa_psk, password: @too_short)
+             |> WiFiConfiguration.validate_password()
+
+    assert {:error, :password_too_long} ==
+             WiFiConfiguration.new("hello",
+               key_mgmt: :wpa_psk,
+               password: @too_long
+             )
+             |> WiFiConfiguration.validate_password()
+
+    assert {:error, :invalid_characters} ==
+             WiFiConfiguration.new("hello",
+               key_mgmt: :wpa_psk,
+               password: @invalid_characters
+             )
+             |> WiFiConfiguration.validate_password()
+
+    assert {:error, :password_required, :wpa_psk} ==
+             WiFiConfiguration.new("hello", key_mgmt: :wpa_psk)
+             |> WiFiConfiguration.validate_password()
   end
 
   test "take a map and turn it into a WiFiConfiguration" do
     map = %{
       "ssid" => "Hello",
-      "key_mgmt" => "wpa_psk"
+      "key_mgmt" => "wpa_psk",
+      "password" => "asdfasdf"
     }
 
-    wifi_configuration = WiFiConfiguration.new("Hello", key_mgmt: :wpa_psk)
+    wifi_configuration = WiFiConfiguration.new("Hello", key_mgmt: :wpa_psk, password: "asdfasdf")
 
     assert {:ok, wifi_configuration} == WiFiConfiguration.from_map(map)
   end
@@ -38,7 +67,7 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
   test "from_map accepts a password too" do
     map = %{
       "ssid" => "Hello",
-      "password" => "asdf",
+      "password" => "asdfasdf",
       "key_mgmt" => "wpa_psk"
     }
 
@@ -47,8 +76,31 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
     assert map["password"] == wifi_configuration.password
   end
 
+  test "from_map errors when there is an invalid password" do
+    map = %{
+      "ssid" => "Hello",
+      "password" => "",
+      "key_mgmt" => "wpa_psk"
+    }
+
+    assert {:error, :password_too_short} == WiFiConfiguration.from_map(map)
+
+    map =
+      Map.put(
+        map,
+        "password",
+        @too_long
+      )
+
+    assert {:error, :password_too_long} = WiFiConfiguration.from_map(map)
+
+    map = Map.put(map, "password", @invalid_characters)
+
+    assert {:error, :invalid_characters} == WiFiConfiguration.from_map(map)
+  end
+
   test "make a vintage_net configuration from a WiFiConfiguration" do
-    wifi_configuration = WiFiConfiguration.new("Hello", password: "asdf", key_mgmt: :wpa_psk)
+    wifi_configuration = WiFiConfiguration.new("Hello", password: "asdfasdf", key_mgmt: :wpa_psk)
 
     expected_result = %{
       ssid: wifi_configuration.ssid,
@@ -70,5 +122,48 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
     }
 
     assert expected_result == WiFiConfiguration.to_vintage_net_configuration(wifi_configuration)
+  end
+
+  test "don't make a vintage_net configuration with a too long password" do
+    configuration_wifi =
+      struct(WiFiConfiguration,
+        ssid: "hello",
+        password: @too_long,
+        key_mgmt: :wpa_psk
+      )
+
+    assert {:error, :password_too_long} ==
+             WiFiConfiguration.to_vintage_net_configuration(configuration_wifi)
+  end
+
+  test "don't make a vintage_net configuration with a too short password" do
+    configuration_wifi =
+      struct(WiFiConfiguration, ssid: "hello", password: @too_short, key_mgmt: :wpa_psk)
+
+    assert {:error, :password_too_short} ==
+             WiFiConfiguration.to_vintage_net_configuration(configuration_wifi)
+  end
+
+  test "don't make a vintage_net configuration with invalid characters in the password" do
+    configuration_wifi =
+      struct(WiFiConfiguration,
+        ssid: "hello",
+        password: @invalid_characters,
+        key_mgmt: :wpa_psk
+      )
+
+    assert {:error, :invalid_characters} ==
+             WiFiConfiguration.to_vintage_net_configuration(configuration_wifi)
+  end
+
+  test "don't make a vintage_net configuration when a password is required" do
+    configuration_wifi =
+      struct(WiFiConfiguration,
+        ssid: "hello",
+        key_mgmt: :wpa_psk
+      )
+
+    assert {:error, :password_required, :wpa_psk} ==
+             WiFiConfiguration.to_vintage_net_configuration(configuration_wifi)
   end
 end
