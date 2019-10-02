@@ -28,6 +28,8 @@ defmodule VintageNetWizard.Backend.Test do
 
     assert c1.ssid == configuration1.ssid
     assert c1.priority == 2
+
+    :ok = Backend.reset()
   end
 
   test "delete a configuration" do
