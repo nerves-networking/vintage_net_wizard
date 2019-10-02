@@ -67,18 +67,12 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   put "/:ssid/configuration" do
-    {:ok, cfg} =
-      conn
-      |> get_body()
-      |> Map.put("ssid", ssid)
-      |> WiFiConfiguration.from_map()
-
-    case Backend.save(cfg) do
-      :ok ->
-        send_json(conn, 204, "")
-
-      {:error, :no_config_for_ssid} ->
-        send_json(conn, 404, "")
+    with {:ok, cfg} <- configuration_from_params(conn, ssid),
+         :ok <- Backend.save(cfg) do
+      send_json(conn, 204, "")
+    else
+      error ->
+        send_json(conn, 400, make_error_message(error))
     end
   end
 
@@ -110,4 +104,39 @@ defmodule VintageNetWizard.Web.Api do
 
   defp non_empty_ssid(%{ssid: ""}), do: false
   defp non_empty_ssid(_other), do: true
+
+  defp configuration_from_params(conn, ssid) do
+    conn
+    |> get_body()
+    |> Map.put("ssid", ssid)
+    |> WiFiConfiguration.from_map()
+  end
+
+  defp make_error_message({:error, :password_required, key_mgmt}) do
+    Jason.encode!(%{
+      error: "password_required",
+      message: "A password is required for #{key_mgmt} access points."
+    })
+  end
+
+  defp make_error_message({:error, :password_too_short}) do
+    Jason.encode!(%{
+      error: "password_too_short",
+      message: "The minimum length for a password is 8."
+    })
+  end
+
+  defp make_error_message({:error, :password_too_long}) do
+    Jason.encode!(%{
+      error: "password_too_long",
+      message: "The maximum length for a password is 63."
+    })
+  end
+
+  defp make_error_message({:error, :invalid_characters}) do
+    Jason.encode!(%{
+      error: "invalid_characters",
+      message: "The password provided has invalid characters."
+    })
+  end
 end
