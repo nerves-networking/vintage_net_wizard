@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.2
+
+* Bug fixes
+  * Fetch the priv dir location at runtime instead of compile time.
+
 ## v0.1.1
 
 * Improvements
