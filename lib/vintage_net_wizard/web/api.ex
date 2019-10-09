@@ -99,6 +99,7 @@ defmodule VintageNetWizard.Web.Api do
     |> Enum.filter(&non_empty_ssid/1)
     |> Enum.sort(fn %{signal_percent: a}, %{signal_percent: b} -> a >= b end)
     |> Enum.uniq_by(fn %{ssid: ssid} -> ssid end)
+    |> Enum.map(&Map.from_struct/1)
     |> Jason.encode()
   end
 
