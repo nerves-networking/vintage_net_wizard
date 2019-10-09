@@ -6,8 +6,6 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   use DynamicSupervisor
 
-  @ssl_dir Path.join(:code.priv_dir(:vintage_net_wizard), "ssl")
-
   @doc false
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
@@ -61,13 +59,15 @@ defmodule VintageNetWizard.Web.Endpoint do
   end
 
   defp maybe_use_ssl(_use_ssl = true) do
+    ssl_dir = ssl_dir()
+
     Plug.Cowboy.child_spec(
       plug: Router,
       scheme: :https,
       options: [
         dispatch: dispatch(),
-        certfile: Application.get_env(:vintage_net_wizard, :certfile, "#{@ssl_dir}/cert.pem"),
-        keyfile: Application.get_env(:vintage_net_wizard, :keyfile, "#{@ssl_dir}/key.pem"),
+        certfile: Application.get_env(:vintage_net_wizard, :certfile, "#{ssl_dir}/cert.pem"),
+        keyfile: Application.get_env(:vintage_net_wizard, :keyfile, "#{ssl_dir}/key.pem"),
         port: Application.get_env(:vintage_net_wizard, :port, 443)
       ]
     )
@@ -82,5 +82,9 @@ defmodule VintageNetWizard.Web.Endpoint do
         port: Application.get_env(:vintage_net_wizard, :port, 80)
       ]
     )
+  end
+
+  defp ssl_dir() do
+    Path.join(:code.priv_dir(:vintage_net_wizard), "ssl")
   end
 end
