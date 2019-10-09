@@ -23,7 +23,7 @@ defmodule VintageNetWizard.Test.Backend do
   end
 
   @impl true
-  def apply(_cfgs, state), do: {:ok, state}
+  def apply(_configs, state), do: {:ok, state}
 
   @impl true
   def handle_info(_, state), do: {:noreply, state}

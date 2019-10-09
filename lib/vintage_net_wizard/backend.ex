@@ -197,8 +197,8 @@ defmodule VintageNetWizard.Backend do
     {:reply, status, state}
   end
 
-  def handle_call({:save, config}, _from, %{configurations: cfgs} = state) do
-    {:reply, :ok, %{state | configurations: Map.put(cfgs, config.ssid, config)}}
+  def handle_call({:save, config}, _from, %{configurations: configs} = state) do
+    {:reply, :ok, %{state | configurations: Map.put(configs, config.ssid, config)}}
   end
 
   def handle_call(
@@ -209,8 +209,8 @@ defmodule VintageNetWizard.Backend do
     {:reply, apply(backend, :device_info, []), state}
   end
 
-  def handle_call(:configurations, _from, %State{configurations: cfgs} = state) do
-    {:reply, build_config_list(cfgs), state}
+  def handle_call(:configurations, _from, %State{configurations: configs} = state) do
+    {:reply, build_config_list(configs), state}
   end
 
   def handle_call(
@@ -242,8 +242,8 @@ defmodule VintageNetWizard.Backend do
     {:reply, :ok, %{state | configurations: %{}, backend_state: new_state}}
   end
 
-  def handle_call({:delete_configuration, ssid}, _from, %State{configurations: cfgs} = state) do
-    {:reply, :ok, %{state | configurations: Map.delete(cfgs, ssid)}}
+  def handle_call({:delete_configuration, ssid}, _from, %State{configurations: configs} = state) do
+    {:reply, :ok, %{state | configurations: Map.delete(configs, ssid)}}
   end
 
   @impl true
@@ -276,8 +276,8 @@ defmodule VintageNetWizard.Backend do
     end
   end
 
-  defp build_config_list(cfgs) do
-    cfgs
+  defp build_config_list(configs) do
+    configs
     |> Enum.into([], &elem(&1, 1))
     |> Enum.sort(&(&1.priority <= &2.priority))
   end
