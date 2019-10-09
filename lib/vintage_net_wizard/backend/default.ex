@@ -130,7 +130,6 @@ defmodule VintageNetWizard.Backend.Default do
         {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _, access_points, _},
         %{data: data} = state
       ) do
-    access_points = Enum.map(access_points, &Map.from_struct/1)
     data = Map.put(data, :access_points, access_points)
     {:reply, {:access_points, access_points}, %{state | data: data}}
   end
