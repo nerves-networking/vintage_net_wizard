@@ -54,7 +54,7 @@ defmodule VintageNetWizard do
       }
     }
 
-    VintageNet.configure("wlan0", config)
+    VintageNet.configure("wlan0", config, persist: false)
   end
 
   defdelegate start_server(), to: Endpoint
