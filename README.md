@@ -109,7 +109,7 @@ config :vintage_net_wizard, ssl: true
 ```
 
 This will default to use a self-signed certificate and key on port `443`.
-You can also specify your own ceritificate, key, and port in the config:
+You can also specify your own certificate, key, and port in the config:
 
 ```elixir
 config :vintage_net_wizard,
@@ -131,7 +131,7 @@ config :vintage_net_wizard,
   backend: VintageNetWizard.Backend.Mock
 ```
 
-The default backend also timesout a configuration attempt if it is unable
+The default backend also times out a configuration attempt if it is unable
 to connect to any of the specified networks within 15 sec (this might
 occur if the password is incorrect or otherwise faulty network). You can
 adjust this timeout in the config for more control of how long you want
