@@ -47,6 +47,16 @@ defmodule VintageNetWizard.Backend do
   @callback configuration_status(state :: any()) :: configuration_status()
 
   @doc """
+  Start scanning for WiFi access points
+  """
+  @callback start_scan(state :: any()) :: state :: any()
+
+  @doc """
+  Stop the scan for WiFi access points
+  """
+  @callback stop_scan(state :: any()) :: state :: any()
+
+  @doc """
   Apply any actions required to set the backend back to an
   initial default state
   """
@@ -111,6 +121,22 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
+  Start scanning for WiFi access points
+  """
+  @spec start_scan() :: :ok
+  def start_scan() do
+    GenServer.call(__MODULE__, :start_scan)
+  end
+
+  @doc """
+  Stop scanning for WiFi access points
+  """
+  @spec stop_scan() :: :ok
+  def stop_scan() do
+    GenServer.call(__MODULE__, :stop_scan)
+  end
+
+  @doc """
   Save a `WiFiConfiguration` to the backend
   """
   @spec save(WiFiConfiguration.t()) :: :ok | {:error, any()}
@@ -168,6 +194,26 @@ defmodule VintageNetWizard.Backend do
       ) do
     access_points = apply(backend, :access_points, [backend_state])
     {:reply, access_points, state}
+  end
+
+  def handle_call(
+        :start_scan,
+        _from,
+        %State{backend: backend, backend_state: backend_state} = state
+      ) do
+    new_backend_state = apply(backend, :start_scan, [backend_state])
+
+    {:reply, :ok, %{state | backend_state: new_backend_state}}
+  end
+
+  def handle_call(
+        :stop_scan,
+        _from,
+        %State{backend: backend, backend_state: backend_state} = state
+      ) do
+    new_backend_state = apply(backend, :stop_scan, [backend_state])
+
+    {:reply, :ok, %{state | backend_state: new_backend_state}}
   end
 
   def handle_call(

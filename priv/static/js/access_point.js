@@ -39,7 +39,7 @@
 
   function buildSSIDTableData({ ssid }) {
     const tdElem = document.createElement("td");
-    const ssidText= document.createTextNode(ssid);
+    const ssidText = document.createTextNode(ssid);
 
     tdElem.appendChild(ssidText);
     tdElem.classList.add("font-weight-bold");
@@ -107,9 +107,9 @@
             key_mgmt: "none"
           })
         })
-        .then(resp => {
-          window.location.href = "/";
-        })
+          .then(resp => {
+            window.location.href = "/";
+          })
       } else {
         window.location.href = "/ssid/" + encodeURI(ssid);
       }

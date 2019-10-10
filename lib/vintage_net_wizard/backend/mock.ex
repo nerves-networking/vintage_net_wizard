@@ -69,6 +69,12 @@ defmodule VintageNetWizard.Backend.Mock do
     configuration_status
   end
 
+  @impl true
+  def start_scan(state), do: state
+
+  @impl true
+  def stop_scan(state), do: state
+
   defp initial_state() do
     access_points = [
       %{

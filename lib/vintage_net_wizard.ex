@@ -15,7 +15,8 @@ defmodule VintageNetWizard do
   def run_wizard() do
     with :ok <- Backend.reset(),
          :ok <- into_ap_mode(),
-         {:ok, _server} <- start_server() do
+         {:ok, _server} <- start_server(),
+         :ok <- Backend.start_scan() do
       :ok
     else
       # Already running is still ok
