@@ -64,6 +64,21 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
+  def start_scan(state) do
+    _ = scan(state)
+    scan_ref = start_scan_timer()
+    %{state | scan_ref: scan_ref}
+  end
+
+  @impl VintageNetWizard.Backend
+  def stop_scan(%{scan_ref: nil} = state), do: state
+
+  def stop_scan(%{scan_ref: ref} = state) do
+    _ = Process.cancel_timer(ref)
+    %{state | scan_ref: nil}
+  end
+
+  @impl VintageNetWizard.Backend
   def reset(), do: initial_state()
 
   @impl VintageNetWizard.Backend
@@ -78,14 +93,6 @@ defmodule VintageNetWizard.Backend.Default do
       |> Map.delete(:apply_configuration_timer)
 
     {:noreply, %{state | state: :configuring, data: data}}
-  end
-
-  def handle_info(
-        {VintageNet, ["interface", "wlan0", "connection"], :disconnected, :lan, _},
-        %{state: :configuring, data: %{configuration_status: :not_configured}} = state
-      ) do
-    _ = scan(state)
-    {:noreply, state}
   end
 
   def handle_info(
@@ -135,13 +142,27 @@ defmodule VintageNetWizard.Backend.Default do
     {:reply, {:access_points, access_points}, %{state | data: data}}
   end
 
+  def handle_info(:run_scan, state) do
+    case scan(state) do
+      :ok ->
+        {:noreply, %{state | scan_ref: start_scan_timer()}}
+
+      _ ->
+        {:noreply, state}
+    end
+  end
+
   def handle_info(_, state), do: {:noreply, state}
 
-  defp scan(%{state: :configuring}), do: :ok
+  defp start_scan_timer(), do: Process.send_after(self(), :run_scan, 20_000)
+
+  defp scan(%{state: :configuring}), do: VintageNet.scan("wlan0")
+  defp scan(_), do: {:error, :invalid_state}
 
   defp initial_state() do
     %{
       state: :configuring,
+      scan_ref: nil,
       data: %{access_points: %{}, configuration_status: :not_configured}
     }
   end

@@ -36,4 +36,14 @@ defmodule VintageNetWizard.Test.Backend do
 
   @impl true
   def configuration_status(_state), do: :not_configured
+
+  @impl true
+  def stop_scan(state) do
+    state
+  end
+
+  @impl true
+  def start_scan(state) do
+    state
+  end
 end
