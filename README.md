@@ -89,6 +89,17 @@ configuration again, such as holding a button for 5+ seconds. Take a look at
 [Running the example](#running-the-example) section for steps on setting up
 a button and running a quick example firmware on a device.
 
+### DNS in AP-mode
+
+When the wizard is running, users go to either `http://192.168.0.1/` or
+`http://wifi.config/` to access the web user interface. The latter can be
+changed via the `config.exs`:
+
+```elixir
+config :vintage_net_wizard,
+  dns_name: "my-wifi-config.com"
+```
+
 ### Port
 
 `VintageNetWizard` starts a webserver on port `80` by default. If port `80` is

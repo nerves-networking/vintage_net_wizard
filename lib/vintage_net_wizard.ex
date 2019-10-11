@@ -29,6 +29,8 @@ defmodule VintageNetWizard do
   """
   def into_ap_mode() do
     ssid = get_hostname()
+    our_ip_address = {192, 168, 0, 1}
+    our_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
 
     config = %{
       type: VintageNet.Technology.WiFi,
@@ -43,14 +45,26 @@ defmodule VintageNetWizard do
       },
       ipv4: %{
         method: :static,
-        address: {192, 168, 0, 1},
+        address: our_ip_address,
         prefix_length: 24
       },
       dhcpd: %{
         # These are defaults and are reproduced here as documentation
         start: {192, 168, 0, 20},
         end: {192, 168, 0, 254},
-        max_leases: 235
+        max_leases: 235,
+        options: %{
+          dns: [our_ip_address],
+          subnet: {255, 255, 255, 0},
+          router: [our_ip_address],
+          domain: our_name,
+          search: [our_name]
+        }
+      },
+      dnsd: %{
+        records: [
+          {our_name, our_ip_address}
+        ]
       }
     }
 
