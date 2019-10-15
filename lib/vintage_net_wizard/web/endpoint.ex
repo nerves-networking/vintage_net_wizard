@@ -3,8 +3,9 @@ defmodule VintageNetWizard.Web.Endpoint do
   Supervisor for the Web part of the VintageNet Wizard.
   """
   alias VintageNetWizard.Web.Router
-
   use DynamicSupervisor
+
+  @type opt :: {:ssl, :ssl.tls_server_option()}
 
   @doc false
   def start_link(args) do
@@ -18,15 +19,17 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   Only one server can be running at a time.
   """
-  @spec start_server() :: GenServer.on_start() | {:error, :already_started}
-  def start_server() do
-    use_ssl? = Application.get_env(:vintage_net_wizard, :ssl)
+  @spec start_server([opt]) ::
+          GenServer.on_start() | {:error, :already_started | :no_keyfile | :no_certfile}
+  def start_server(opts \\ []) do
+    use_ssl? = Keyword.has_key?(opts, :ssl)
 
-    spec = maybe_use_ssl(use_ssl?)
-
-    case DynamicSupervisor.start_child(__MODULE__, spec) do
+    with spec <- maybe_use_ssl(use_ssl?, opts),
+         {:ok, _pid} = ok <- DynamicSupervisor.start_child(__MODULE__, spec) do
+      ok
+    else
       {:error, :max_children} -> {:error, :already_started}
-      ok -> ok
+      error -> error
     end
   end
 
@@ -58,33 +61,27 @@ defmodule VintageNetWizard.Web.Endpoint do
     ]
   end
 
-  defp maybe_use_ssl(_use_ssl = true) do
-    ssl_dir = ssl_dir()
+  defp maybe_use_ssl(_use_ssl = true, opts) do
+    port = Application.get_env(:vintage_net_wizard, :port, 443)
+    ssl_options = Keyword.get(opts, :ssl)
+    options = [dispatch: dispatch(), port: port]
 
     Plug.Cowboy.child_spec(
       plug: Router,
       scheme: :https,
-      options: [
-        dispatch: dispatch(),
-        certfile: Application.get_env(:vintage_net_wizard, :certfile, "#{ssl_dir}/cert.pem"),
-        keyfile: Application.get_env(:vintage_net_wizard, :keyfile, "#{ssl_dir}/key.pem"),
-        port: Application.get_env(:vintage_net_wizard, :port, 443)
-      ]
+      options: Keyword.merge(ssl_options, options)
     )
   end
 
-  defp maybe_use_ssl(_no_ssl) do
-    Plug.Cowboy.child_spec(
-      plug: Router,
-      scheme: :http,
-      options: [
-        dispatch: dispatch(),
-        port: Application.get_env(:vintage_net_wizard, :port, 80)
-      ]
-    )
-  end
-
-  defp ssl_dir() do
-    Path.join(:code.priv_dir(:vintage_net_wizard), "ssl")
+  defp maybe_use_ssl(_no_ssl, _opts) do
+    {:ok,
+     Plug.Cowboy.child_spec(
+       plug: Router,
+       scheme: :http,
+       options: [
+         dispatch: dispatch(),
+         port: Application.get_env(:vintage_net_wizard, :port, 80)
+       ]
+     )}
   end
 end

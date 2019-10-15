@@ -111,24 +111,19 @@ config :vintage_net_wizard,
   port: 4001
 ```
 
+If SSL is enabled the default port is `443`.
+
 ### SSL
 
-To use SSL with the web UI, simply set the configuration flag:
+To use SSL with the web UI, you can pass SSL options to
+`VintageNetWizard.run_wizard/1`:
 
 ```elixir
-config :vintage_net_wizard, ssl: true
+VintageNetWizard.run_wizard(ssl: [keyfile: "/path/to/key.pem", certfile: "/path/to/cert.pem"])
 ```
 
-This will default to use a self-signed certificate and key on port `443`.
-You can also specify your own certificate, key, and port in the config:
-
-```elixir
-config :vintage_net_wizard,
-  ssl: true,
-  certfile: "path/to/cert.pem",
-  keyfile: "path/to/key.pem",
-  port: 4443
-```
+To see all available options see `Plug.SSL.configure/1` and Erlang's `:ssl`
+module.
 
 ### Backends
 
