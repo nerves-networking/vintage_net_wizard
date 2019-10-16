@@ -27,4 +27,20 @@ defmodule VintageNetWizard.APModeTest do
 
     assert expected == config
   end
+
+  test "empty hostname gets changed to a valid ssid" do
+    config = APMode.ap_mode_configuration("", "our_name")
+
+    %{wifi: %{networks: [%{ssid: ssid}]}} = config
+
+    assert ssid == "vintage_net_wizard"
+  end
+
+  test "long hostname gets trimmed" do
+    config = APMode.ap_mode_configuration("1234567890123456789012345678901234567890", "our_name")
+
+    %{wifi: %{networks: [%{ssid: ssid}]}} = config
+
+    assert byte_size(ssid) <= 32
+  end
 end

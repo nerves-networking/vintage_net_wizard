@@ -3,6 +3,8 @@ defmodule VintageNetWizard.APMode do
   This module contains utilities for configuration VintageNet in AP Mode
   """
 
+  @default_hostname "vintage_net_wizard"
+
   @doc """
   Change the WiFi module into access point mode
   """
@@ -20,7 +22,7 @@ defmodule VintageNetWizard.APMode do
   """
   @spec ap_mode_configuration(String.t(), String.t()) :: map()
   def ap_mode_configuration(hostname, our_name) do
-    ssid = hostname
+    ssid = sanitize_hostname_for_ssid(hostname)
     our_ip_address = {192, 168, 0, 1}
 
     %{
@@ -63,5 +65,17 @@ defmodule VintageNetWizard.APMode do
   defp get_hostname() do
     {:ok, hostname} = :inet.gethostname()
     to_string(hostname)
+  end
+
+  defp sanitize_hostname_for_ssid(<<ssid::32-bytes, _rest::binary>>) do
+    ssid
+  end
+
+  defp sanitize_hostname_for_ssid("") do
+    @default_hostname
+  end
+
+  defp sanitize_hostname_for_ssid(good_hostname) do
+    good_hostname
   end
 end
