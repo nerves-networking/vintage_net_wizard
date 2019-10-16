@@ -74,14 +74,13 @@ defmodule VintageNetWizard.Web.Endpoint do
   end
 
   defp maybe_use_ssl(_no_ssl, _opts) do
-    {:ok,
-     Plug.Cowboy.child_spec(
-       plug: Router,
-       scheme: :http,
-       options: [
-         dispatch: dispatch(),
-         port: Application.get_env(:vintage_net_wizard, :port, 80)
-       ]
-     )}
+    Plug.Cowboy.child_spec(
+      plug: Router,
+      scheme: :http,
+      options: [
+        dispatch: dispatch(),
+        port: Application.get_env(:vintage_net_wizard, :port, 80)
+      ]
+    )
   end
 end
