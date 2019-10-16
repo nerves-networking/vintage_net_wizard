@@ -8,6 +8,7 @@ defmodule VintageNetWizard.Backend.Mock do
   @behaviour VintageNetWizard.Backend
 
   alias VintageNetWizard.Web.Endpoint
+  alias VintageNet.WiFi.AccessPoint
 
   @impl true
   def init() do
@@ -79,7 +80,7 @@ defmodule VintageNetWizard.Backend.Mock do
 
   defp initial_state() do
     access_points = [
-      %{
+      %AccessPoint{
         band: :wifi_5_ghz,
         bssid: "8a:8a:20:88:7a:50",
         channel: 149,
@@ -89,7 +90,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 57,
         ssid: "Let It Crash-5GHz"
       },
-      %{
+      %AccessPoint{
         band: :wifi_2_4_ghz,
         bssid: "04:18:d6:47:1a:6a",
         channel: 6,
@@ -99,7 +100,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 10,
         ssid: "Let It Crash-2GHz"
       },
-      %{
+      %AccessPoint{
         band: :wifi_2_4_ghz,
         bssid: "16:18:d6:47:1a:6a",
         channel: 6,
@@ -109,7 +110,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 9,
         ssid: "CIA"
       },
-      %{
+      %AccessPoint{
         band: :wifi_2_4_ghz,
         bssid: "06:18:d6:47:1a:6a",
         channel: 6,
@@ -119,7 +120,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 9,
         ssid: "Red███ed W███"
       },
-      %{
+      %AccessPoint{
         band: :wifi_2_4_ghz,
         bssid: "26:9e:db:0d:4f:21",
         channel: 6,
@@ -129,7 +130,7 @@ defmodule VintageNetWizard.Backend.Mock do
         signal_percent: 60,
         ssid: "Airport WiFi"
       },
-      %{
+      %AccessPoint{
         band: :wifi_2_4_ghz,
         bssid: "26:9e:db:0d:4f:22",
         channel: 6,
