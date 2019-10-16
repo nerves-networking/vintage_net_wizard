@@ -1,7 +1,7 @@
 defmodule VintageNetWizard.Backend.Default do
   @behaviour VintageNetWizard.Backend
 
-  alias VintageNetWizard.WiFiConfiguration
+  alias VintageNetWizard.{APMode, WiFiConfiguration}
 
   @impl VintageNetWizard.Backend
   def init() do
@@ -85,7 +85,7 @@ defmodule VintageNetWizard.Backend.Default do
   def handle_info(:configuration_timeout, %{data: data} = state) do
     # If we get this timeout, something went wrong trying to apply
     # the configuration, i.e. bad password or faulty network
-    :ok = VintageNetWizard.into_ap_mode()
+    :ok = APMode.into_ap_mode()
 
     data =
       data
@@ -123,7 +123,7 @@ defmodule VintageNetWizard.Backend.Default do
     # wifi runs into a race condition. So, we wait a little
     # before trying to re-initialize the interface.
     Process.sleep(4_000)
-    :ok = VintageNetWizard.into_ap_mode()
+    :ok = APMode.into_ap_mode()
 
     data =
       data
