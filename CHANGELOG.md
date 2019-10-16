@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.3
+
+* Improvements
+  * Add dnsd to reduce connection time and allow users to connect via DNS names
+    (mDNS was also possible, but not as likely to work everywhere)
+
 ## v0.1.2
 
 * Improvements
