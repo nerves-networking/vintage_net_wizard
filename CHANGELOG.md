@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.4
+
+* Improvements
+  * Better handle using Erlang `:ssl` options when starting the wizard
+
 ## v0.1.3
 
 * Improvements
