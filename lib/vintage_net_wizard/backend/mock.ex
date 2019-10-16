@@ -7,11 +7,13 @@ defmodule VintageNetWizard.Backend.Mock do
   """
   @behaviour VintageNetWizard.Backend
 
+  alias VintageNetWizard.Web.Endpoint
+
   @impl true
   def init() do
     # It either starts, already running, or will error. So
     # don't need to care about the return
-    _ = VintageNetWizard.start_server()
+    _ = Endpoint.start_server()
 
     initial_state()
   end
@@ -47,7 +49,7 @@ defmodule VintageNetWizard.Backend.Mock do
 
   def handle_info({__MODULE__, :stop_server}, state) do
     _ = Process.send_after(self(), {__MODULE__, :apply_config}, 2_000)
-    :ok = VintageNetWizard.stop_server()
+    :ok = Endpoint.stop_server()
     {:noreply, state}
   end
 
@@ -56,7 +58,7 @@ defmodule VintageNetWizard.Backend.Mock do
   end
 
   def handle_info({__MODULE__, :apply_config}, state) do
-    {:ok, _} = VintageNetWizard.start_server()
+    {:ok, _} = Endpoint.start_server()
     {:noreply, %{state | configuration_status: :good}}
   end
 

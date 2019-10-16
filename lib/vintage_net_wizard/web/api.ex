@@ -2,6 +2,7 @@ defmodule VintageNetWizard.Web.Api do
   @moduledoc false
 
   alias VintageNetWizard.{WiFiConfiguration, Backend}
+  alias VintageNetWizard.Web.Endpoint
   alias Plug.Conn
 
   use Plug.Router
@@ -37,7 +38,7 @@ defmodule VintageNetWizard.Web.Api do
     _ = send_json(conn, 202, "")
     :ok = Backend.stop_scan()
     :ok = Backend.apply()
-    :ok = VintageNetWizard.stop_server()
+    :ok = Endpoint.stop_server()
 
     conn
   end

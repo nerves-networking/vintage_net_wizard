@@ -31,8 +31,4 @@ defmodule VintageNetWizard do
       error -> error
     end
   end
-
-  defdelegate start_server(), to: Endpoint
-
-  defdelegate stop_server(), to: Endpoint
 end

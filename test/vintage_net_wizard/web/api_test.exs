@@ -186,6 +186,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   end
 
   test "404 when trying to apply no configurations" do
+    :ok = Backend.reset()
     {conn, body} = run_request(:post, "/apply", body: "", content_type: "application/json")
 
     assert conn.status == 404
