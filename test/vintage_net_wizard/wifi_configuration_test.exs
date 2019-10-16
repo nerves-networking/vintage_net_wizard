@@ -9,10 +9,10 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
 
   test "decode json" do
     json = """
-    { "ssid": "test", "key_mgmt": "wpa_psk", "password": "asdfasdf"}
+    { "ssid": "test", "key_mgmt": "wpa_psk", "password": "secret12"}
     """
 
-    result = WiFiConfiguration.new("test", key_mgmt: :wpa_psk, password: "asdfasdf")
+    result = WiFiConfiguration.new("test", key_mgmt: :wpa_psk, password: "secret12")
 
     assert {:ok, result} == WiFiConfiguration.decode(json)
   end
@@ -45,10 +45,10 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
     map = %{
       "ssid" => "Hello",
       "key_mgmt" => "wpa_psk",
-      "password" => "asdfasdf"
+      "password" => "secret12"
     }
 
-    wifi_configuration = WiFiConfiguration.new("Hello", key_mgmt: :wpa_psk, password: "asdfasdf")
+    wifi_configuration = WiFiConfiguration.new("Hello", key_mgmt: :wpa_psk, password: "secret12")
 
     assert {:ok, wifi_configuration} == WiFiConfiguration.from_map(map)
   end
@@ -67,7 +67,7 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
   test "from_map accepts a password too" do
     map = %{
       "ssid" => "Hello",
-      "password" => "asdfasdf",
+      "password" => "secret12",
       "key_mgmt" => "wpa_psk"
     }
 
@@ -100,7 +100,7 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
   end
 
   test "make a vintage_net configuration from a WiFiConfiguration" do
-    wifi_configuration = WiFiConfiguration.new("Hello", password: "asdfasdf", key_mgmt: :wpa_psk)
+    wifi_configuration = WiFiConfiguration.new("Hello", password: "secret12", key_mgmt: :wpa_psk)
 
     expected_result = %{
       ssid: wifi_configuration.ssid,
