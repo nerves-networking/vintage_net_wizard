@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.5
+
+* Bug fixes
+  * Fixed error when not using SSL
+  * Don't create invalid SSIDs if the hostname isn't set or is something really
+    long
+
 ## v0.1.4
 
 * Improvements
