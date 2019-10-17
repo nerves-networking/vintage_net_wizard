@@ -142,4 +142,11 @@ defmodule VintageNetWizard.Web.Api do
       message: "The password provided has invalid characters."
     })
   end
+
+  defp make_error_message({:error, :user_required}) do
+    Jason.encode!(%{
+      error: "user_required",
+      message: "A user is required."
+    })
+  end
 end
