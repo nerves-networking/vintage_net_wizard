@@ -9,8 +9,6 @@ defmodule VintageNetWizard.Web.Router do
     WiFiConfiguration
   }
 
-  alias VintageNetWizard.WiFiConfiguration.{NoSecurity, WPAPersonal}
-
   plug(Plug.Logger, log: :debug)
   plug(Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/")
   plug(Plug.Parsers, parsers: [Plug.Parsers.URLENCODED, :json], json_decoder: Jason)
@@ -25,7 +23,7 @@ defmodule VintageNetWizard.Web.Router do
       configs ->
         render_page(conn, "index.html",
           configs: configs,
-          format_security: &display_security_from_config/1,
+          format_security: &WiFiConfiguration.security_name/1,
           get_key_mgmt: &WiFiConfiguration.get_key_mgmt/1
         )
     end
@@ -41,16 +39,25 @@ defmodule VintageNetWizard.Web.Router do
         redirect(conn, "/")
 
       error ->
-        render_page(conn, "configure_password.html",
+        {:ok, key_mgmt} = WiFiConfiguration.key_mgmt_from_string(conn.body_params["key_mgmt"])
+        error_message = password_error_message(error)
+
+        render_password_page(conn, key_mgmt,
           ssid: ssid,
-          error: password_error_message(error),
-          password: password
+          error: error_message,
+          password: password,
+          user: conn.body_params["user"]
         )
     end
   end
 
   get "/ssid/:ssid" do
-    render_page(conn, "configure_password.html", ssid: ssid, password: "", error: "")
+    key_mgmt =
+      Backend.access_points()
+      |> Enum.find(&(&1.ssid == ssid))
+      |> get_key_mgmt_from_ap()
+
+    render_password_page(conn, key_mgmt, ssid: ssid, password: "", error: "", user: "")
   end
 
   get "/networks" do
@@ -101,12 +108,17 @@ defmodule VintageNetWizard.Web.Router do
     |> (fn {:safe, contents} -> send_resp(conn, 200, contents) end).()
   end
 
+  defp render_password_page(conn, :wpa_psk, info) do
+    render_page(conn, "configure_password.html", info)
+  end
+
+  defp render_password_page(conn, :wpa_eap, info) do
+    render_page(conn, "configure_enterprise.html", info)
+  end
+
   defp template_file(page) do
     Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
   end
-
-  defp display_security_from_config(%NoSecurity{}), do: ""
-  defp display_security_from_config(%WPAPersonal{}), do: "WPA2 Personal"
 
   defp password_error_message({:error, :password_required}), do: "Password required."
 
@@ -118,4 +130,27 @@ defmodule VintageNetWizard.Web.Router do
 
   defp password_error_message({:error, :invalid_characters}),
     do: "Password as invalid characters double check you typed it correctly."
+
+  defp get_key_mgmt_from_ap(%{flags: []}) do
+    :none
+  end
+
+  defp get_key_mgmt_from_ap(%{flags: flags}) do
+    cond do
+      :wpa2_eap_ccmp in flags ->
+        :wpa_eap
+
+      :wpa2_psk_ccmp in flags ->
+        :wpa_psk
+
+      :wpa2_psk_ccmp_tkip in flags ->
+        :wpa_psk
+
+      :wpa_psk_ccmp_tkip in flags ->
+        :wpa_psk
+
+      true ->
+        :none
+    end
+  end
 end

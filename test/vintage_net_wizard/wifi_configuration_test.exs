@@ -2,7 +2,7 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
   use ExUnit.Case, async: true
 
   alias VintageNetWizard.WiFiConfiguration
-  alias VintageNetWizard.WiFiConfiguration.{NoSecurity, WPAPersonal}
+  alias VintageNetWizard.WiFiConfiguration.{NoSecurity, WPAPersonal, PEAPEnterprise}
 
   test "get the :none key_mgmt from NoSecurity config" do
     config = %NoSecurity{ssid: "Free WIFI"}
@@ -60,5 +60,51 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
     }
 
     assert expected_vintage_net_config == WiFiConfiguration.to_vintage_net_configuration(config)
+  end
+
+  describe "Get a key_mgmt from a string" do
+    test "wpa_eap" do
+      assert {:ok, :wpa_eap} == WiFiConfiguration.key_mgmt_from_string("wpa_eap")
+    end
+
+    test "wpa_psk" do
+      assert {:ok, :wpa_psk} == WiFiConfiguration.key_mgmt_from_string("wpa_psk")
+    end
+
+    test "none" do
+      assert {:ok, :none} == WiFiConfiguration.key_mgmt_from_string("none")
+    end
+
+    test "invalid" do
+      assert {:error, :invalid_key_mgmt} == WiFiConfiguration.key_mgmt_from_string("blue")
+    end
+  end
+
+  describe "Get a human friendly name from a particular WiFiConfiguration" do
+    test "NoSecurity" do
+      assert "None" == WiFiConfiguration.security_name(%NoSecurity{})
+    end
+
+    test "WPAPersonal" do
+      assert "WPA Personal" == WiFiConfiguration.security_name(%WPAPersonal{})
+    end
+
+    test "PEAPEnterprise" do
+      assert "WPA Enterprise" == WiFiConfiguration.security_name(%PEAPEnterprise{})
+    end
+  end
+
+  describe "get expected timeouts" do
+    test "NoSecurity" do
+      assert 30_000 == WiFiConfiguration.timeout(%NoSecurity{})
+    end
+
+    test "WPAPersonal" do
+      assert 30_000 == WiFiConfiguration.timeout(%WPAPersonal{})
+    end
+
+    test "PEAPEnterprise" do
+      assert 75_000 == WiFiConfiguration.timeout(%PEAPEnterprise{})
+    end
   end
 end

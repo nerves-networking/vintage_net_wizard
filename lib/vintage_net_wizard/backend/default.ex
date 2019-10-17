@@ -31,7 +31,11 @@ defmodule VintageNetWizard.Backend.Default do
         ipv4: %{method: :dhcp}
       })
 
-    timeout = Application.get_env(:vintage_net_wizard, :configuration_timeout, 15_000)
+    timeout =
+      wifi_configurations
+      |> Enum.max_by(&WiFiConfiguration.timeout/1)
+      |> WiFiConfiguration.timeout()
+
     timer = Process.send_after(self(), :configuration_timeout, timeout)
 
     data =

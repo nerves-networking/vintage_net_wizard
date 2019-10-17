@@ -137,16 +137,6 @@ config :vintage_net_wizard,
   backend: VintageNetWizard.Backend.Mock
 ```
 
-The default backend also times out a configuration attempt if it is unable
-to connect to any of the specified networks within 15 sec (this might
-occur if the password is incorrect or otherwise faulty network). You can
-adjust this timeout in the config for more control of how long you want
-to allow the device to attempt the new configuration:
-
-```elixir
-config :vintage_net_wizard, configuration_timeout: 30_000
-```
-
 ## JSON API
 
 It is possible to write a smartphone app to configure your device using an API

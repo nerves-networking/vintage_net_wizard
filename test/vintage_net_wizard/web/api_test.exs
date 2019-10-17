@@ -4,7 +4,7 @@ defmodule VintageNetWizard.Web.ApiTest do
 
   alias VintageNetWizard.Web.Api
   alias VintageNetWizard.Backend
-  alias VintageNetWizard.WiFiConfiguration.{WPAPersonal, NoSecurity}
+  alias VintageNetWizard.WiFiConfiguration.{WPAPersonal, NoSecurity, PEAPEnterprise}
 
   @opts Api.init([])
 
@@ -26,7 +26,7 @@ defmodule VintageNetWizard.Web.ApiTest do
     assert conn.status == 200
   end
 
-  test "configure an SSID" do
+  test "configure a WPA Personal SSID" do
     json_body =
       Jason.encode!(%{
         key_mgmt: "wpa_psk",
@@ -42,7 +42,73 @@ defmodule VintageNetWizard.Web.ApiTest do
     Backend.delete_configuration("fake")
   end
 
-  test "returns error if passed a password is required" do
+  test "configure a WPA Enterprise SSID" do
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_eap",
+        password: "password",
+        user: "user"
+      })
+
+    {conn, body} =
+      run_request(:put, "/enterprise/configuration",
+        body: json_body,
+        content_type: "application/json"
+      )
+
+    assert conn.status == 204
+    assert body == ""
+
+    Backend.delete_configuration("enterprise")
+  end
+
+  test "errors when a WPA Enterprise is configured with no password" do
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_eap",
+        user: "user"
+      })
+
+    {conn, body} =
+      run_request(:put, "/enterprise/configuration",
+        body: json_body,
+        content_type: "application/json"
+      )
+
+    assert conn.status == 400
+
+    assert body == %{
+             "error" => "password_required",
+             "message" => "A password is required."
+           }
+
+    Backend.delete_configuration("enterprise")
+  end
+
+  test "errors when a WPA Enterprise is configured with no user" do
+    json_body =
+      Jason.encode!(%{
+        key_mgmt: "wpa_eap",
+        password: "password"
+      })
+
+    {conn, body} =
+      run_request(:put, "/enterprise/configuration",
+        body: json_body,
+        content_type: "application/json"
+      )
+
+    assert conn.status == 400
+
+    assert body == %{
+             "error" => "user_required",
+             "message" => "A user is required."
+           }
+
+    Backend.delete_configuration("enterprise")
+  end
+
+  test "errors when a WPA Personal is configured with no password" do
     :ok = Backend.reset()
 
     json_body =
@@ -154,17 +220,30 @@ defmodule VintageNetWizard.Web.ApiTest do
     fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
     fake2 = %WPAPersonal{ssid: "fake2", psk: "password", priority: 2}
 
+    enterprise = %PEAPEnterprise{
+      ssid: "enterprise",
+      password: "password",
+      user: "user",
+      priority: 3
+    }
+
     Backend.save(fake1)
     Backend.save(fake2)
+    Backend.save(enterprise)
 
     {conn, body} = run_request(:get, "/configurations")
 
     assert conn.status == 200
 
     Enum.each(body, fn
-      %{"password" => _} -> flunk("Configurations endpoint should not expose passwords")
-      %{"key_mgmt" => _, "ssid" => ssid} when ssid in ["fake1", "fake2"] -> assert true
-      payload -> flunk("Configuration endpoint returns bad payload: #{inspect(payload)}")
+      %{"password" => _} ->
+        flunk("Configurations endpoint should not expose passwords")
+
+      %{"key_mgmt" => _, "ssid" => ssid} when ssid in ["fake1", "fake2", "enterprise"] ->
+        assert true
+
+      payload ->
+        flunk("Configuration endpoint returns bad payload: #{inspect(payload)}")
     end)
 
     :ok = Backend.reset()
