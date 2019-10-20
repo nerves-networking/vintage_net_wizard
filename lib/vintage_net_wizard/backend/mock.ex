@@ -10,8 +10,12 @@ defmodule VintageNetWizard.Backend.Mock do
   alias VintageNetWizard.Web.Endpoint
   alias VintageNet.WiFi.AccessPoint
 
+  require Logger
+
   @impl true
   def init() do
+    _ = Logger.info("Go to http://localhost:#{Application.get_env(:vintage_net_wizard, :port)}/")
+
     # It either starts, already running, or will error. So
     # don't need to care about the return
     _ = Endpoint.start_server()
