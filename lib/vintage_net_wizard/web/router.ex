@@ -110,8 +110,9 @@ defmodule VintageNetWizard.Web.Router do
     Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
   end
 
-  defp display_security_from_key_mgmt(:none), do: ""
+  defp display_security_from_key_mgmt(:none), do: "None"
   defp display_security_from_key_mgmt(:wpa_psk), do: "WPA2 Personal"
+  defp display_security_from_key_mgmt(:wpa_eap), do: "WPA Enterprise"
 
   defp password_error_message({:error, :password_required, _}), do: "Password required."
 
