@@ -29,13 +29,6 @@ install_nerves_bootstrap: &install_nerves_bootstrap
       cd /tmp
       mix archive.install hex nerves_bootstrap "~> 1.0" --force
 
-install_mdl: &install_mdl
-  run:
-    name: Install Markdown Lint
-    command: |
-      apt install -y ruby
-      gem install mdl
-
 defaults: &defaults
   working_directory: ~/repo
 
@@ -50,7 +43,6 @@ jobs:
     steps:
       - checkout
       - <<: *install_system_deps
-      - <<: *install_mdl
       - <<: *install_elixir
       - <<: *install_hex_rebar
       - restore_cache:
@@ -59,7 +51,6 @@ jobs:
       - run: mix deps.get
       - run: MIX_ENV=test mix coveralls.circle
       - run: mix format --check-formatted
-      - run: mdl --style .circleci/md-style.rb *.md
       - run: MIX_ENV=docs mix docs
       - run: mix hex.build
       - run: mix dialyzer --halt-exit-status
