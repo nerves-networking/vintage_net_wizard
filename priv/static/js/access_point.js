@@ -48,24 +48,20 @@
   }
 
   function buildSecurityTableData({ flags }) {
-    if (flags.includes("none") || flags.length === 0) {
-      return document.createElement("td");
-    } else {
-      const tdElem = document.createElement("td");
-      const securityText = document.createTextNode(getSecurityDisplayName(flags));
-      tdElem.appendChild(securityText);
+    const tdElem = document.createElement("td");
+    const securityText = document.createTextNode(getSecurityDisplayName(flags));
+    tdElem.appendChild(securityText);
 
-      return tdElem;
-    }
+    return tdElem;
   }
 
   function addSecurityData(row, { flags }) {
     if (isWPAPersonal(flags)) {
       row.setAttribute("data-security", "wpa");
-    } else if (flags.includes("none") || flags.length === 0) {
-      row.setAttribute("data-security", "none");
+    } else if (isWPAEnterprise(flags)) {
+      row.setAttribute("data-security", "wpa");
     } else {
-      console.warn("Unsupported security");
+      row.setAttribute("data-security", "none");
     }
   }
 
@@ -88,8 +84,7 @@
     } else if (isWPAEnterprise(flags)) {
       return "WPA Enterprise";
     } else {
-      console.warn("Unsupported security");
-      return "Not Supported"
+      return "None"
     }
   }
 

@@ -132,6 +132,16 @@ defmodule VintageNetWizard.Backend.Mock do
       },
       %AccessPoint{
         band: :wifi_2_4_ghz,
+        bssid: "26:9e:db:0d:4f:23",
+        channel: 6,
+        flags: [:ess],
+        frequency: 2462,
+        signal_dbm: -20,
+        signal_percent: 99,
+        ssid: "Open Wifi"
+      },
+      %AccessPoint{
+        band: :wifi_2_4_ghz,
         bssid: "26:9e:db:0d:4f:22",
         channel: 6,
         flags: [:wpa2_eap_ccmp, :ess],
