@@ -69,12 +69,12 @@
   function view({view, dots}) {
     switch (view) {
       case "trying":
-        return ["Trying Configuration" + dots, runGetStatus];
+        return ["Trying configuration" + dots, runGetStatus];
       case "configurationGood":
         return [`
-        <p>Configuration Okay</p>
-        <p>Press "Complete" to exit the Wizard and connect to the WiFi.</p>
-        <p>The Wizard will exit and connect to the WiFi automatically after 60 seconds.</p>
+        <p>Configuration okay</p>
+        <p>Press "Complete" to exit the wizard and connect to the WiFi.</p>
+        <p>The wizard will exit and connect to the WiFi automatically after 60 seconds.</p>
         `, createCompleteLink];
       case "configurationBad":
         return [`
