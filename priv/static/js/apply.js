@@ -13,12 +13,12 @@
   function runGetStatus() {
     setTimeout(getStatus, 1000);
   }
-  
+
   function getStatus() {
     fetch("/api/v1/configuration/status")
       .then(resp => resp.json())
       .then(handleStatusResponse)
-      .catch(handleNetworkEorrResponse);
+      .catch(handleNetworkErrorResponse);
   }
 
   function handleStatusResponse(status) {
@@ -43,7 +43,7 @@
     }
   }
 
-  function handleNetworkEorrResponse(e) {
+  function handleNetworkErrorResponse(e) {
     state.dots = state.dots + ".";
     render(state);
   }
