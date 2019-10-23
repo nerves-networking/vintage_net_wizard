@@ -112,13 +112,13 @@ defmodule VintageNetWizard.Web.Api do
     conn
     |> get_body()
     |> Map.put("ssid", ssid)
-    |> WiFiConfiguration.from_map()
+    |> WiFiConfiguration.from_params()
   end
 
-  defp make_error_message({:error, :password_required, key_mgmt}) do
+  defp make_error_message({:error, :password_required}) do
     Jason.encode!(%{
       error: "password_required",
-      message: "A password is required for #{key_mgmt} access points."
+      message: "A password is required."
     })
   end
 

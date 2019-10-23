@@ -18,9 +18,9 @@
 
            <div class="form-group">
              <label for="security">Security</label>
-             <select id="security" name="security" class="custom-select js-security-select">
+             <select id="key_mgmt" name="security" class="custom-select js-security-select">
                <option value="none" selected>None</option>
-               <option value="wpa">WPA Personal</option>
+               <option value="wpa_psk">WPA Personal</option>
              </select>
            </div>
 
