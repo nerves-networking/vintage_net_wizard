@@ -9,6 +9,8 @@ defmodule VintageNetWizard.Web.Router do
     WiFiConfiguration
   }
 
+  alias VintageNetWizard.WiFiConfiguration.{NoSecurity, WPAPersonal}
+
   plug(Plug.Logger, log: :debug)
   plug(Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/")
   plug(Plug.Parsers, parsers: [Plug.Parsers.URLENCODED, :json], json_decoder: Jason)
@@ -23,23 +25,18 @@ defmodule VintageNetWizard.Web.Router do
       configs ->
         render_page(conn, "index.html",
           configs: configs,
-          format_security: &display_security_from_key_mgmt/1
+          format_security: &display_security_from_config/1,
+          get_key_mgmt: &WiFiConfiguration.get_key_mgmt/1
         )
     end
   end
 
   post "/ssid/:ssid" do
     password = conn.body_params["password"]
+    params = Map.put(conn.body_params, "ssid", ssid)
 
-    wifi_config =
-      WiFiConfiguration.new(
-        ssid,
-        password: password,
-        key_mgmt: :wpa_psk
-      )
-
-    case WiFiConfiguration.validate_password(wifi_config) do
-      :ok ->
+    case WiFiConfiguration.from_params(params) do
+      {:ok, wifi_config} ->
         :ok = Backend.save(wifi_config)
         redirect(conn, "/")
 
@@ -67,16 +64,14 @@ defmodule VintageNetWizard.Web.Router do
   post "/networks/new" do
     ssid = Map.get(conn.body_params, "ssid")
 
-    case Map.get(conn.body_params, "security") do
+    case Map.get(conn.body_params, "key_mgmt") do
       "none" ->
-        :ok =
-          ssid
-          |> WiFiConfiguration.new(key_mgmt: :none)
-          |> Backend.save()
+        {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
+        :ok = Backend.save(config)
 
         redirect(conn, "/")
 
-      "wpa" ->
+      "wpa_psk" ->
         redirect(conn, "/ssid/#{ssid}")
     end
   end
@@ -110,17 +105,16 @@ defmodule VintageNetWizard.Web.Router do
     Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
   end
 
-  defp display_security_from_key_mgmt(:none), do: "None"
-  defp display_security_from_key_mgmt(:wpa_psk), do: "WPA2 Personal"
-  defp display_security_from_key_mgmt(:wpa_eap), do: "WPA Enterprise"
+  defp display_security_from_config(%NoSecurity{}), do: ""
+  defp display_security_from_config(%WPAPersonal{}), do: "WPA2 Personal"
 
-  defp password_error_message({:error, :password_required, _}), do: "Password required."
+  defp password_error_message({:error, :password_required}), do: "Password required."
 
   defp password_error_message({:error, :password_too_short}),
     do: "Password is too short, must be greater than or equal to 8 characters."
 
   defp password_error_message({:error, :password_too_long}),
-    do: "Password is too short, must be greater than or equal to 8 characters."
+    do: "Password is too long, must be less than or equal to 64 characters."
 
   defp password_error_message({:error, :invalid_characters}),
     do: "Password as invalid characters double check you typed it correctly."

@@ -27,9 +27,9 @@
                <%= for config <- configs do %>
                  <tr class="configuration" data-security="wpa" data-ssid="<%= config.ssid %>">
                    <td scope="row"><span class="handle font-weight-bold">↕&nbsp;&nbsp;<%= config.ssid %></span></td>
-                   <td><%= format_security.(config.key_mgmt) %></td>
+                   <td><%= format_security.(config) %></td>
                    <td>
-                     <%= if config.key_mgmt == :none do %>
+                     <%= if get_key_mgmt.(config) == :none do %>
                      <% else %>
                        <a href="/ssid/<%= URI.encode(config.ssid) %>">
                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
