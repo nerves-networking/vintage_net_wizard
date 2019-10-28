@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.6
+
+* New features
+  * Added support for configuring WPA-EAP PEAP
+
+* Bug fixes
+  * Fixed issue where the UI would ask for a password for some access points
+    that didn't have security.
+
 ## v0.1.5
 
 * Bug fixes
