@@ -2,11 +2,18 @@ defmodule VintageNetWizard.Web.ApiTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias VintageNetWizard.Web.{Api, Endpoint}
+  alias VintageNetWizard.Web.Api
   alias VintageNetWizard.Backend
   alias VintageNetWizard.WiFiConfiguration.{WPAPersonal, NoSecurity, PEAPEnterprise}
 
   @opts Api.init([])
+
+  setup do
+    # There is a race condition between these tests and
+    # handling state in the Mock backend. To be solved
+    # in the next change
+    VintageNetWizard.run_wizard()
+  end
 
   test "get a configuration status" do
     {_conn, status} = run_request(:get, "/configuration/status")
@@ -293,7 +300,6 @@ defmodule VintageNetWizard.Web.ApiTest do
 
   test "completes configuration" do
     :ok = Backend.reset()
-    {:ok, _pid} = Endpoint.start_server()
 
     fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
     Backend.save(fake1)
@@ -306,8 +312,6 @@ defmodule VintageNetWizard.Web.ApiTest do
 
     assert conn.status == 202
     assert body == ""
-
-    :ok = Backend.reset()
   end
 
   defp run_request(method, endpoint, opts \\ []) do
