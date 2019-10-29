@@ -35,12 +35,10 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   get "/complete" do
-    _ = send_json(conn, 202, "")
-    :ok = Backend.stop_scan()
-    :ok = Backend.apply()
+    :ok = Backend.complete()
     :ok = Endpoint.stop_server()
 
-    conn
+    send_json(conn, 202, "")
   end
 
   get "/configurations" do

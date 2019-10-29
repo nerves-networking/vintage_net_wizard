@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias VintageNetWizard.Web.Api
+  alias VintageNetWizard.Web.{Api, Endpoint}
   alias VintageNetWizard.Backend
   alias VintageNetWizard.WiFiConfiguration.{WPAPersonal, NoSecurity, PEAPEnterprise}
 
@@ -291,6 +291,25 @@ defmodule VintageNetWizard.Web.ApiTest do
     :ok = Backend.reset()
   end
 
+  test "completes configuration" do
+    :ok = Backend.reset()
+    {:ok, _pid} = Endpoint.start_server()
+
+    fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
+    Backend.save(fake1)
+
+    Backend.subscribe()
+
+    {conn, body} = run_request(:get, "/complete")
+
+    assert_receive({VintageNetWizard, :completed})
+
+    assert conn.status == 202
+    assert body == ""
+
+    :ok = Backend.reset()
+  end
+
   defp run_request(method, endpoint, opts \\ []) do
     body = Keyword.get(opts, :body)
     content_type = Keyword.get(opts, :content_type)
@@ -314,6 +333,7 @@ defmodule VintageNetWizard.Web.ApiTest do
 
   defp decode_body(conn) do
     case conn.resp_body do
+      nil -> ""
       "" -> ""
       json -> Jason.decode!(json)
     end
