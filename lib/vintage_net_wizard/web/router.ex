@@ -71,7 +71,7 @@ defmodule VintageNetWizard.Web.Router do
   post "/networks/new" do
     ssid = Map.get(conn.body_params, "ssid")
 
-    case Map.get(conn.body_params, "key_mgmt") do
+    case Map.get(conn.body_params, "security") do
       "none" ->
         {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
         :ok = Backend.save(config)
