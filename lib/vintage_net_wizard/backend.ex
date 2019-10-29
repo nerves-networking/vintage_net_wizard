@@ -116,6 +116,7 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Get the current state of the WiFi configuration
   """
+  @spec configuration_state() :: %State{}
   def configuration_state() do
     GenServer.call(__MODULE__, :configuration_state)
   end
@@ -174,6 +175,20 @@ defmodule VintageNetWizard.Backend do
   @spec reset() :: :ok
   def reset() do
     GenServer.call(__MODULE__, :reset)
+  end
+
+  @doc """
+  """
+  @spec complete() :: :ok
+  def complete() do
+    :ok = stop_scan()
+    :ok = apply()
+
+    configuration_state()
+    |> Map.get(:subscriber)
+    |> maybe_send({VintageNetWizard, :completed})
+
+    :ok
   end
 
   @impl true
@@ -290,6 +305,10 @@ defmodule VintageNetWizard.Backend do
 
   def handle_call({:delete_configuration, ssid}, _from, %State{configurations: configs} = state) do
     {:reply, :ok, %{state | configurations: Map.delete(configs, ssid)}}
+  end
+
+  def handle_call(:configuration_state, _from, state) do
+    {:reply, state, state}
   end
 
   @impl true
