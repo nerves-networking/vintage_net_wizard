@@ -64,7 +64,7 @@ defmodule VintageNetWizard.Backend do
 
   defmodule State do
     @moduledoc false
-    defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
+    defstruct subscribers: [], backend: nil, backend_state: nil, configurations: []
   end
 
   @spec start_link(backend :: module()) :: GenServer.on_start()
@@ -75,9 +75,17 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Subscribe to messages from the backend
   """
-  @spec subscribe() :: :ok
-  def subscribe() do
-    GenServer.cast(__MODULE__, {:subscribe, self()})
+  @spec subscribe(pid() | nil) :: :ok
+  def subscribe(pid \\ nil) do
+    GenServer.cast(__MODULE__, {:subscribe, pid || self()})
+  end
+
+  @doc """
+  Subscribe to messages from the backend
+  """
+  @spec unsubscribe(pid() | nil) :: :ok
+  def unsubscribe(pid \\ nil) do
+    GenServer.cast(__MODULE__, {:unsubscribe, pid || self()})
   end
 
   @doc """
@@ -178,6 +186,7 @@ defmodule VintageNetWizard.Backend do
   end
 
   @doc """
+  Complete the configuration
   """
   @spec complete() :: :ok
   def complete() do
@@ -185,7 +194,7 @@ defmodule VintageNetWizard.Backend do
     :ok = apply()
 
     configuration_state()
-    |> Map.get(:subscriber)
+    |> Map.get(:subscribers)
     |> maybe_send({VintageNetWizard, :completed})
 
     :ok
@@ -312,22 +321,50 @@ defmodule VintageNetWizard.Backend do
   end
 
   @impl true
-  def handle_cast({:subscribe, subscriber}, state) do
-    {:noreply, %{state | subscriber: subscriber}}
+  def handle_cast({:subscribe, subscriber}, %{subscribers: subscribers} = state) do
+    subscribers =
+      if Enum.find(subscribers, fn {p, _} -> p == subscriber end) do
+        # Already subscribed
+        subscribers
+      else
+        [{subscriber, Process.monitor(subscriber)} | subscribers]
+      end
+
+    {:noreply, %{state | subscribers: subscribers}}
+  end
+
+  def handle_cast({:unsubscribe, subscriber}, %{subscribers: subscribers} = state) do
+    subscribers =
+      Enum.reduce(subscribers, [], fn {p, ref} = sub, acc ->
+        if p == subscriber do
+          Process.demonitor(ref)
+          acc
+        else
+          [sub, acc]
+        end
+      end)
+
+    {:noreply, %{state | subscribers: subscribers}}
   end
 
   @impl true
+  def handle_info({:DOWN, ref, :process, subscriber, _reason}, state) do
+    # Subscriber went down, so remove from our list
+    subscribers = state.subscribers |> Enum.reject(&(&1 == {subscriber, ref}))
+    {:noreply, %{state | subscribers: subscribers}}
+  end
+
   def handle_info(
         info,
         %State{
-          subscriber: subscriber,
+          subscribers: subscribers,
           backend: backend,
           backend_state: backend_state
         } = state
       ) do
     case apply(backend, :handle_info, [info, backend_state]) do
       {:reply, message, new_backend_state} ->
-        maybe_send(subscriber, {VintageNetWizard, message})
+        maybe_send(subscribers, {VintageNetWizard, message})
         {:noreply, %{state | backend_state: new_backend_state}}
 
       {:noreply, %{state: :idle, data: %{configuration_status: :good}} = new_backend_state} ->
@@ -347,8 +384,11 @@ defmodule VintageNetWizard.Backend do
     |> Enum.sort(&(&1.priority <= &2.priority))
   end
 
-  defp maybe_send(nil, _message), do: :ok
-  defp maybe_send(pid, message), do: send(pid, message)
+  defp maybe_send(subscribers, message) when is_list(subscribers) and length(subscribers) > 0 do
+    Enum.each(subscribers, fn {p, _} -> send(p, message) end)
+  end
+
+  defp maybe_send(_subscribers, _message), do: :ok
 
   defp get_priority_for_ssid(priority_order_list, ssid) do
     priority_index =
