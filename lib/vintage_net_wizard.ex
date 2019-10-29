@@ -20,9 +20,8 @@ defmodule VintageNetWizard do
   """
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do
-    with :ok <- Backend.reset(),
-         :ok <- APMode.into_ap_mode(),
-         {:ok, _server} <- Endpoint.start_server(opts),
+    with :ok <- APMode.into_ap_mode(),
+         :ok <- Endpoint.start_server(opts),
          :ok <- Backend.start_scan() do
       :ok
     else
