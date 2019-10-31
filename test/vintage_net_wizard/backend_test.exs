@@ -55,4 +55,9 @@ defmodule VintageNetWizard.Backend.Test do
 
     assert {:error, :no_configurations} = Backend.apply()
   end
+
+  test "can complete with no configurations" do
+    :ok = Backend.reset()
+    assert :ok = Backend.complete()
+  end
 end

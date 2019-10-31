@@ -62,6 +62,11 @@ defmodule VintageNetWizard.Backend do
   """
   @callback reset() :: state :: any()
 
+  @doc """
+  Perform final completion steps.
+  """
+  @callback complete([WiFiConfiguration.t()], state :: any()) :: {:ok, state :: any()}
+
   defmodule State do
     @moduledoc false
     defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
@@ -181,8 +186,7 @@ defmodule VintageNetWizard.Backend do
   """
   @spec complete() :: :ok
   def complete() do
-    :ok = stop_scan()
-    :ok = apply()
+    GenServer.call(__MODULE__, :complete)
 
     configuration_state()
     |> Map.get(:subscriber)
@@ -309,6 +313,18 @@ defmodule VintageNetWizard.Backend do
 
   def handle_call(:configuration_state, _from, state) do
     {:reply, state, state}
+  end
+
+  def handle_call(
+        :complete,
+        _from,
+        %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
+          state
+      ) do
+    {:ok, new_backend_state} =
+      apply(backend, :complete, [build_config_list(wifi_configs), backend_state])
+
+    {:reply, :ok, %{state | backend_state: new_backend_state}}
   end
 
   @impl true
