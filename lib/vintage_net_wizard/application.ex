@@ -5,8 +5,6 @@ defmodule VintageNetWizard.Application do
 
   @spec start(Application.start_type(), any()) :: {:error, any} | {:ok, pid()}
   def start(_type, _args) do
-    backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
-
     children = [
       VintageNetWizard.Web.Endpoint
     ]
