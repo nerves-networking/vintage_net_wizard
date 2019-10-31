@@ -304,8 +304,6 @@ defmodule VintageNetWizard.Web.ApiTest do
     # Starts a task to kill the server after delivery
     assert length(Task.Supervisor.children(VintageNetWizard.TaskSupervisor)) == 1
 
-    assert_receive({VintageNetWizard, :completed})
-
     assert conn.status == 202
     assert body == ""
   end

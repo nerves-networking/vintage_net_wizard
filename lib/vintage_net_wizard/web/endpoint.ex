@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNetWizard.{Backend, Web.Router}
+  alias VintageNetWizard.{Backend, Callbacks, Web.Router}
   use DynamicSupervisor
 
   @type opt :: {:ssl, :ssl.tls_server_option()}
@@ -24,10 +24,12 @@ defmodule VintageNetWizard.Web.Endpoint do
   def start_server(opts \\ []) do
     use_ssl? = Keyword.has_key?(opts, :ssl)
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
+    callbacks = Keyword.take(opts, [:on_exit])
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Backend, backend}) do
+         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Backend, backend}),
+         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}) do
       :ok
     else
       {:error, :max_children} -> {:error, :already_started}
@@ -41,10 +43,12 @@ defmodule VintageNetWizard.Web.Endpoint do
   @spec stop_server() :: :ok | {:error, :not_found}
   def stop_server() do
     case DynamicSupervisor.which_children(__MODULE__) do
-      [{_, cowboy, _, _}, {_, backend, _, _}] ->
+      [{_, cowboy, _, _}, {_, backend, _, _}, {_, callbacks, _, _}] ->
         _ = DynamicSupervisor.terminate_child(__MODULE__, cowboy)
         _ = DynamicSupervisor.terminate_child(__MODULE__, backend)
-        :ok
+
+        _ = VintageNetWizard.Callbacks.on_exit()
+        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks)
 
       _ ->
         {:error, :not_found}
@@ -53,7 +57,7 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   @impl DynamicSupervisor
   def init(_) do
-    DynamicSupervisor.init(strategy: :one_for_one, max_children: 2)
+    DynamicSupervisor.init(strategy: :one_for_one, max_children: 3)
   end
 
   defp dispatch do

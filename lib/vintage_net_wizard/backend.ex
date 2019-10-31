@@ -187,12 +187,6 @@ defmodule VintageNetWizard.Backend do
   @spec complete() :: :ok
   def complete() do
     GenServer.call(__MODULE__, :complete)
-
-    configuration_state()
-    |> Map.get(:subscriber)
-    |> maybe_send({VintageNetWizard, :completed})
-
-    :ok
   end
 
   @impl true

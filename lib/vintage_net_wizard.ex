@@ -14,6 +14,8 @@ defmodule VintageNetWizard do
   Options:
 
     - `:ssl` - A Keyword list of `:ssl.tls_server_options`
+    - `:on_exit` - `{module, function, args}` tuple specifying
+    callback to perform after stopping the server.
 
   See `Plug.SSL.configure/1` for more information about the
   SSL options.

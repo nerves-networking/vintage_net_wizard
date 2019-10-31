@@ -184,3 +184,25 @@ browser at [http://wifi.config](http://wifi.config/) or
 [http://192.168.0.1/](http://192.168.0.1/). If you've configured an SSL
 certificate, it's possible to use `https`. You may also need to change the
 `:dns_name` configuration to match the name on your SSL certificate.
+
+## Callbacks when Stopping
+
+There may be cases that your application needs to know when the wizard
+is stopped (i.e. start your app once the port is free, etc).
+
+For that, you can use the `:on_exit` options when calling
+`VintageNetWizard.run_wizard/1` and specify a `{module, function, args}` tuple of the function to call after the wizard has stopped.
+
+```elixir
+defmodule MyApp do
+  def start_wizard() do
+    VintageNetWizard.run_wizard(
+      on_exit: {__MODULE__, :handle_on_exit, []}
+    )
+  end
+
+  def handle_on_exit() do
+    Logger.info("VintageNetWizard stopped")
+  end
+end
+```
