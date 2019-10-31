@@ -36,7 +36,14 @@ defmodule VintageNetWizard.Web.Api do
 
   get "/complete" do
     :ok = Backend.complete()
-    :ok = Endpoint.stop_server()
+
+    _ =
+      Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
+        # We don't want to stop the server before we
+        # send the response back.
+        :timer.sleep(3000)
+        Endpoint.stop_server()
+      end)
 
     send_json(conn, 202, "")
   end

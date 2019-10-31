@@ -7,7 +7,6 @@ defmodule VintageNetWizard.Backend.Mock do
   """
   @behaviour VintageNetWizard.Backend
 
-  alias VintageNetWizard.Web.Endpoint
   alias VintageNet.WiFi.AccessPoint
 
   require Logger
@@ -41,6 +40,9 @@ defmodule VintageNetWizard.Backend.Mock do
 
   @impl true
   def reset(), do: initial_state()
+
+  @impl true
+  def complete(_configs, state), do: {:ok, state}
 
   @impl true
   def handle_info({__MODULE__, :stop_server}, %{configuration_status: :good} = state) do

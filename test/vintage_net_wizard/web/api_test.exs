@@ -8,13 +8,6 @@ defmodule VintageNetWizard.Web.ApiTest do
 
   @opts Api.init([])
 
-  setup do
-    # There is a race condition between these tests and
-    # handling state in the Mock backend. To be solved
-    # in the next change
-    VintageNetWizard.run_wizard()
-  end
-
   test "get a configuration status" do
     {_conn, status} = run_request(:get, "/configuration/status")
     assert Enum.member?(["not_configured", "good", "bad"], status)
@@ -307,6 +300,9 @@ defmodule VintageNetWizard.Web.ApiTest do
     Backend.subscribe()
 
     {conn, body} = run_request(:get, "/complete")
+
+    # Starts a task to kill the server after delivery
+    assert length(Task.Supervisor.children(VintageNetWizard.TaskSupervisor)) == 1
 
     assert_receive({VintageNetWizard, :completed})
 

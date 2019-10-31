@@ -19,17 +19,7 @@ defmodule VintageNetWizard.Backend.Default do
   def apply(_, %{state: :applying} = state), do: {:ok, state}
 
   def apply(wifi_configurations, state) do
-    vintage_net_config =
-      Enum.map(wifi_configurations, &WiFiConfiguration.to_vintage_net_configuration/1)
-
-    :ok =
-      VintageNet.configure("wlan0", %{
-        type: VintageNet.Technology.WiFi,
-        wifi: %{
-          networks: vintage_net_config
-        },
-        ipv4: %{method: :dhcp}
-      })
+    :ok = apply_configurations(wifi_configurations)
 
     timeout =
       wifi_configurations
@@ -43,6 +33,15 @@ defmodule VintageNetWizard.Backend.Default do
       |> Map.put(:apply_configuration_timer, timer)
 
     {:ok, %{state | state: :applying, data: data}}
+  end
+
+  @impl VintageNetWizard.Backend
+  def complete(wifi_configurations, state) do
+    # When completeing, we don't make assertions on the success
+    # of the connection and only care that it was applied
+    :ok = apply_configurations(wifi_configurations)
+
+    {:ok, %{state | state: :complete}}
   end
 
   @impl VintageNetWizard.Backend
@@ -156,6 +155,19 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info(_, state), do: {:noreply, state}
+
+  defp apply_configurations(wifi_configurations) do
+    vintage_net_config =
+      Enum.map(wifi_configurations, &WiFiConfiguration.to_vintage_net_configuration/1)
+
+    VintageNet.configure("wlan0", %{
+      type: VintageNet.Technology.WiFi,
+      wifi: %{
+        networks: vintage_net_config
+      },
+      ipv4: %{method: :dhcp}
+    })
+  end
 
   defp start_scan_timer(), do: Process.send_after(self(), :run_scan, 20_000)
 

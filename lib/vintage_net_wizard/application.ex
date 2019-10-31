@@ -6,6 +6,7 @@ defmodule VintageNetWizard.Application do
   @spec start(Application.start_type(), any()) :: {:error, any} | {:ok, pid()}
   def start(_type, _args) do
     children = [
+      {Task.Supervisor, name: VintageNetWizard.TaskSupervisor},
       VintageNetWizard.Web.Endpoint
     ]
 

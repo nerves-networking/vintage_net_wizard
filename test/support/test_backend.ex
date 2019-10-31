@@ -46,4 +46,7 @@ defmodule VintageNetWizard.Test.Backend do
   def start_scan(state) do
     state
   end
+
+  @impl true
+  def complete(_configs, state), do: {:ok, state}
 end
