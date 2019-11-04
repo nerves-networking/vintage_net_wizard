@@ -30,4 +30,20 @@ defmodule VintageNetWizard do
       error -> error
     end
   end
+
+  @doc """
+  Stop the wizard.
+
+  This will apply the current configuration in memory and completely
+  stop the web and backend processes.
+  """
+  @spec stop_wizard() :: :ok | {:error, String.t()}
+  def stop_wizard() do
+    with :ok <- Backend.complete(),
+         :ok <- Endpoint.stop_server() do
+      :ok
+    else
+      error -> error
+    end
+  end
 end
