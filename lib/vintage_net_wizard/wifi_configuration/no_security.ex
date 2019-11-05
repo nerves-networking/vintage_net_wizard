@@ -23,7 +23,7 @@ defmodule VintageNetWizard.WiFiConfiguration.NoSecurity do
       }) do
     %{
       ssid: ssid,
-      mode: :client,
+      mode: :infrastructure,
       key_mgmt: :none
     }
     |> maybe_put_priority(priority)

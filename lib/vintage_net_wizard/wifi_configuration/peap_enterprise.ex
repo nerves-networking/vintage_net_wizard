@@ -23,7 +23,7 @@ defmodule VintageNetWizard.WiFiConfiguration.PEAPEnterprise do
         priority: priority
       }) do
     %{
-      mode: :client,
+      mode: :infrastructure,
       key_mgmt: :wpa_eap,
       eap: "PEAP",
       phase2: "auth=MSCHAPV2",

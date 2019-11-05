@@ -30,7 +30,7 @@ defmodule VintageNetWizard.APMode do
       wifi: %{
         networks: [
           %{
-            mode: :host,
+            mode: :ap,
             ssid: ssid,
             key_mgmt: :none
           }

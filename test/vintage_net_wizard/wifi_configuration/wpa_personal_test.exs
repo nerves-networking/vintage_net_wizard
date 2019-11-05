@@ -41,7 +41,7 @@ defmodule VintageNetWizard.WiFiConfiguration.WPAPersonalTest do
       ssid: config.ssid,
       key_mgmt: :wpa_psk,
       psk: config.psk,
-      mode: :client
+      mode: :infrastructure
     }
 
     assert expected_vintage_net_config == WPAPersonal.to_vintage_net_configuration(config)
@@ -54,7 +54,7 @@ defmodule VintageNetWizard.WiFiConfiguration.WPAPersonalTest do
       ssid: config.ssid,
       key_mgmt: :wpa_psk,
       psk: config.psk,
-      mode: :client,
+      mode: :infrastructure,
       priority: 1
     }
 

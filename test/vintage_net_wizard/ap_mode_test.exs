@@ -9,7 +9,7 @@ defmodule VintageNetWizard.APModeTest do
     expected = %{
       type: VintageNet.Technology.WiFi,
       ipv4: %{address: {192, 168, 0, 1}, method: :static, prefix_length: 24},
-      wifi: %{networks: [%{key_mgmt: :none, mode: :host, ssid: "hostname"}]},
+      wifi: %{networks: [%{key_mgmt: :none, mode: :ap, ssid: "hostname"}]},
       dhcpd: %{
         end: {192, 168, 0, 254},
         max_leases: 235,

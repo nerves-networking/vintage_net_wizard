@@ -34,7 +34,7 @@ defmodule VintageNetWizard.WiFiConfiguration.PEAPEnterpriseTest do
     config = %PEAPEnterprise{ssid: "Enterprise", password: "123123123", user: "user"}
 
     expected_vintage_net_config = %{
-      mode: :client,
+      mode: :infrastructure,
       key_mgmt: :wpa_eap,
       eap: "PEAP",
       phase2: "auth=MSCHAPV2",
@@ -50,7 +50,7 @@ defmodule VintageNetWizard.WiFiConfiguration.PEAPEnterpriseTest do
     config = %PEAPEnterprise{ssid: "Enterprise", password: "123123123", user: "user", priority: 1}
 
     expected_vintage_net_config = %{
-      mode: :client,
+      mode: :infrastructure,
       key_mgmt: :wpa_eap,
       eap: "PEAP",
       phase2: "auth=MSCHAPV2",

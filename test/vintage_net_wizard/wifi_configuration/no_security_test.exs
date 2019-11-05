@@ -15,7 +15,7 @@ defmodule VintageNetWizard.WiFiConfiguration.NoSecurityTest do
     expected_vintage_net_config = %{
       ssid: config.ssid,
       key_mgmt: :none,
-      mode: :client
+      mode: :infrastructure
     }
 
     assert expected_vintage_net_config == NoSecurity.to_vintage_net_configuration(config)
@@ -27,7 +27,7 @@ defmodule VintageNetWizard.WiFiConfiguration.NoSecurityTest do
     expected_vintage_net_config = %{
       ssid: config.ssid,
       key_mgmt: :none,
-      mode: :client,
+      mode: :infrastructure,
       priority: 1
     }
 

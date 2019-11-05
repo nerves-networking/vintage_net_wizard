@@ -41,7 +41,7 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
     expected_vintage_net_config = %{
       ssid: config.ssid,
       key_mgmt: :none,
-      mode: :client,
+      mode: :infrastructure,
       priority: 1
     }
 
@@ -54,7 +54,7 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
     expected_vintage_net_config = %{
       ssid: config.ssid,
       key_mgmt: :wpa_psk,
-      mode: :client,
+      mode: :infrastructure,
       psk: config.psk,
       priority: 1
     }

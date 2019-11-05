@@ -33,7 +33,7 @@ defmodule VintageNetWizard.WiFiConfiguration.WPAPersonal do
       }) do
     %{
       ssid: ssid,
-      mode: :client,
+      mode: :infrastructure,
       key_mgmt: :wpa_psk,
       psk: psk
     }
