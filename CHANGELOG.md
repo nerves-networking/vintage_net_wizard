@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.7
+
+* New features
+  * Added `VintageNetWizard.stop_wizard/0`
+  * Added a callback so that users could be notified when configuration
+    completes
+
 ## v0.1.6
 
 * New features
