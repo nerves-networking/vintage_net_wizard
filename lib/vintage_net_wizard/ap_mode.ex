@@ -64,7 +64,8 @@ defmodule VintageNetWizard.APMode do
 
   defp get_hostname() do
     {:ok, hostname} = :inet.gethostname()
-    to_string(hostname)
+    hostname_string = to_string(hostname)
+    Application.get_env(:vintage_net_wizard, :ssid, hostname_string)
   end
 
   defp sanitize_hostname_for_ssid(<<ssid::32-bytes, _rest::binary>>) do
