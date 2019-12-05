@@ -9,7 +9,7 @@ defmodule VintageNetWizard.Test.Backend do
   @impl true
   def access_points(_) do
     [
-      %VintageNet.WiFi.AccessPoint{
+      %VintageNetWiFi.AccessPoint{
         band: :wifi_5_ghz,
         bssid: "8a:8a:20:88:7a:50",
         channel: 149,

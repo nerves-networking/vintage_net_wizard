@@ -6,7 +6,7 @@ defmodule VintageNetWizard.Backend do
   use GenServer
 
   alias VintageNetWizard.WiFiConfiguration
-  alias VintageNet.WiFi.AccessPoint
+  alias VintageNetWiFi.AccessPoint
 
   @type configuration_status :: :not_configured | :good | :bad
 

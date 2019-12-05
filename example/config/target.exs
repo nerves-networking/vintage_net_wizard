@@ -26,17 +26,7 @@ config :nerves_firmware_ssh,
 config :vintage_net,
   regulatory_domain: "US",
   config: [
-    {"eth0",
-     %{
-       type: VintageNet.Technology.Ethernet,
-       ipv4: %{
-         method: :dhcp
-       }
-     }},
-    {"wlan0",
-     %{
-       type: VintageNet.Technology.WiFi
-     }}
+    {"wlan0", %{type: VintageNetWiFi}}
   ]
 
 # Import target specific config. This must remain at the bottom

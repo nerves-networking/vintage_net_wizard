@@ -1,7 +1,7 @@
 defmodule VintageNetWizard.WiFiConfiguration.Params do
   @moduledoc false
 
-  alias VintageNet.WiFi.WPA2
+  alias VintageNetWiFi.WPA2
 
   @type param_error :: :invalid_ssid | :password_required | WPA2.invalid_passphrase_error()
 
@@ -20,7 +20,7 @@ defmodule VintageNetWizard.WiFiConfiguration.Params do
   `:ok` if the password is valid, or `{:error, reason}` if the password
   is not valide with reason.
 
-  By default this will use `VintageNet.WiFi.WPA2.validate_passphrase/1`
+  By default this will use `VintageNetWiFi.WPA2.validate_passphrase/1`
   """
   @spec password_from_params(map(), (String.t() -> :ok | {:error, param_error() | any()})) ::
           {:ok, String.t()} | {:error, param_error()}

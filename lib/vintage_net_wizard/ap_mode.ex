@@ -26,8 +26,8 @@ defmodule VintageNetWizard.APMode do
     our_ip_address = {192, 168, 0, 1}
 
     %{
-      type: VintageNet.Technology.WiFi,
-      wifi: %{
+      type: VintageNetWiFi,
+      vintage_net_wifi: %{
         networks: [
           %{
             mode: :ap,

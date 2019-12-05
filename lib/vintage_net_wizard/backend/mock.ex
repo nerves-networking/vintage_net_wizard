@@ -7,7 +7,7 @@ defmodule VintageNetWizard.Backend.Mock do
   """
   @behaviour VintageNetWizard.Backend
 
-  alias VintageNet.WiFi.AccessPoint
+  alias VintageNetWiFi.AccessPoint
 
   require Logger
 
@@ -138,7 +138,7 @@ defmodule VintageNetWizard.Backend.Mock do
         frequency: 2462,
         signal_dbm: -20,
         signal_percent: 99,
-        ssid: "Open Wifi"
+        ssid: "Open WiFi"
       },
       %AccessPoint{
         band: :wifi_2_4_ghz,

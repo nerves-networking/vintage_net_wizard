@@ -7,9 +7,9 @@ defmodule VintageNetWizard.APModeTest do
     config = APMode.ap_mode_configuration("hostname", "our_name")
 
     expected = %{
-      type: VintageNet.Technology.WiFi,
+      type: VintageNetWiFi,
       ipv4: %{address: {192, 168, 0, 1}, method: :static, prefix_length: 24},
-      wifi: %{networks: [%{key_mgmt: :none, mode: :ap, ssid: "hostname"}]},
+      vintage_net_wifi: %{networks: [%{key_mgmt: :none, mode: :ap, ssid: "hostname"}]},
       dhcpd: %{
         end: {192, 168, 0, 254},
         max_leases: 235,
@@ -31,7 +31,7 @@ defmodule VintageNetWizard.APModeTest do
   test "empty hostname gets changed to a valid ssid" do
     config = APMode.ap_mode_configuration("", "our_name")
 
-    %{wifi: %{networks: [%{ssid: ssid}]}} = config
+    %{vintage_net_wifi: %{networks: [%{ssid: ssid}]}} = config
 
     assert ssid == "vintage_net_wizard"
   end
@@ -39,7 +39,7 @@ defmodule VintageNetWizard.APModeTest do
   test "long hostname gets trimmed" do
     config = APMode.ap_mode_configuration("1234567890123456789012345678901234567890", "our_name")
 
-    %{wifi: %{networks: [%{ssid: ssid}]}} = config
+    %{vintage_net_wifi: %{networks: [%{ssid: ssid}]}} = config
 
     assert byte_size(ssid) <= 32
   end

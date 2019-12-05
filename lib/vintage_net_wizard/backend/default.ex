@@ -161,8 +161,8 @@ defmodule VintageNetWizard.Backend.Default do
       Enum.map(wifi_configurations, &WiFiConfiguration.to_vintage_net_configuration/1)
 
     VintageNet.configure("wlan0", %{
-      type: VintageNet.Technology.WiFi,
-      wifi: %{
+      type: VintageNetWiFi,
+      vintage_net_wifi: %{
         networks: vintage_net_config
       },
       ipv4: %{method: :dhcp}
