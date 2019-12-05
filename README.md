@@ -185,13 +185,13 @@ browser at [http://wifi.config](http://wifi.config/) or
 certificate, it's possible to use `https`. You may also need to change the
 `:dns_name` configuration to match the name on your SSL certificate.
 
-You can change the SSID to a string less that 32 characters long, via the `config.exs`:
+The SSID defaults to the hostname of the device, and you can change the SSID via
+the `config.exs`:
 
 ```elixir
 config :vintage_net_wizard,
   ssid: "MY_SSID"
 ```
-
 
 ## Callbacks when Stopping
 
