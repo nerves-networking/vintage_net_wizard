@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2.0
+
+This release contains updates to use `vintage_net` `v0.7.0`. This includes
+depending on `vintage_net_wifi` and renaming keys used for the configuration.
+Projects pulling this update should review the [`vintage_net` release
+notes](https://github.com/nerves-networking/vintage_net/releases/tag/v0.7.0).
+
+* New features
+  * Support customization of the SSID. In your `config.exs`, add the following:
+
+```
+config :vintage_net_wizard,
+      ssid: "MY_SSID"
+```
+
 ## v0.1.7
 
 * New features
