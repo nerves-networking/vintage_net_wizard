@@ -42,15 +42,14 @@ library has an example project for the Raspberry Pi for use as a demo.
 
 ## Supported WiFi adapters
 
-Not all WiFi adapters support AP mode use or their device drivers require
-patching when used on Linux. Here are the ones that we've used:
+Not all WiFi adapters support AP mode. Here are the ones that we've used:
 
-1. Raspberry Pi Zero W and Raspberry Pi 3 WiFi modules
+1. Raspberry Pis with built-in WiFi modules (like the RPi 3, 4 and Zero W)
 2. RT5370-based USB modules
 
 It is highly likely that other modules work. We have not had any luck with
-Realtek RTL8192c (in the popular Edimax EW7811Un) or MediaTek MT7601u (in lots
-of brands).
+the Realtek RTL8192c (in the popular Edimax EW7811Un) or MediaTek MT7601u (in
+lots of brands).
 
 ## Configuration
 
