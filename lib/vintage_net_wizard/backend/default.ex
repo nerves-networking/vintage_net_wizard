@@ -106,9 +106,10 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info(
-        {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
+        {VintageNet, ["interface", "wlan0", "connection"], _, connectivity, _},
         %{state: :applying, data: %{configuration_status: :good} = data} = state
-      ) do
+      )
+      when connectivity in [:lan, :internet] do
     # Everything connected, so cancel our timeout
     _ = Process.cancel_timer(data.apply_configuration_timer)
 
@@ -116,9 +117,10 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info(
-        {VintageNet, ["interface", "wlan0", "connection"], _, :internet, _},
+        {VintageNet, ["interface", "wlan0", "connection"], _, connectivity, _},
         %{state: :applying, data: data} = state
-      ) do
+      )
+      when connectivity in [:lan, :internet] do
     # Everything connected, so cancel our timeout
     _ = Process.cancel_timer(data.apply_configuration_timer)
 
