@@ -5,7 +5,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   alias VintageNetWizard.{Backend, Callbacks, Web.Router}
   use DynamicSupervisor
 
-  @type opt :: {:ssl, :ssl.tls_server_option()}
+  @type opt :: {:ssl, :ssl.tls_server_option()} | {:on_exit, {module(), atom(), list()}}
 
   @doc false
   def start_link(args) do
