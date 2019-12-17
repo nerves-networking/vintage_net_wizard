@@ -192,13 +192,12 @@ config :vintage_net_wizard,
   ssid: "MY_SSID"
 ```
 
-## Callbacks when Stopping
+## Stop callback
 
-There may be cases that your application needs to know when the wizard
-is stopped (i.e. start your app once the port is free, etc).
-
-For that, you can use the `:on_exit` options when calling
-`VintageNetWizard.run_wizard/1` and specify a `{module, function, args}` tuple of the function to call after the wizard has stopped.
+If your application runs a webserver or has other functionality that is
+incompatible with the wizard, you can use the `:on_exit` option to
+`VintageNetWizard.run_wizard/1` to register a completion callback. The callback
+has the form, `{module, function, args}`. Here's an example:
 
 ```elixir
 defmodule MyApp do
