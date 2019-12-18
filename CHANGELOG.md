@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.1
+
+Some fun doc updates and type fixes.
+
+* Enhancements
+  * Don't require internet connectivity to consider a WiFi config as successful
+
 ## v0.2.0
 
 This release contains updates to use `vintage_net` `v0.7.0`. This includes
