@@ -60,6 +60,30 @@ defmodule VintageNetWizard.Web.Router do
     render_password_page(conn, key_mgmt, ssid: ssid, password: "", error: "", user: "")
   end
 
+  get "/redirect" do
+    redirect(conn, "/")
+  end
+
+  get "/ncsi.txt" do
+    redirect(conn, "/")
+  end
+
+  get "/connecttest.txt" do
+    redirect(conn, "/")
+  end
+
+  get "/generate_204" do
+    redirect(conn, "/")
+  end
+
+  get "/hotspot-detect.html" do
+    render_page(conn, "apple_captive_portal.html")
+  end
+
+  get "/library/test/success.html" do
+    render_page(conn, "apple_captive_portal.html")
+  end
+
   get "/networks" do
     render_page(conn, "networks.html")
   end
