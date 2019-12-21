@@ -22,7 +22,7 @@ defmodule VintageNetWizard.APModeTest do
         },
         start: {192, 168, 0, 20}
       },
-      dnsd: %{records: [{"our_name", {192, 168, 0, 1}}]}
+      dnsd: %{records: [{"our_name", {192, 168, 0, 1}},{"*", {192, 168, 0, 1}}]}
     }
 
     assert expected == config
