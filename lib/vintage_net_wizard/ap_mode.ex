@@ -57,7 +57,7 @@ defmodule VintageNetWizard.APMode do
       dnsd: %{
         records: [
           {our_name, our_ip_address},
-          {"*", our_ip_address},
+          {"*", our_ip_address}
         ]
       }
     }
