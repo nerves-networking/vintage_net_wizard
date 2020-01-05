@@ -94,6 +94,7 @@ defmodule VintageNetWizard.Web.Endpoint do
       error -> error
     end
   end
+
   defp maybe_with_redirect(spec), do: DynamicSupervisor.start_child(__MODULE__, spec)
 
   defp maybe_use_ssl(_use_ssl = true, opts) do
