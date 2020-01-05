@@ -61,27 +61,27 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/redirect" do
-    redirect(conn, "/")
+    redirect_with_dnsname(conn)
   end
 
   get "/ncsi.txt" do
-    redirect(conn, "/")
+    redirect_with_dnsname(conn)
   end
 
   get "/connecttest.txt" do
-    redirect(conn, "/")
+    redirect_with_dnsname(conn)
   end
 
   get "/generate_204" do
-    redirect(conn, "/")
+    redirect_with_dnsname(conn)
   end
 
   get "/hotspot-detect.html" do
-    render_page(conn, "apple_captive_portal.html")
+    render_page(conn, "apple_captive_portal.html", dns_name: get_redirect_dnsname(conn))
   end
 
   get "/library/test/success.html" do
-    render_page(conn, "apple_captive_portal.html")
+    render_page(conn, "apple_captive_portal.html", dns_name: get_redirect_dnsname(conn))
   end
 
   get "/networks" do
@@ -115,6 +115,20 @@ defmodule VintageNetWizard.Web.Router do
 
   match _ do
     send_resp(conn, 404, "oops")
+  end
+
+  defp redirect_with_dnsname(conn) do
+    conn
+    |> put_resp_header("location", get_redirect_dnsname(conn))
+    |> send_resp(302, "")
+  end
+
+  defp get_redirect_dnsname(conn, to \\ nil) do
+    dns_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
+
+    port = if conn.port != 80 and conn.port != 443, do: ":#{conn.port}", else: ""
+
+    "#{conn.scheme}://#{dns_name}#{port}#{to}"
   end
 
   defp redirect(conn, to) do

@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNetWizard.{Backend, Callbacks, Web.Router}
+  alias VintageNetWizard.{Backend, Callbacks, Web.Router, Web.RedirectRouter}
   use DynamicSupervisor
 
   @type opt :: {:ssl, :ssl.tls_server_option()} | {:on_exit, {module(), atom(), list()}}
@@ -27,7 +27,7 @@ defmodule VintageNetWizard.Web.Endpoint do
     callbacks = Keyword.take(opts, [:on_exit])
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
+         {:ok, _pid} <- maybe_with_redirect(spec),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Backend, backend}),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}) do
       :ok
@@ -43,6 +43,14 @@ defmodule VintageNetWizard.Web.Endpoint do
   @spec stop_server() :: :ok | {:error, :not_found}
   def stop_server() do
     case DynamicSupervisor.which_children(__MODULE__) do
+      [{_, cowboy, _, _}, {_, redirector, _, _}, {_, backend, _, _}, {_, callbacks, _, _}] ->
+        _ = DynamicSupervisor.terminate_child(__MODULE__, redirector)
+        _ = DynamicSupervisor.terminate_child(__MODULE__, cowboy)
+        _ = DynamicSupervisor.terminate_child(__MODULE__, backend)
+
+        _ = VintageNetWizard.Callbacks.on_exit()
+        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks)
+
       [{_, cowboy, _, _}, {_, backend, _, _}, {_, callbacks, _, _}] ->
         _ = DynamicSupervisor.terminate_child(__MODULE__, cowboy)
         _ = DynamicSupervisor.terminate_child(__MODULE__, backend)
@@ -69,26 +77,80 @@ defmodule VintageNetWizard.Web.Endpoint do
     ]
   end
 
+  defp redirect_dispatch(options) do
+    [
+      {:_,
+       [
+         {:_, Plug.Cowboy.Handler, {RedirectRouter, options}}
+       ]}
+    ]
+  end
+
+  defp maybe_with_redirect([main, redirector]) do
+    with {:ok, pid} <- DynamicSupervisor.start_child(__MODULE__, main),
+         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, redirector) do
+      {:ok, pid}
+    else
+      error -> error
+    end
+  end
+  defp maybe_with_redirect(spec), do: DynamicSupervisor.start_child(__MODULE__, spec)
+
   defp maybe_use_ssl(_use_ssl = true, opts) do
+    dns_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
     port = Application.get_env(:vintage_net_wizard, :port, 443)
     ssl_options = Keyword.get(opts, :ssl)
     options = [dispatch: dispatch(), port: port]
+    redirect_options = [scheme: :https, dns_name: dns_name, port: port]
 
-    Plug.Cowboy.child_spec(
-      plug: Router,
-      scheme: :https,
-      options: Keyword.merge(ssl_options, options)
-    )
+    [
+      Plug.Cowboy.child_spec(
+        plug: Router,
+        scheme: :https,
+        options: Keyword.merge(ssl_options, options)
+      ),
+      Plug.Cowboy.child_spec(
+        plug: {RedirectRouter, redirect_options},
+        scheme: :http,
+        options: [
+          port: 80
+        ]
+      )
+    ]
   end
 
   defp maybe_use_ssl(_no_ssl, _opts) do
-    Plug.Cowboy.child_spec(
-      plug: Router,
-      scheme: :http,
-      options: [
-        dispatch: dispatch(),
-        port: Application.get_env(:vintage_net_wizard, :port, 80)
+    dns_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
+    port = Application.get_env(:vintage_net_wizard, :port, 80)
+    redirect_options = [scheme: :http, dns_name: dns_name, port: port]
+
+    if port != 80 do
+      [
+        Plug.Cowboy.child_spec(
+          plug: Router,
+          scheme: :http,
+          options: [
+            dispatch: dispatch(),
+            port: port
+          ]
+        ),
+        Plug.Cowboy.child_spec(
+          plug: {RedirectRouter, redirect_options},
+          scheme: :http,
+          options: [
+            port: 80
+          ]
+        )
       ]
-    )
+    else
+      Plug.Cowboy.child_spec(
+        plug: Router,
+        scheme: :http,
+        options: [
+          dispatch: dispatch(),
+          port: port
+        ]
+      )
+    end
   end
 end
