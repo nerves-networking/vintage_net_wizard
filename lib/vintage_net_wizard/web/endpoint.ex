@@ -77,15 +77,6 @@ defmodule VintageNetWizard.Web.Endpoint do
     ]
   end
 
-  defp redirect_dispatch(options) do
-    [
-      {:_,
-       [
-         {:_, Plug.Cowboy.Handler, {RedirectRouter, options}}
-       ]}
-    ]
-  end
-
   defp maybe_with_redirect([main, redirector]) do
     with {:ok, pid} <- DynamicSupervisor.start_child(__MODULE__, main),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, redirector) do
