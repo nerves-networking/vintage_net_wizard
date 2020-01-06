@@ -23,6 +23,7 @@ defmodule VintageNetWizard.Web.Router do
       configs ->
         render_page(conn, "index.html",
           configs: configs,
+          configuration_status: configuration_status_details(),
           format_security: &WiFiConfiguration.security_name/1,
           get_key_mgmt: &WiFiConfiguration.get_key_mgmt/1
         )
@@ -61,7 +62,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/networks" do
-    render_page(conn, "networks.html")
+    render_page(conn, "networks.html", configuration_status: configuration_status_details())
   end
 
   get "/networks/new" do
@@ -151,6 +152,28 @@ defmodule VintageNetWizard.Web.Router do
 
       true ->
         :none
+    end
+  end
+
+  defp configuration_status_details() do
+    case status = Backend.configuration_status() do
+      :good ->
+        %{
+          value: status,
+          class: "text-success",
+          title: "Device successfully connected to a network in the applied configuration"
+        }
+
+      :bad ->
+        %{
+          value: status,
+          class: "text-danger",
+          title:
+            "Device was unable to connect to any network in the configuration due to bad password or a timeout while attempting."
+        }
+
+      _ ->
+        %{value: status, class: "text-warning", title: "Device waiting to be configured."}
     end
   end
 end
