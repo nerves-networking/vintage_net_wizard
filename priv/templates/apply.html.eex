@@ -9,9 +9,16 @@
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container">
        <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+       <div id="ssid" value="<%= ssid %>" hidden></div>
 
        <div class="content">
-         Trying configuration...
+        <p>Trying Configuration</p>
+
+        <p>VintageNetWizard has disabled Access Point mode and is attempting to connect
+        to at least one of the networks in the configuration as verification.</p>
+
+        <p>If this page is present for > 15 seconds, check that you have reconnected to
+        the access point "<b><%= ssid %></b>"</p>
        </div>
      </div>
      <footer class="py-3 bg-white shadow-sm w-100 text-muted">

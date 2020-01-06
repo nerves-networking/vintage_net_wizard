@@ -85,7 +85,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/apply" do
-    render_page(conn, "apply.html")
+    render_page(conn, "apply.html", ssid: VintageNetWizard.APMode.ssid())
   end
 
   forward("/api/v1", to: VintageNetWizard.Web.Api)
