@@ -48,12 +48,20 @@
     render(state);
   }
 
-  function createCompleteLink({ targetElem }) {
+  function createCompleteLink({ targetElem, view }) {
     const button = document.createElement("button");
+    var btnClass = "btn-primary";
+    var btnText = "Complete";
+
+    if (view === "configurationBad") {
+      btnClass = "btn-danger";
+      btnText = "Complete Without Verification";
+    }
+
     button.classList.add("btn");
-    button.classList.add("btn-primary");
+    button.classList.add(btnClass);
     button.addEventListener("click", handleCompleteClick); 
-    button.innerHTML = "Complete";
+    button.innerHTML = btnText;
 
     targetElem.appendChild(button);
   }
@@ -78,11 +86,18 @@
         `, createCompleteLink];
       case "configurationBad":
         return [`
-        <p>Looks like there is a problem with your configuration.</p>
-        <p>Please ensure that your password(s) are correct and/or the
-        network you are trying to connect to is available.</p>
+        <p>Looks like there is a problem applying your configuration.</p>
+        <p>A few possible reasons are:</p>
+        <ul>
+          <li>The network password is incorrect</li>
+          <li>The network is blocking the connection attempt</li>
+          <li>The connection attempt is taking too long and VintageNetWizard is timing out</li>
+          <li>None of the configured networks are available</li>
+        </ul>
+        <p>Check your setup and try configuring again. Or you can also skip verification
+        to save the configuration as is.</p>
         <a class="btn btn-primary" href="/">Configure</a>
-        `, null];
+        `, createCompleteLink];
       case "complete":
         return ["Configuration complete", null];
     }

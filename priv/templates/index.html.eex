@@ -62,6 +62,7 @@
        <a class="btn btn-primary" href="/networks">Add a New Network</a>
        <%= if length(configs) > 0 do %>
          <a class="btn btn-primary" href="/apply">Apply configuration</a>
+         <a class="btn btn-secondary" href="#" onclick="applyWithoutVerification()">Complete Without Verification</a>
        <% end %>
      </div>
 
@@ -93,6 +94,18 @@
          })
        }
 
+       function applyWithoutVerification() {
+         var message = "This will apply the configuration without any attempt to verify a successful network connection.\n\nDo you want to continue?"
+
+         if (confirm(message)) {
+          fetch("/api/v1/complete")
+            .then(resp => {
+            document.querySelector("body .container").innerHTML = "Configuration Complete"
+          });
+         } else {
+           return false;
+         }
+       }
 
        Sortable.create(document.querySelector(".configurations"), {
                handle: ".handle",
