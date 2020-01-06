@@ -7,7 +7,8 @@
     completeTimer: null,
     targetElem: document.querySelector(".content"),
     configurationStatus: "not_configured",
-    completed: false
+    completed: false,
+    ssid: document.getElementById("ssid").getAttribute("value")
   }
 
   function runGetStatus() {
@@ -66,10 +67,19 @@
     complete();
   }
 
-  function view({view, dots}) {
+  function view({view, dots, ssid}) {
     switch (view) {
       case "trying":
-        return ["Trying configuration" + dots, runGetStatus];
+        return [`
+        <p>Trying Configuration ${dots}</p>
+
+        <p>VintageNetWizard has disabled Access Point mode and is attempting to connect
+        to at least one of the networks in the configuration as verification.</p>
+
+        <p>If this page is present for > 15 seconds, check that you have reconnected to
+        the access point "<b>${ssid}</b>"</p>
+        `, runGetStatus
+        ];
       case "configurationGood":
         return [`
         <p>Configuration okay</p>

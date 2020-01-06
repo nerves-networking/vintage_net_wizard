@@ -62,6 +62,15 @@ defmodule VintageNetWizard.APMode do
     }
   end
 
+  @doc """
+  Return SSID that is used for AP Mode
+  """
+  @spec ssid() :: String.t()
+  def ssid() do
+    get_hostname()
+    |> sanitize_hostname_for_ssid()
+  end
+
   defp get_hostname() do
     {:ok, hostname} = :inet.gethostname()
     hostname_string = to_string(hostname)
