@@ -49,7 +49,6 @@ defmodule WizardExample.MixProject do
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.10", targets: @all_targets},
-      {:busybox, "~> 0.1", targets: @all_targets},
       {:vintage_net_wizard, path: "..", targets: @all_targets},
       {:circuits_gpio, "~> 0.4.1", targets: @all_targets},
       {:nerves_firmware_ssh, "~> 0.2", targets: @all_targets},
