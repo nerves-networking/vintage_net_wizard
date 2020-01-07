@@ -6,6 +6,7 @@ defmodule VintageNetWizard.Web.Router do
 
   alias VintageNetWizard.{
     Backend,
+    Web.Endpoint,
     WiFiConfiguration
   }
 
@@ -110,6 +111,20 @@ defmodule VintageNetWizard.Web.Router do
 
   get "/apply" do
     render_page(conn, "apply.html", ssid: VintageNetWizard.APMode.ssid())
+  end
+
+  get "/complete" do
+    :ok = Backend.complete()
+
+    _ =
+      Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
+        # We don't want to stop the server before we
+        # send the response back.
+        :timer.sleep(3000)
+        Endpoint.stop_server()
+      end)
+
+    render_page(conn, "complete.html")
   end
 
   forward("/api/v1", to: VintageNetWizard.Web.Api)
