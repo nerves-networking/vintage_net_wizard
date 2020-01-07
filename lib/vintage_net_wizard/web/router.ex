@@ -97,15 +97,16 @@ defmodule VintageNetWizard.Web.Router do
   post "/networks/new" do
     ssid = Map.get(conn.body_params, "ssid")
 
-    case Map.get(conn.body_params, "security") do
+    case Map.get(conn.body_params, "key_mgmt") do
       "none" ->
         {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
         :ok = Backend.save(config)
 
         redirect(conn, "/")
 
-      "wpa_psk" ->
-        redirect(conn, "/ssid/#{ssid}")
+      key_mgmt ->
+        key_mgmt = String.to_existing_atom(key_mgmt)
+        render_password_page(conn, key_mgmt, ssid: ssid, password: "", error: "", user: "")
     end
   end
 

@@ -17,10 +17,11 @@
            </div>
 
            <div class="form-group">
-             <label for="security">Security</label>
-             <select id="key_mgmt" name="security" class="custom-select js-security-select">
+             <label for="key_mgmt">Security</label>
+             <select id="key_mgmt" name="key_mgmt" class="custom-select js-security-select">
                <option value="none" selected>None</option>
                <option value="wpa_psk">WPA Personal</option>
+               <option value="wpa_eap">WPA Enterprise</option>
              </select>
            </div>
 
