@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2.2
+
+* New Features
+  * Support captive portal detection (thanks to @jmerriweather!)
+
+* Bug Fixes
+  * Fix adding a network not shown in the AP list
+
+* Enhancements
+  * Include the configuration status on the webpage
+  * Allow submitting the configuration without verifying it. (Useful when you want to configure networks that aren't nearby or confident the config is good)
+  * Better message page when configuration verification is running
+  * Better message when configuration fails
+  * Show WPA Enterprise option when adding a network not in the AP list
+
 ## v0.2.1
 
 Some fun doc updates and type fixes.
