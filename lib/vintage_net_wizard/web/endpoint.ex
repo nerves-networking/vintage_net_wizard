@@ -44,23 +44,24 @@ defmodule VintageNetWizard.Web.Endpoint do
   @spec stop_server() :: :ok | {:error, :not_found}
   def stop_server() do
     case DynamicSupervisor.which_children(__MODULE__) do
-      [{_, cowboy, _, _}, {_, redirector, _, _}, {_, backend, _, _}, {_, callbacks, _, _}] ->
-        _ = DynamicSupervisor.terminate_child(__MODULE__, redirector)
-        _ = DynamicSupervisor.terminate_child(__MODULE__, cowboy)
-        _ = DynamicSupervisor.terminate_child(__MODULE__, backend)
-
-        _ = VintageNetWizard.Callbacks.on_exit()
-        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks)
-
-      [{_, cowboy, _, _}, {_, backend, _, _}, {_, callbacks, _, _}] ->
-        _ = DynamicSupervisor.terminate_child(__MODULE__, cowboy)
-        _ = DynamicSupervisor.terminate_child(__MODULE__, backend)
-
-        _ = VintageNetWizard.Callbacks.on_exit()
-        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks)
-
-      _ ->
+      [] ->
         {:error, :not_found}
+
+      children ->
+        # Ensure we terminate callbacks last after all other children
+        # and the callbacks have been executed
+        callbacks_child =
+          Enum.reduce(children, nil, fn {_, child, _, [mod]}, _acc ->
+            if mod == Callbacks do
+              child
+            else
+              DynamicSupervisor.terminate_child(__MODULE__, child)
+            end
+          end)
+
+        _ = Callbacks.on_exit()
+
+        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks_child)
     end
   end
 
