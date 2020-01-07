@@ -31,8 +31,7 @@ library has an example project for the Raspberry Pi for use as a demo.
 * [x] - Simple web-based configuration utility
 * [x] - WiFi scanning while in AP mode
 * [x] - JSON REST-based API to support smartphone app-based configuration
-* [ ] - Captive portal - the webserver is at a static IP address, but it
-  currently won't trigger captive portal detection
+* [x] - Captive portal detection
 * [x] - WPA PSK configuration
 * [ ] - WPA EAP configuration
 * [x] - Hidden AP configuration
