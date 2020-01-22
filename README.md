@@ -135,6 +135,18 @@ config :vintage_net_wizard,
   backend: VintageNetWizard.Backend.Mock
 ```
 
+### Captive Portal
+
+Captive portal is enabled by default. If using a port other than `80` then all
+traffic on port `80` will be captured and redirected to the specified wizard
+address in order to trigger the portal.
+
+You can disable captive portal in your configuration:
+
+```elixir
+config :vintage_net_wizard, captive_portal: false
+```
+
 ## JSON API
 
 It is possible to write a smartphone app to configure your device using an API
