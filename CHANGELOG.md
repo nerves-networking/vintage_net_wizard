@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.3
+
+* Enhancements
+  * Support disabling captive portal
+
 ## v0.2.2
 
 * New Features
