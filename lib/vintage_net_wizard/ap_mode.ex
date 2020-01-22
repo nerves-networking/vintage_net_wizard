@@ -55,10 +55,7 @@ defmodule VintageNetWizard.APMode do
         }
       },
       dnsd: %{
-        records: [
-          {our_name, our_ip_address},
-          {"*", our_ip_address}
-        ]
+        records: dnsd_records(our_name, our_ip_address)
       }
     }
   end
@@ -70,6 +67,14 @@ defmodule VintageNetWizard.APMode do
   def ssid() do
     get_hostname()
     |> sanitize_hostname_for_ssid()
+  end
+
+  defp dnsd_records(our_name, our_ip_address) do
+    if Application.get_env(:vintage_net_wizard, :captive_portal, true) do
+      [{our_name, our_ip_address}, {"*", our_ip_address}]
+    else
+      [{our_name, our_ip_address}]
+    end
   end
 
   defp get_hostname() do

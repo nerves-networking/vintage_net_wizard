@@ -23,12 +23,13 @@ defmodule VintageNetWizard.Web.Endpoint do
           :ok | {:error, :already_started | :no_keyfile | :no_certfile}
   def start_server(opts \\ []) do
     use_ssl? = Keyword.has_key?(opts, :ssl)
+    use_captive_portal? = Application.get_env(:vintage_net_wizard, :captive_portal, true)
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
     callbacks = Keyword.take(opts, [:on_exit])
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
-         {:ok, _pid} <- maybe_with_redirect(use_ssl?),
+         {:ok, _pid} <- maybe_with_redirect(use_captive_portal?, use_ssl?),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Backend, backend}),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}) do
       :ok
@@ -84,7 +85,7 @@ defmodule VintageNetWizard.Web.Endpoint do
     Application.get_env(:vintage_net_wizard, :port, default_port)
   end
 
-  defp maybe_with_redirect(use_ssl?) do
+  defp maybe_with_redirect(_use_captive_portal = true, use_ssl?) do
     # Captive Portal needs port 80. If we're not listening on that
     # then we start a RedirectRouter to forward port 80 traffic
     # to our defined port
@@ -106,6 +107,8 @@ defmodule VintageNetWizard.Web.Endpoint do
         DynamicSupervisor.start_child(__MODULE__, redirect_spec)
     end
   end
+
+  defp maybe_with_redirect(_no_captive_portal, _), do: {:ok, :ignore}
 
   defp maybe_use_ssl(use_ssl = true, opts) do
     ssl_options = Keyword.get(opts, :ssl)
