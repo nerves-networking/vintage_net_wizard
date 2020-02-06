@@ -11,7 +11,7 @@
 * [Apply](#apply)
 * [Complete the Configuration Process](#complete-the-configuration-process)
 
-### Get Access Points
+### Get access points
 
 This request returns a list of known access points and their properties. Hidden
 access points are not returned.
@@ -48,7 +48,7 @@ Response Code: `200`
 ]
 ```
 
-### Configure SSID Priority
+### Configure SSID priority
 
 This endpoint takes a list of SSIDs. Each SSID is tried in order until a
 successful connection is made. It is not required to list all configured SSIDs.
@@ -161,7 +161,7 @@ Response: Empty
 
 Response Code: `200`
 
-### Get Configurations
+### Get configurations
 
 Get the current known configurations.
 
@@ -186,7 +186,7 @@ Response Code: 200
 ]
 ```
 
-### Get Configuration Status
+### Get configuration status
 
 Get the current status of the configuration. This is useful after using
 the `/api/v1/apply` endpoint to figure out if the configurations that
@@ -206,7 +206,7 @@ Response Code: 200
 
 A POST to this endpoint applies the configuration and attempts to connect to the
 configured WiFi networks. This will return back to AP mode and you can use the
-`/api/v1/configuration/status` endpoint to get weather or not the configuration
+`/api/v1/configuration/status` endpoint to get whether or not the configuration
 worked or not.
 
 Path: `/api/v1/apply`
@@ -219,7 +219,7 @@ Response: Empty
 
 Response Code: `202`
 
-### Complete the Configuration Process
+### Complete the configuration process
 
 Finalize the configuration process. This will apply the configuration and
 not return to AP mode.
