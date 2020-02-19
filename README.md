@@ -45,12 +45,16 @@ Not all WiFi adapters support AP mode. Here are the ones that we've used:
 
 1. Raspberry Pis with built-in WiFi modules (like the RPi 3, 4 and Zero W)
 2. RT5370-based USB modules
-3. Edimax EW-7612UAn V2  
-Needs nerves system with `CONFIG_RTL8192CU=m` in the `linux-x.xx.defconfig` as well as `BR2_PACKAGE_LINUX_FIRMWARE=y` and `BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX=y` in `nerves_defconfig`.
+3. Edimax EW-7612UAn V2 (See note)
 
 It is highly likely that other modules work. We have not had any luck with
 other Realtek RTL8192c (in the popular Edimax EW7811Un) or MediaTek MT7601u (in
 lots of brands).
+
+NOTE: For the Edimax EW-7612UAn V2 to work, you'll need to create a custom
+Nerves system with `CONFIG_RTL8192CU=m` in the `linux-x.xx.defconfig` as well as
+`BR2_PACKAGE_LINUX_FIRMWARE=y` and `BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX=y` in
+`nerves_defconfig`.
 
 ## Configuration
 
