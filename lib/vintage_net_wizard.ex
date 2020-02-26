@@ -3,7 +3,7 @@ defmodule VintageNetWizard do
   Documentation for VintageNetWizard.
   """
 
-  alias VintageNetWizard.{Backend, APMode, Web.Endpoint}
+  alias VintageNetWizard.{BackendServer, APMode, Web.Endpoint}
 
   @doc """
   Run the wizard.
@@ -24,7 +24,7 @@ defmodule VintageNetWizard do
   def run_wizard(opts \\ []) do
     with :ok <- APMode.into_ap_mode(),
          :ok <- Endpoint.start_server(opts),
-         :ok <- Backend.start_scan() do
+         :ok <- BackendServer.start_scan() do
       :ok
     else
       # Already running is still ok
@@ -41,7 +41,7 @@ defmodule VintageNetWizard do
   """
   @spec stop_wizard() :: :ok | {:error, String.t()}
   def stop_wizard() do
-    with :ok <- Backend.complete(),
+    with :ok <- BackendServer.complete(),
          :ok <- Endpoint.stop_server() do
       :ok
     else

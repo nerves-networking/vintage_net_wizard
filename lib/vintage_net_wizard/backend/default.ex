@@ -37,7 +37,7 @@ defmodule VintageNetWizard.Backend.Default do
 
   @impl VintageNetWizard.Backend
   def complete(wifi_configurations, state) do
-    # When completeing, we don't make assertions on the success
+    # When completing, we don't make assertions on the success
     # of the connection and only care that it was applied
     :ok = apply_configurations(wifi_configurations)
 

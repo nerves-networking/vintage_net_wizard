@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNetWizard.{Backend, Callbacks, Web.Router, Web.RedirectRouter}
+  alias VintageNetWizard.{BackendServer, Callbacks, Web.Router, Web.RedirectRouter}
   use DynamicSupervisor
 
   @type opt :: {:ssl, :ssl.tls_server_option()} | {:on_exit, {module(), atom(), list()}}
@@ -30,7 +30,7 @@ defmodule VintageNetWizard.Web.Endpoint do
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
          {:ok, _pid} <- maybe_with_redirect(use_captive_portal?, use_ssl?),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Backend, backend}),
+         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {BackendServer, backend}),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}) do
       :ok
     else

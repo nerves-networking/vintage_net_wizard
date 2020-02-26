@@ -5,7 +5,7 @@ defmodule VintageNetWizard.Web.Router do
   use Plug.Debugger, otp_app: :vintage_net_wizard
 
   alias VintageNetWizard.{
-    Backend,
+    BackendServer,
     Web.Endpoint,
     WiFiConfiguration
   }
@@ -17,7 +17,7 @@ defmodule VintageNetWizard.Web.Router do
   plug(:dispatch)
 
   get "/" do
-    case Backend.configurations() do
+    case BackendServer.configurations() do
       [] ->
         redirect(conn, "/networks")
 
@@ -37,7 +37,7 @@ defmodule VintageNetWizard.Web.Router do
 
     case WiFiConfiguration.from_params(params) do
       {:ok, wifi_config} ->
-        :ok = Backend.save(wifi_config)
+        :ok = BackendServer.save(wifi_config)
         redirect(conn, "/")
 
       error ->
@@ -55,7 +55,7 @@ defmodule VintageNetWizard.Web.Router do
 
   get "/ssid/:ssid" do
     key_mgmt =
-      Backend.access_points()
+      BackendServer.access_points()
       |> Enum.find(&(&1.ssid == ssid))
       |> get_key_mgmt_from_ap()
 
@@ -100,7 +100,7 @@ defmodule VintageNetWizard.Web.Router do
     case Map.get(conn.body_params, "key_mgmt") do
       "none" ->
         {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
-        :ok = Backend.save(config)
+        :ok = BackendServer.save(config)
 
         redirect(conn, "/")
 
@@ -115,7 +115,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/complete" do
-    :ok = Backend.complete()
+    :ok = BackendServer.complete()
 
     _ =
       Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
@@ -155,7 +155,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp render_page(conn, page, info \\ []) do
-    info = [device_info: Backend.device_info()] ++ info
+    info = [device_info: BackendServer.device_info()] ++ info
 
     page
     |> template_file()
@@ -210,7 +210,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp configuration_status_details() do
-    case status = Backend.configuration_status() do
+    case status = BackendServer.configuration_status() do
       :good ->
         %{
           value: status,

@@ -3,7 +3,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   use Plug.Test
 
   alias VintageNetWizard.Web.Api
-  alias VintageNetWizard.Backend
+  alias VintageNetWizard.BackendServer
   alias VintageNetWizard.WiFiConfiguration.{WPAPersonal, NoSecurity, PEAPEnterprise}
 
   @opts Api.init([])
@@ -39,7 +39,7 @@ defmodule VintageNetWizard.Web.ApiTest do
     assert conn.status == 204
     assert body == ""
 
-    Backend.delete_configuration("fake")
+    BackendServer.delete_configuration("fake")
   end
 
   test "configure a WPA Enterprise SSID" do
@@ -59,7 +59,7 @@ defmodule VintageNetWizard.Web.ApiTest do
     assert conn.status == 204
     assert body == ""
 
-    Backend.delete_configuration("enterprise")
+    BackendServer.delete_configuration("enterprise")
   end
 
   test "errors when a WPA Enterprise is configured with no password" do
@@ -82,7 +82,7 @@ defmodule VintageNetWizard.Web.ApiTest do
              "message" => "A password is required."
            }
 
-    Backend.delete_configuration("enterprise")
+    BackendServer.delete_configuration("enterprise")
   end
 
   test "errors when a WPA Enterprise is configured with no user" do
@@ -105,11 +105,11 @@ defmodule VintageNetWizard.Web.ApiTest do
              "message" => "A user is required."
            }
 
-    Backend.delete_configuration("enterprise")
+    BackendServer.delete_configuration("enterprise")
   end
 
   test "errors when a WPA Personal is configured with no password" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     json_body =
       Jason.encode!(%{
@@ -128,7 +128,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   end
 
   test "returns error if passed a password is too short" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     json_body =
       Jason.encode!(%{
@@ -148,7 +148,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   end
 
   test "returns error if passed a password that has invalid characters" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     json_body =
       Jason.encode!(%{
@@ -168,7 +168,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   end
 
   test "returns error if passed a password is too long" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     json_body =
       Jason.encode!(%{
@@ -191,8 +191,8 @@ defmodule VintageNetWizard.Web.ApiTest do
     fake1 = %WPAPersonal{ssid: "fake1", psk: "123123123", priority: 1}
     fake2 = %NoSecurity{ssid: "fake2", priority: 2}
 
-    Backend.save(fake1)
-    Backend.save(fake2)
+    BackendServer.save(fake1)
+    BackendServer.save(fake2)
 
     json_body =
       Jason.encode!([
@@ -210,13 +210,13 @@ defmodule VintageNetWizard.Web.ApiTest do
     fake1ssid = fake1.ssid
 
     assert [%NoSecurity{ssid: ^fake2ssid}, %WPAPersonal{ssid: ^fake1ssid}] =
-             Backend.configurations()
+             BackendServer.configurations()
 
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
   end
 
   test "get all the configurations, ensure passwords are not exposed" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
     fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
     fake2 = %WPAPersonal{ssid: "fake2", psk: "password", priority: 2}
 
@@ -227,9 +227,9 @@ defmodule VintageNetWizard.Web.ApiTest do
       priority: 3
     }
 
-    Backend.save(fake1)
-    Backend.save(fake2)
-    Backend.save(enterprise)
+    BackendServer.save(fake1)
+    BackendServer.save(fake2)
+    BackendServer.save(enterprise)
 
     {conn, body} = run_request(:get, "/configurations")
 
@@ -246,27 +246,27 @@ defmodule VintageNetWizard.Web.ApiTest do
         flunk("Configuration endpoint returns bad payload: #{inspect(payload)}")
     end)
 
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
   end
 
   test "delete an SSID configuration" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
-    Backend.save(fake1)
+    BackendServer.save(fake1)
 
     {conn, body} = run_request(:delete, "/fake1/configuration")
 
     assert conn.status == 200
     assert body == ""
 
-    refute Enum.any?(Backend.configurations(), &(&1.ssid == fake1.ssid))
+    refute Enum.any?(BackendServer.configurations(), &(&1.ssid == fake1.ssid))
 
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
   end
 
   test "404 when trying to apply no configurations" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
     {conn, body} = run_request(:post, "/apply", body: "", content_type: "application/json")
 
     assert conn.status == 404
@@ -278,26 +278,26 @@ defmodule VintageNetWizard.Web.ApiTest do
   end
 
   test "apply configurations" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
-    Backend.save(fake1)
+    BackendServer.save(fake1)
 
     {conn, body} = run_request(:post, "/apply", body: "", content_type: "application/json")
 
     assert conn.status == 202
     assert body == ""
 
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
   end
 
   test "completes configuration" do
-    :ok = Backend.reset()
+    :ok = BackendServer.reset()
 
     fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
-    Backend.save(fake1)
+    BackendServer.save(fake1)
 
-    Backend.subscribe()
+    BackendServer.subscribe()
 
     {conn, body} = run_request(:get, "/complete")
 

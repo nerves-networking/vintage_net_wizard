@@ -1,7 +1,7 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
 
-  alias VintageNetWizard.{WiFiConfiguration, Backend}
+  alias VintageNetWizard.{WiFiConfiguration, BackendServer}
   alias VintageNetWizard.Web.Endpoint
   alias Plug.Conn
 
@@ -12,7 +12,7 @@ defmodule VintageNetWizard.Web.Api do
   plug(:dispatch)
 
   get "/configuration/status" do
-    with status <- Backend.configuration_status(),
+    with status <- BackendServer.configuration_status(),
          {:ok, json_status} <- Jason.encode(status) do
       send_json(conn, 200, json_status)
     end
@@ -20,7 +20,7 @@ defmodule VintageNetWizard.Web.Api do
 
   get "/access_points" do
     {:ok, access_points} =
-      Backend.access_points()
+      BackendServer.access_points()
       |> to_json()
 
     send_json(conn, 200, access_points)
@@ -29,13 +29,13 @@ defmodule VintageNetWizard.Web.Api do
   put "/ssids" do
     conn
     |> get_body()
-    |> Backend.set_priority_order()
+    |> BackendServer.set_priority_order()
 
     send_json(conn, 204, "")
   end
 
   get "/complete" do
-    :ok = Backend.complete()
+    :ok = BackendServer.complete()
 
     _ =
       Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
@@ -50,14 +50,14 @@ defmodule VintageNetWizard.Web.Api do
 
   get "/configurations" do
     {:ok, json} =
-      Backend.configurations()
+      BackendServer.configurations()
       |> Jason.encode()
 
     send_json(conn, 200, json)
   end
 
   post "/apply" do
-    case Backend.apply() do
+    case BackendServer.apply() do
       :ok ->
         send_json(conn, 202, "")
 
@@ -75,7 +75,7 @@ defmodule VintageNetWizard.Web.Api do
 
   put "/:ssid/configuration" do
     with {:ok, cfg} <- configuration_from_params(conn, ssid),
-         :ok <- Backend.save(cfg) do
+         :ok <- BackendServer.save(cfg) do
       send_json(conn, 204, "")
     else
       error ->
@@ -84,7 +84,7 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   delete "/:ssid/configuration" do
-    :ok = Backend.delete_configuration(ssid)
+    :ok = BackendServer.delete_configuration(ssid)
 
     send_json(conn, 200, "")
   end
