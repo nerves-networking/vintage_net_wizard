@@ -229,3 +229,21 @@ defmodule MyApp do
   end
 end
 ```
+
+## Development
+
+It's possible to work on the wizard locally and without using Nerves or changing
+the network settings of your development machine:
+
+```sh
+$ mix deps.get
+$ iex -S mix
+
+iex> VintageNetWizard.run_wizard
+
+07:49:00.710 [info]  Go to http://localhost:4001/
+:ok
+```
+
+Look in `lib/vintage_net_wizard/backend/mock.ex` if you need to change anything
+for your testing.
