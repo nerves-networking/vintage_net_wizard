@@ -13,7 +13,7 @@ defmodule VintageNetWizard.Backend.Mock do
 
   @impl true
   def init() do
-    _ = Logger.info("Go to http://localhost:#{Application.get_env(:vintage_net_wizard, :port)}/")
+    Logger.info("Go to http://localhost:#{Application.get_env(:vintage_net_wizard, :port)}/")
 
     initial_state()
   end
