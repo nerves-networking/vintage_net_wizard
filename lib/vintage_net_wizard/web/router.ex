@@ -157,10 +157,13 @@ defmodule VintageNetWizard.Web.Router do
   defp render_page(conn, page, info \\ []) do
     info = [device_info: BackendServer.device_info()] ++ info
 
-    page
-    |> template_file()
-    |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
-    |> (fn {:safe, contents} -> send_resp(conn, 200, contents) end).()
+    resp =
+      page
+      |> template_file()
+      |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
+      |> Phoenix.HTML.Engine.encode_to_iodata!()
+
+    send_resp(conn, 200, resp)
   end
 
   defp render_password_page(conn, :wpa_psk, info) do
