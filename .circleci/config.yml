@@ -33,11 +33,11 @@ defaults: &defaults
   working_directory: ~/repo
 
 jobs:
-  build_elixir_1_9_otp_22:
+  build_elixir_1_10_otp_22:
     docker:
-      - image: erlang:22.0
+      - image: erlang:22.3
         environment:
-          ELIXIR_VERSION: 1.9.1-otp-22
+          ELIXIR_VERSION: 1.10.3-otp-22
           LC_ALL: C.UTF-8
     <<: *defaults
     steps:
@@ -52,13 +52,29 @@ jobs:
       - run: MIX_ENV=test mix coveralls.circle
       - run: mix format --check-formatted
       - run: MIX_ENV=docs mix docs
-      - run: mix hex.build
-      - run: mix dialyzer --halt-exit-status
+      - run: MIX_ENV=docs mix hex.build
+      - run: mix dialyzer
       - save_cache:
           key: v1-mix-cache-{{ checksum "mix.lock" }}
           paths:
             - _build
             - deps
+
+  build_elixir_1_9_otp_22:
+    docker:
+      - image: erlang:22.2
+        environment:
+          ELIXIR_VERSION: 1.9.4-otp-22
+          LC_ALL: C.UTF-8
+    <<: *defaults
+    steps:
+      - checkout
+      - <<: *install_system_deps
+      - <<: *install_elixir
+      - <<: *install_hex_rebar
+      - run: mix deps.get
+      - run: mix compile
+      - run: mix test
 
   build_elixir_1_8_otp_22:
     docker:
@@ -76,12 +92,12 @@ jobs:
       - run: mix compile
       - run: mix test
 
-  build_example_elixir_1_9_otp_22:
+  build_example_elixir_1_10_otp_22:
     docker:
-      - image: nervesproject/nerves_system_br:1.8.5
+      - image: nervesproject/nerves_system_br:1.11.4
         environment:
           MIX_TARGET: rpi0
-          ELIXIR_VERSION: 1.9.1-otp-22
+          ELIXIR_VERSION: 1.10.3-otp-22
           LC_ALL: C.UTF-8
     <<: *defaults
     steps:
@@ -96,7 +112,7 @@ jobs:
       - run: cd example && mix deps.get
       - run: cd example && mix firmware
       - run: cd example && mix format --check-formatted
-      - run: cd example && mix dialyzer --halt-exit-status
+      - run: cd example && mix dialyzer
       - save_cache:
           key: v1-example-mix-cache-{{ checksum "mix.lock" }}
           paths:
@@ -107,6 +123,7 @@ workflows:
   version: 2
   build_test:
     jobs:
+      - build_elixir_1_10_otp_22
       - build_elixir_1_9_otp_22
       - build_elixir_1_8_otp_22
-      - build_example_elixir_1_9_otp_22
+      - build_example_elixir_1_10_otp_22
