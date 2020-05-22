@@ -45,7 +45,7 @@ defmodule WizardExample.MixProject do
       {:ring_logger, "~> 0.6"},
       {:ramoops_logger, "~> 0.3.0"},
       {:toolshed, "~> 0.2"},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.10", targets: @all_targets},
