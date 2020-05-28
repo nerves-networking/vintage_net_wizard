@@ -3,11 +3,13 @@
 (() => {
   const accessPointsTable = document.querySelector(".access-points-table");
   const body = accessPointsTable.tBodies.item(0);
+  const relative_path = document.getElementById("relative-path").value;
+
   getAccessPoints();
   setInterval(getAccessPoints, 5000);
 
   function getAccessPoints() {
-    fetch("/api/v1/access_points")
+    fetch(relative_path + "api/v1/access_points")
       .then((resp) => resp.json())
       .then((accessPoints) => {
         body.innerHTML = "";
@@ -92,7 +94,7 @@
     networkTR.addEventListener("click", ({ target }) => {
       const ssid = target.parentElement.dataset.ssid
       if (type === "addConfig") {
-        fetch(`/api/v1/${ssid}/configuration`, {
+        fetch(`${relative_path}api/v1/${ssid}/configuration`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json"
@@ -103,10 +105,10 @@
           })
         })
           .then(resp => {
-            window.location.href = "/";
+            window.location.href = relative_path;
           })
       } else {
-        window.location.href = "/ssid/" + encodeURI(ssid);
+        window.location.href = relative_path + "ssid/" + encodeURI(ssid);
       }
     });
   }
