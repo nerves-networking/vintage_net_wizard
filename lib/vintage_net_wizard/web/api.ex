@@ -1,8 +1,7 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
 
-  alias VintageNetWizard.{WiFiConfiguration, BackendServer}
-  alias VintageNetWizard.Web.Endpoint
+  alias VintageNetWizard.{Callbacks, WiFiConfiguration, BackendServer}
   alias Plug.Conn
 
   use Plug.Router
@@ -37,13 +36,7 @@ defmodule VintageNetWizard.Web.Api do
   get "/complete" do
     :ok = BackendServer.complete()
 
-    _ =
-      Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
-        # We don't want to stop the server before we
-        # send the response back.
-        :timer.sleep(3000)
-        Endpoint.stop_server()
-      end)
+    _ = Callbacks.on_complete()
 
     send_json(conn, 202, "")
   end

@@ -25,7 +25,19 @@ defmodule VintageNetWizard.Web.Endpoint do
     use_ssl? = Keyword.has_key?(opts, :ssl)
     use_captive_portal? = Application.get_env(:vintage_net_wizard, :captive_portal, true)
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
-    callbacks = Keyword.take(opts, [:on_exit])
+
+    callbacks =
+      Keyword.take(opts, [:on_exit])
+      |> Keyword.put(:on_complete, {Task.Supervisor, :start_child,
+       [
+         VintageNetWizard.TaskSupervisor,
+         fn ->
+           # We don't want to stop the server before we
+           # send the response back.
+           :timer.sleep(3000)
+           __MODULE__.stop_server()
+         end
+       ]})
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),

@@ -6,7 +6,7 @@ defmodule VintageNetWizard.Web.Router do
 
   alias VintageNetWizard.{
     BackendServer,
-    Web.Endpoint,
+    Callbacks,
     WiFiConfiguration
   }
 
@@ -101,7 +101,6 @@ defmodule VintageNetWizard.Web.Router do
       "none" ->
         {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
         :ok = BackendServer.save(config)
-
         redirect(conn, "/")
 
       key_mgmt ->
@@ -117,13 +116,7 @@ defmodule VintageNetWizard.Web.Router do
   get "/complete" do
     :ok = BackendServer.complete()
 
-    _ =
-      Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
-        # We don't want to stop the server before we
-        # send the response back.
-        :timer.sleep(3000)
-        Endpoint.stop_server()
-      end)
+    _ = Callbacks.on_complete()
 
     render_page(conn, "complete.html")
   end

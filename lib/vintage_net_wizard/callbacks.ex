@@ -12,6 +12,12 @@ defmodule VintageNetWizard.Callbacks do
     Agent.get(__MODULE__, & &1)
   end
 
+  def on_complete() do
+    list()
+    |> Keyword.get(:on_complete)
+    |> apply_callback()
+  end
+
   def on_exit() do
     list()
     |> Keyword.get(:on_exit)
