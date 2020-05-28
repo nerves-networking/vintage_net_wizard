@@ -2,7 +2,8 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNetWizard.{BackendServer, Callbacks, Web.Router, Web.RedirectRouter}
+  alias VintageNetWizard.{Callbacks, Web.Router, Web.RedirectRouter}
+  alias VintageNetWizard.TaskSupervisor, as: Tasks
   use DynamicSupervisor
 
   @type opt :: {:ssl, :ssl.tls_server_option()} | {:on_exit, {module(), atom(), list()}}
@@ -23,27 +24,15 @@ defmodule VintageNetWizard.Web.Endpoint do
           :ok | {:error, :already_started | :no_keyfile | :no_certfile}
   def start_server(opts \\ []) do
     use_ssl? = Keyword.has_key?(opts, :ssl)
-    use_captive_portal? = Application.get_env(:vintage_net_wizard, :captive_portal, true)
-    backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
 
-    callbacks =
-      Keyword.take(opts, [:on_exit])
-      |> Keyword.put(:on_complete, {Task.Supervisor, :start_child,
-       [
-         VintageNetWizard.TaskSupervisor,
-         fn ->
-           # We don't want to stop the server before we
-           # send the response back.
-           :timer.sleep(3000)
-           __MODULE__.stop_server()
-         end
-       ]})
+    use_captive_portal? =
+      opts[:captive_portal] || Application.get_env(:vintage_net_wizard, :captive_portal, true)
+
+    _ = set_callbacks(opts)
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
-         {:ok, _pid} <- maybe_with_redirect(use_captive_portal?, use_ssl?),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {BackendServer, backend}),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}) do
+         {:ok, _pid} <- maybe_with_redirect(use_captive_portal?, use_ssl?) do
       :ok
     else
       {:error, :max_children} -> {:error, :already_started}
@@ -61,26 +50,17 @@ defmodule VintageNetWizard.Web.Endpoint do
         {:error, :not_found}
 
       children ->
-        # Ensure we terminate callbacks last after all other children
-        # and the callbacks have been executed
-        callbacks_child =
-          Enum.reduce(children, nil, fn {_, child, _, [mod]}, _acc ->
-            if mod == Callbacks do
-              child
-            else
-              DynamicSupervisor.terminate_child(__MODULE__, child)
-            end
-          end)
+        Enum.each(children, fn {_, child, _, _} ->
+          DynamicSupervisor.terminate_child(__MODULE__, child)
+        end)
 
         _ = Callbacks.on_exit()
-
-        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks_child)
     end
   end
 
   @impl DynamicSupervisor
   def init(_) do
-    DynamicSupervisor.init(strategy: :one_for_one, max_children: 4)
+    DynamicSupervisor.init(strategy: :one_for_one, max_children: 2)
   end
 
   defp dispatch do
@@ -142,5 +122,23 @@ defmodule VintageNetWizard.Web.Endpoint do
         port: get_port()
       ]
     )
+  end
+
+  defp set_callbacks(opts) do
+    on_complete =
+      {Task.Supervisor, :start_child,
+       [
+         Tasks,
+         fn ->
+           # We don't want to stop the server before we
+           # send the response back.
+           :timer.sleep(3000)
+           __MODULE__.stop_server()
+         end
+       ]}
+
+    Keyword.take(opts, [:on_exit])
+    |> Keyword.put(:on_complete, on_complete)
+    |> Callbacks.set_callbacks()
   end
 end

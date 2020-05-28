@@ -7,6 +7,9 @@ defmodule VintageNetWizard.BackendServer do
   alias VintageNetWizard.WiFiConfiguration
   alias VintageNetWiFi.AccessPoint
 
+  # Hibernate after 5 minutes
+  @hibernate_after 5 * 60 * 1000
+
   defmodule State do
     @moduledoc false
     defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
@@ -14,7 +17,7 @@ defmodule VintageNetWizard.BackendServer do
 
   @spec start_link(backend :: module()) :: GenServer.on_start()
   def start_link(backend) do
-    GenServer.start_link(__MODULE__, backend, name: __MODULE__)
+    GenServer.start_link(__MODULE__, backend, name: __MODULE__, hibernate_after: @hibernate_after)
   end
 
   @doc """

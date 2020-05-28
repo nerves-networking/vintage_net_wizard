@@ -14,12 +14,12 @@ defmodule VintageNetWizard.Web.Router do
   plug(Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/")
   plug(Plug.Parsers, parsers: [Plug.Parsers.URLENCODED, :json], json_decoder: Jason)
   plug(:match)
-  plug(:dispatch)
+  plug(:dispatch, builder_opts())
 
   get "/" do
     case BackendServer.configurations() do
       [] ->
-        redirect(conn, "/networks")
+        redirect(conn, relative_path(conn) <> "networks")
 
       configs ->
         render_page(conn, "index.html",
@@ -38,7 +38,8 @@ defmodule VintageNetWizard.Web.Router do
     case WiFiConfiguration.from_params(params) do
       {:ok, wifi_config} ->
         :ok = BackendServer.save(wifi_config)
-        redirect(conn, "/")
+
+        redirect(conn, relative_path(conn))
 
       error ->
         {:ok, key_mgmt} = WiFiConfiguration.key_mgmt_from_string(conn.body_params["key_mgmt"])
@@ -101,7 +102,8 @@ defmodule VintageNetWizard.Web.Router do
       "none" ->
         {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
         :ok = BackendServer.save(config)
-        redirect(conn, "/")
+
+        redirect(conn, relative_path(conn))
 
       key_mgmt ->
         key_mgmt = String.to_existing_atom(key_mgmt)
@@ -116,9 +118,7 @@ defmodule VintageNetWizard.Web.Router do
   get "/complete" do
     :ok = BackendServer.complete()
 
-    _ = Callbacks.on_complete()
-
-    render_page(conn, "complete.html")
+    do_on_complete(conn, opts[:on_complete])
   end
 
   forward("/api/v1", to: VintageNetWizard.Web.Api)
@@ -148,7 +148,7 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp render_page(conn, page, info \\ []) do
-    info = [device_info: BackendServer.device_info()] ++ info
+    info = [relative_path: relative_path(conn), device_info: BackendServer.device_info()] ++ info
 
     resp =
       page
@@ -225,5 +225,33 @@ defmodule VintageNetWizard.Web.Router do
       _ ->
         %{value: status, class: "text-warning", title: "Device waiting to be configured."}
     end
+  end
+
+  defp relative_path(conn) do
+    case conn.script_name do
+      [] -> "/"
+      path -> "/#{Path.join(path)}/"
+    end
+  end
+
+  defp do_on_complete(conn, opt \\ nil)
+
+  defp do_on_complete(conn, path) when is_binary(path) do
+    # A path was provided to signify redirect location
+    # Run callback (if any), then redirect
+    _ = Callbacks.on_complete()
+    redirect(conn, path)
+  end
+
+  defp do_on_complete(conn, {_, _, _} = mfa) do
+    # Set the callback first if provided
+    Callbacks.set_callbacks(on_complete: mfa)
+
+    do_on_complete(conn)
+  end
+
+  defp do_on_complete(conn, _) do
+    _ = Callbacks.on_complete()
+    render_page(conn, "complete.html")
   end
 end
