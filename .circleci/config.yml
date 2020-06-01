@@ -35,7 +35,7 @@ defaults: &defaults
 jobs:
   build_elixir_1_10_otp_23:
     docker:
-      - image: erlang:23.0
+      - image: erlang:23.0.1
         environment:
           ELIXIR_VERSION: 1.10.3-otp-23
           LC_ALL: C.UTF-8
@@ -49,7 +49,7 @@ jobs:
           keys:
             - v1-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
-      - run: MIX_ENV=test mix coveralls.circle
+      - run: mix coveralls.circle
       - run: mix format --check-formatted
       - run: mix docs
       - run: mix hex.build
@@ -62,7 +62,7 @@ jobs:
 
   build_elixir_1_10_otp_22:
     docker:
-      - image: erlang:22.3
+      - image: erlang:22.3.4.1
         environment:
           ELIXIR_VERSION: 1.10.3-otp-22
           LC_ALL: C.UTF-8
