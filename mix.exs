@@ -69,7 +69,7 @@ defmodule VintageNetWizard.MixProject do
       {:nerves_runtime, "~> 0.10"},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.8", only: :test, runtime: false}
+      {:excoveralls, "~> 0.13", only: :test, runtime: false}
     ]
   end
 

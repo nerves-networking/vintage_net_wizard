@@ -72,20 +72,9 @@ jobs:
       - <<: *install_system_deps
       - <<: *install_elixir
       - <<: *install_hex_rebar
-      - restore_cache:
-          keys:
-            - v2-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
-      - run: MIX_ENV=test mix coveralls.circle
-      - run: mix format --check-formatted
-      - run: MIX_ENV=docs mix docs
-      - run: MIX_ENV=docs mix hex.build
-      - run: mix dialyzer
-      - save_cache:
-          key: v2-mix-cache-{{ checksum "mix.lock" }}
-          paths:
-            - _build
-            - deps
+      - run: mix compile
+      - run: mix test
 
   build_elixir_1_9_otp_22:
     docker:
@@ -119,12 +108,12 @@ jobs:
       - run: mix compile
       - run: mix test
 
-  build_example_elixir_1_10_otp_22:
+  build_example_elixir_1_10_otp_23:
     docker:
-      - image: nervesproject/nerves_system_br:1.11.4
+      - image: nervesproject/nerves_system_br:1.12.0
         environment:
           MIX_TARGET: rpi0
-          ELIXIR_VERSION: 1.10.3-otp-22
+          ELIXIR_VERSION: 1.10.4-otp-23
           LC_ALL: C.UTF-8
     <<: *defaults
     steps:
@@ -154,4 +143,4 @@ workflows:
       - build_elixir_1_10_otp_22
       - build_elixir_1_9_otp_22
       - build_elixir_1_8_otp_22
-      - build_example_elixir_1_10_otp_22
+      - build_example_elixir_1_10_otp_23
