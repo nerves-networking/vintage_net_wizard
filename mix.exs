@@ -67,7 +67,7 @@ defmodule VintageNetWizard.MixProject do
       {:vintage_net_wifi, "~> 0.9.0"},
       {:vintage_net, "~> 0.9.1"},
       {:nerves_runtime, "~> 0.10"},
-      {:ex_doc, "~> 0.19", only: :docs, runtime: false},
+      {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.8", only: :test, runtime: false}
     ]
@@ -82,10 +82,11 @@ defmodule VintageNetWizard.MixProject do
 
   defp docs do
     [
-      extras: ["README.md", "json-api.md"],
+      extras: ["README.md", "json-api.md", "CHANGELOG.md"],
       main: "readme",
       source_ref: "v#{@version}",
-      source_url: @source_url
+      source_url: @source_url,
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
   end
 
