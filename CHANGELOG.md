@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.4
+
+This release is mostly documentation updates and code refactoring without any
+core usage changes. It also updates dependencies, including `vintage_net_wifi`
+to allow `vintage_net v0.8` if desired.
+
 ## v0.2.3
 
 * Enhancements
