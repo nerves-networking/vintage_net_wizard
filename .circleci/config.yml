@@ -74,7 +74,7 @@ jobs:
       - <<: *install_hex_rebar
       - restore_cache:
           keys:
-            - v1-mix-cache-{{ checksum "mix.lock" }}
+            - v2-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
       - run: MIX_ENV=test mix coveralls.circle
       - run: mix format --check-formatted
@@ -82,7 +82,7 @@ jobs:
       - run: MIX_ENV=docs mix hex.build
       - run: mix dialyzer
       - save_cache:
-          key: v1-mix-cache-{{ checksum "mix.lock" }}
+          key: v2-mix-cache-{{ checksum "mix.lock" }}
           paths:
             - _build
             - deps
