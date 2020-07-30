@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0
+
+This release has modifications to support `vintage_net v0.9.1`. It contains no
+functional changes.
+
 ## v0.2.4
 
 This release is mostly documentation updates and code refactoring without any
