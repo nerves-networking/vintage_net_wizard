@@ -51,7 +51,7 @@ defmodule WizardExample.MixProject do
       {:nerves_runtime, "~> 0.10", targets: @all_targets},
       {:vintage_net_wizard, path: "..", targets: @all_targets, override: true},
       {:circuits_gpio, "~> 0.4.1", targets: @all_targets},
-      {:nerves_pack, "~> 0.2", targets: @all_targets},
+      {:nerves_pack, "~> 0.3", targets: @all_targets},
 
       # Dependencies for specific targets
       {:nerves_system_rpi, "~> 1.11", runtime: false, targets: :rpi},
