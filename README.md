@@ -153,6 +153,17 @@ You can disable captive portal in your configuration:
 config :vintage_net_wizard, captive_portal: false
 ```
 
+### Inactivity Timeout
+
+After a set mount of time of inactivity the wizard will timeout and shut down
+the server. This prevents a device using the wizard to infinitely be in AP mode.
+The default timeout is 10 minutes, but can be configured:
+
+```elixir
+config :vintage_net_wizard,
+  inactivity_timeout: <timeout in minutes>
+```
+
 ## JSON API
 
 It is possible to write a smartphone app to configure your device using an API

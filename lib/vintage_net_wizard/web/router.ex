@@ -13,6 +13,10 @@ defmodule VintageNetWizard.Web.Router do
   plug(Plug.Logger, log: :debug)
   plug(Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/")
   plug(Plug.Parsers, parsers: [Plug.Parsers.URLENCODED, :json], json_decoder: Jason)
+  # This route is polled by the front end to update its list of access points.
+  # This can mean the user could potentially have the page open without knowing
+  # it just polling this endpoint but still be inactive.
+  plug(VintageNetWizard.Plugs.Activity, excluding: ["/api/v1/access_points"])
   plug(:match)
   plug(:dispatch)
 
