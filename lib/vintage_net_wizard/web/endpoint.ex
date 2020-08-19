@@ -2,7 +2,14 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
-  alias VintageNetWizard.{BackendServer, Callbacks, Web.Router, Web.RedirectRouter}
+  alias VintageNetWizard.{
+    BackendServer,
+    Callbacks,
+    WatchDog,
+    Web.Router,
+    Web.RedirectRouter
+  }
+
   use DynamicSupervisor
 
   @type opt :: {:ssl, :ssl.tls_server_option()} | {:on_exit, {module(), atom(), list()}}
@@ -25,13 +32,16 @@ defmodule VintageNetWizard.Web.Endpoint do
     use_ssl? = Keyword.has_key?(opts, :ssl)
     use_captive_portal? = Application.get_env(:vintage_net_wizard, :captive_portal, true)
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
+    inactivity_timeout = Application.get_env(:vintage_net_wizard, :inactivity_timeout, 10)
     callbacks = Keyword.take(opts, [:on_exit])
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
          {:ok, _pid} <- maybe_with_redirect(use_captive_portal?, use_ssl?),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {BackendServer, backend}),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}) do
+         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}),
+         {:ok, _pid} <-
+           DynamicSupervisor.start_child(__MODULE__, {WatchDog, inactivity_timeout}) do
       :ok
     else
       {:error, :max_children} -> {:error, :already_started}
@@ -52,11 +62,12 @@ defmodule VintageNetWizard.Web.Endpoint do
         # Ensure we terminate callbacks last after all other children
         # and the callbacks have been executed
         callbacks_child =
-          Enum.reduce(children, nil, fn {_, child, _, [mod]}, _acc ->
+          Enum.reduce(children, nil, fn {_, child, _, [mod]}, acc ->
             if mod == Callbacks do
               child
             else
-              DynamicSupervisor.terminate_child(__MODULE__, child)
+              :ok = DynamicSupervisor.terminate_child(__MODULE__, child)
+              acc
             end
           end)
 
