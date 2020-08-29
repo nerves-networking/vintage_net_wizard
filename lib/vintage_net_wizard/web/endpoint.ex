@@ -12,7 +12,10 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   use DynamicSupervisor
 
-  @type opt :: {:ssl, :ssl.tls_server_option()} | {:on_exit, {module(), atom(), list()}}
+  @type opt ::
+          {:ssl, :ssl.tls_server_option()}
+          | {:on_exit, {module(), atom(), list()}}
+          | {:ifname, VintageNet.ifname()}
 
   @doc false
   def start_link(args) do
@@ -31,14 +34,13 @@ defmodule VintageNetWizard.Web.Endpoint do
   def start_server(opts \\ []) do
     use_ssl? = Keyword.has_key?(opts, :ssl)
     use_captive_portal? = Application.get_env(:vintage_net_wizard, :captive_portal, true)
-    backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
     inactivity_timeout = Application.get_env(:vintage_net_wizard, :inactivity_timeout, 10)
     callbacks = Keyword.take(opts, [:on_exit])
 
     with spec <- maybe_use_ssl(use_ssl?, opts),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec),
          {:ok, _pid} <- maybe_with_redirect(use_captive_portal?, use_ssl?),
-         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {BackendServer, backend}),
+         {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, get_backend_spec(opts)),
          {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, {Callbacks, callbacks}),
          {:ok, _pid} <-
            DynamicSupervisor.start_child(__MODULE__, {WatchDog, inactivity_timeout}) do
@@ -141,5 +143,12 @@ defmodule VintageNetWizard.Web.Endpoint do
         port: get_port()
       ]
     )
+  end
+
+  defp get_backend_spec(opts) do
+    ifname = Keyword.get(opts, :ifname, "wlan0")
+    backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
+
+    BackendServer.child_spec(backend, ifname)
   end
 end

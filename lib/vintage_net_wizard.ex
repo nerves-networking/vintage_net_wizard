@@ -22,7 +22,9 @@ defmodule VintageNetWizard do
   """
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do
-    with :ok <- APMode.into_ap_mode(),
+    ifname = Keyword.get(opts, :ifname, "wlan0")
+
+    with :ok <- APMode.into_ap_mode(ifname),
          :ok <- Endpoint.start_server(opts),
          :ok <- BackendServer.start_scan() do
       :ok

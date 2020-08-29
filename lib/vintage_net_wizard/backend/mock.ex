@@ -2,8 +2,7 @@ defmodule VintageNetWizard.Backend.Mock do
   @moduledoc """
   A default backend for host machines.
 
-  This is useful for testing and local
-  JavaScript development
+  This is useful for testing and local JavaScript development.
   """
   @behaviour VintageNetWizard.Backend
 
@@ -12,7 +11,7 @@ defmodule VintageNetWizard.Backend.Mock do
   require Logger
 
   @impl VintageNetWizard.Backend
-  def init() do
+  def init(_ifname) do
     Logger.info("Go to http://localhost:#{Application.get_env(:vintage_net_wizard, :port)}/")
 
     initial_state()
@@ -28,7 +27,7 @@ defmodule VintageNetWizard.Backend.Mock do
   def access_points(%{access_points: access_points}), do: access_points
 
   @impl VintageNetWizard.Backend
-  def device_info() do
+  def device_info(_state) do
     [
       {"Wi-Fi Address", "11:22:33:44:55:66"},
       {"Serial number", "12345678"},
@@ -39,7 +38,7 @@ defmodule VintageNetWizard.Backend.Mock do
   end
 
   @impl VintageNetWizard.Backend
-  def reset(), do: initial_state()
+  def reset(_state), do: initial_state()
 
   @impl VintageNetWizard.Backend
   def complete(_configs, state), do: {:ok, state}
