@@ -1,14 +1,20 @@
 defmodule VintageNetWizard.Backend.Default do
+  @moduledoc """
+  The default backend implementation for target devices
+
+  This backend will be used if no other backend is configured in the
+  application configuration.
+  """
   @behaviour VintageNetWizard.Backend
 
   alias VintageNetWizard.{APMode, WiFiConfiguration}
 
   @impl VintageNetWizard.Backend
-  def init() do
-    :ok = VintageNet.subscribe(["interface", "wlan0", "connection"])
-    :ok = VintageNet.subscribe(["interface", "wlan0", "wifi", "access_points"])
+  def init(ifname) do
+    :ok = VintageNet.subscribe(["interface", ifname, "connection"])
+    :ok = VintageNet.subscribe(["interface", ifname, "wifi", "access_points"])
 
-    initial_state()
+    initial_state(ifname)
   end
 
   @impl VintageNetWizard.Backend
@@ -19,7 +25,7 @@ defmodule VintageNetWizard.Backend.Default do
   def apply(_, %{state: :applying} = state), do: {:ok, state}
 
   def apply(wifi_configurations, state) do
-    :ok = apply_configurations(wifi_configurations)
+    :ok = apply_configurations(wifi_configurations, state)
 
     timeout =
       wifi_configurations
@@ -39,7 +45,7 @@ defmodule VintageNetWizard.Backend.Default do
   def complete(wifi_configurations, state) do
     # When completing, we don't make assertions on the success
     # of the connection and only care that it was applied
-    :ok = apply_configurations(wifi_configurations)
+    :ok = apply_configurations(wifi_configurations, state)
 
     {:ok, %{state | state: :complete}}
   end
@@ -50,12 +56,12 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
-  def device_info() do
+  def device_info(state) do
     kv =
       Nerves.Runtime.KV.get_all_active()
       |> kv_to_map
 
-    mac_addr = VintageNet.get(["interface", "wlan0", "mac_address"])
+    mac_addr = VintageNet.get(["interface", state.ifname, "mac_address"])
 
     [
       {"Wi-Fi Address", mac_addr},
@@ -82,13 +88,13 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
-  def reset(), do: initial_state()
+  def reset(state), do: initial_state(ifname: state.ifname)
 
   @impl VintageNetWizard.Backend
-  def handle_info(:configuration_timeout, %{data: data} = state) do
+  def handle_info(:configuration_timeout, %{data: data, ifname: ifname} = state) do
     # If we get this timeout, something went wrong trying to apply
     # the configuration, i.e. bad password or faulty network
-    :ok = APMode.into_ap_mode()
+    :ok = APMode.into_ap_mode(ifname)
 
     data =
       data
@@ -99,15 +105,15 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info(
-        {VintageNet, ["interface", "wlan0", "connection"], :disconnected, :lan, _},
-        %{state: :configuring} = state
+        {VintageNet, ["interface", ifname, "connection"], :disconnected, :lan, _},
+        %{state: :configuring, ifname: ifname} = state
       ) do
     {:noreply, state}
   end
 
   def handle_info(
-        {VintageNet, ["interface", "wlan0", "connection"], _, connectivity, _},
-        %{state: :applying, data: %{configuration_status: :good} = data} = state
+        {VintageNet, ["interface", ifname, "connection"], _, connectivity, _},
+        %{state: :applying, data: %{configuration_status: :good} = data, ifname: ifname} = state
       )
       when connectivity in [:lan, :internet] do
     # Everything connected, so cancel our timeout
@@ -117,8 +123,8 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info(
-        {VintageNet, ["interface", "wlan0", "connection"], _, connectivity, _},
-        %{state: :applying, data: data} = state
+        {VintageNet, ["interface", ifname, "connection"], _, connectivity, _},
+        %{state: :applying, data: data, ifname: ifname} = state
       )
       when connectivity in [:lan, :internet] do
     # Everything connected, so cancel our timeout
@@ -128,7 +134,7 @@ defmodule VintageNetWizard.Backend.Default do
     # wifi runs into a race condition. So, we wait a little
     # before trying to re-initialize the interface.
     Process.sleep(4_000)
-    :ok = APMode.into_ap_mode()
+    :ok = APMode.into_ap_mode(ifname)
 
     data =
       data
@@ -139,8 +145,8 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   def handle_info(
-        {VintageNet, ["interface", "wlan0", "wifi", "access_points"], _, access_points, _},
-        %{data: data} = state
+        {VintageNet, ["interface", ifname, "wifi", "access_points"], _, access_points, _},
+        %{data: data, ifname: ifname} = state
       ) do
     data = Map.put(data, :access_points, access_points)
     {:reply, {:access_points, access_points}, %{state | data: data}}
@@ -158,11 +164,11 @@ defmodule VintageNetWizard.Backend.Default do
 
   def handle_info(_, state), do: {:noreply, state}
 
-  defp apply_configurations(wifi_configurations) do
+  defp apply_configurations(wifi_configurations, state) do
     vintage_net_config =
       Enum.map(wifi_configurations, &WiFiConfiguration.to_vintage_net_configuration/1)
 
-    VintageNet.configure("wlan0", %{
+    VintageNet.configure(state.ifname, %{
       type: VintageNetWiFi,
       vintage_net_wifi: %{
         networks: vintage_net_config
@@ -173,14 +179,15 @@ defmodule VintageNetWizard.Backend.Default do
 
   defp start_scan_timer(), do: Process.send_after(self(), :run_scan, 20_000)
 
-  defp scan(%{state: :configuring}), do: VintageNet.scan("wlan0")
+  defp scan(%{state: :configuring, ifname: ifname}), do: VintageNet.scan(ifname)
   defp scan(_), do: {:error, :invalid_state}
 
-  defp initial_state() do
+  defp initial_state(ifname) do
     %{
       state: :configuring,
       scan_ref: nil,
-      data: %{access_points: %{}, configuration_status: :not_configured}
+      data: %{access_points: %{}, configuration_status: :not_configured},
+      ifname: ifname
     }
   end
 

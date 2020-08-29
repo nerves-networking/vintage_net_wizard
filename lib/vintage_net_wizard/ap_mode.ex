@@ -8,13 +8,13 @@ defmodule VintageNetWizard.APMode do
   @doc """
   Change the WiFi module into access point mode
   """
-  @spec into_ap_mode() :: :ok | {:error, any()}
-  def into_ap_mode() do
+  @spec into_ap_mode(VintageNet.ifname()) :: :ok | {:error, any()}
+  def into_ap_mode(ifname) do
     hostname = get_hostname()
     our_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
 
     config = ap_mode_configuration(hostname, our_name)
-    VintageNet.configure("wlan0", config, persist: false)
+    VintageNet.configure(ifname, config, persist: false)
   end
 
   @doc """

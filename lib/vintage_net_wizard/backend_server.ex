@@ -12,9 +12,13 @@ defmodule VintageNetWizard.BackendServer do
     defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
   end
 
-  @spec start_link(backend :: module()) :: GenServer.on_start()
-  def start_link(backend) do
-    GenServer.start_link(__MODULE__, backend, name: __MODULE__)
+  def child_spec(backend, ifname) do
+    %{id: __MODULE__, start: {__MODULE__, :start_link, [backend, ifname]}, restart: :transient}
+  end
+
+  @spec start_link(backend :: module(), VintageNet.ifname()) :: GenServer.on_start()
+  def start_link(backend, ifname) do
+    GenServer.start_link(__MODULE__, [backend, ifname], name: __MODULE__)
   end
 
   @doc """
@@ -130,12 +134,12 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   @impl GenServer
-  def init(backend) do
+  def init([backend, ifname]) do
     {:ok,
      %State{
        configurations: %{},
        backend: backend,
-       backend_state: apply(backend, :init, [])
+       backend_state: apply(backend, :init, [ifname])
      }}
   end
 
@@ -203,9 +207,9 @@ defmodule VintageNetWizard.BackendServer do
   def handle_call(
         :device_info,
         _from,
-        %State{backend: backend} = state
+        %State{backend: backend, backend_state: backend_state} = state
       ) do
-    {:reply, apply(backend, :device_info, []), state}
+    {:reply, apply(backend, :device_info, [backend_state]), state}
   end
 
   def handle_call(:configurations, _from, %State{configurations: configs} = state) do
@@ -236,8 +240,8 @@ defmodule VintageNetWizard.BackendServer do
     end
   end
 
-  def handle_call(:reset, _from, %State{backend: backend} = state) do
-    new_state = apply(backend, :reset, [])
+  def handle_call(:reset, _from, %State{backend: backend, backend_state: backend_state} = state) do
+    new_state = apply(backend, :reset, [backend_state])
     {:reply, :ok, %{state | configurations: %{}, backend_state: new_state}}
   end
 

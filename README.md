@@ -129,6 +129,16 @@ VintageNetWizard.run_wizard(ssl: [keyfile: "/path/to/key.pem", certfile: "/path/
 To see all available options see `Plug.SSL.configure/1` and Erlang's `:ssl`
 module.
 
+### Interface name
+
+VintageNetWizard uses `"wlan0"` by default. If you have more than one wireless
+LAN or the interface is called something else, pass the appropriate interface
+name to `VintageNetWizard.run_wizard/1` to use it:
+
+```elixir
+VintageNetWizard.run_wizard(ifname: "wlan1")
+```
+
 ### Backends
 
 Backends control how `VintageNetWizard` configures the network. The default

@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Test.Backend do
   @behaviour VintageNetWizard.Backend
 
   @impl VintageNetWizard.Backend
-  def init() do
+  def init(_ifname) do
     {:ok, nil}
   end
 
@@ -29,10 +29,10 @@ defmodule VintageNetWizard.Test.Backend do
   def handle_info(_, state), do: {:noreply, state}
 
   @impl VintageNetWizard.Backend
-  def device_info(), do: []
+  def device_info(_args), do: []
 
   @impl VintageNetWizard.Backend
-  def reset(), do: %{}
+  def reset(_args), do: %{}
 
   @impl VintageNetWizard.Backend
   def configuration_status(_state), do: :not_configured

@@ -1,18 +1,22 @@
 defmodule VintageNetWizard.Backend do
   @moduledoc """
-  Backends define the boundaries of getting access points,
-  handling incoming messages, and scanning the network
+  Backends define the boundaries of getting access points, handling incoming
+  messages, and scanning the network
   """
 
   alias VintageNetWizard.WiFiConfiguration
   alias VintageNetWiFi.AccessPoint
 
-  @type configuration_status :: :not_configured | :good | :bad
+  @type configuration_status() :: :not_configured | :good | :bad
 
   @doc """
   Do any initialization work like subscribing to messages
+
+  Will be passed the interface name that the backend should use. By default
+  this will be `"wlan0"`. If you want to use a different interface name you
+  can pass that in an option to `VintageNetWizard.run_wizard/1`.
   """
-  @callback init() :: state :: any()
+  @callback init(VintageNet.ifname()) :: state :: any()
 
   @doc """
   Get all the access points that the backend knowns about
@@ -38,7 +42,7 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Return information about the device for populating the web UI footer
   """
-  @callback device_info() :: [{String.t(), String.t()}]
+  @callback device_info(state :: any()) :: [{String.t(), String.t()}]
 
   @doc """
   Return the configuration status of a configuration that has been applied
@@ -59,7 +63,7 @@ defmodule VintageNetWizard.Backend do
   Apply any actions required to set the backend back to an
   initial default state
   """
-  @callback reset() :: state :: any()
+  @callback reset(state :: any()) :: state :: any()
 
   @doc """
   Perform final completion steps.
