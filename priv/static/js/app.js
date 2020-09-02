@@ -10,6 +10,8 @@ const signal_to_class = function (signal) {
   }
 }
 
+const relative_path = document.getElementById("relative-path").value;
+
 /**
  * Adds or updates an element on one of the ssid list tables.
  * data should contain the following keys:
@@ -126,7 +128,7 @@ const handle_scanned_ssid = function (data, table_id) {
 const parseResponse = (response) => response.json();
 
 const getAccessPoints = () => {
-  return fetch("/api/v1/access_points")
+  return fetch(relative_path + "api/v1/access_points")
     .then(parseResponse)
     .then((json) => {
       handle_scanned_ssid(json, "wifi_scan");
@@ -134,7 +136,7 @@ const getAccessPoints = () => {
 }
 
 const save = () => {
-  fetch("/api/v1/apply", {
+  fetch(relative_path + "api/v1/apply", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -157,7 +159,7 @@ const addSsid = function () {
     config[elem.name] = elem.value;
   }
 
-  fetch("/api/v1/configurations", {
+  fetch(relative_path + "api/v1/configurations", {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"

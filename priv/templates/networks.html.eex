@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title>VintageNet Wizard</title>
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="<%= relative_path %>css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="<%= relative_path %>css/styles.css">
+    <input type="hidden" id="relative-path" value="<%= relative_path %>">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container access-points-container">
-       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+       <h1 class="text-right mt-2"><a href="<%= relative_path %>">VintageNet Wizard</a></h1>
        <h3 class="text-left mt-2">
         Configuration Status:
         <span class="<%= configuration_status.class %>">
@@ -33,7 +34,7 @@
          </table>
        </div>
 
-       <a class="btn btn-primary" href="/networks/new">Add another network</a>
+       <a class="btn btn-primary" href="<%= relative_path %>networks/new">Add another network</a>
      </div>
 
      <footer class="py-3 bg-white shadow-sm w-100 text-muted">
@@ -46,6 +47,6 @@
          <% end %>
         </div>
      </footer>
-     <script src="/js/access_point.js"></script>
+     <script src="<%= relative_path %>js/access_point.js"></script>
   </body>
 </html>

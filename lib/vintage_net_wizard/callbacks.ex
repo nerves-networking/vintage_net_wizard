@@ -3,8 +3,11 @@ defmodule VintageNetWizard.Callbacks do
 
   require Logger
 
-  def start_link(callbacks) do
-    callbacks = Enum.reduce(callbacks, [], &validate_callback/2)
+  def start_link(callbacks \\ []) do
+    callbacks =
+      starting_callbacks(callbacks)
+      |> Enum.reduce([], &validate_callback/2)
+
     Agent.start_link(fn -> callbacks end, name: __MODULE__)
   end
 
@@ -12,10 +15,21 @@ defmodule VintageNetWizard.Callbacks do
     Agent.get(__MODULE__, & &1)
   end
 
+  def on_complete() do
+    list()
+    |> Keyword.get(:on_complete)
+    |> apply_callback()
+  end
+
   def on_exit() do
     list()
     |> Keyword.get(:on_exit)
     |> apply_callback()
+  end
+
+  def set_callbacks(callbacks) do
+    cbs = Enum.reduce(callbacks, [], &validate_callback/2)
+    Agent.update(__MODULE__, &Keyword.merge(&1, cbs))
   end
 
   defp apply_callback({mod, fun, args}) do
@@ -28,6 +42,17 @@ defmodule VintageNetWizard.Callbacks do
   end
 
   defp apply_callback(invalid), do: {:error, "invalid callback: #{inspect(invalid)}"}
+
+  defp starting_callbacks(initial) do
+    cbs = Application.get_env(:vintage_net_wizard, :callbacks, [])
+
+    if Keyword.keyword?(cbs) do
+      Keyword.merge(cbs, initial)
+    else
+      Logger.warn("[VintageNetWizard] invalid callbacks defined in config:\n\t#{inspect(cbs)}\n")
+      initial
+    end
+  end
 
   defp validate_callback({_key, {mod, fun, args}} = callback, acc)
        when is_atom(mod) and is_atom(fun) and is_list(args) do

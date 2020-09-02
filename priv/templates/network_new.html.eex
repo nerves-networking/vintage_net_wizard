@@ -3,14 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <title>VintageNet Wizard</title>
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="<%= relative_path %>css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="<%= relative_path %>css/styles.css">
+    <input type="hidden" id="relative-path" value="<%= relative_path %>">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container">
-       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+       <h1 class="text-right mt-2"><a href="<%= relative_path %>">VintageNet Wizard</a></h1>
        <div class="row justify-content-center">
-         <form class="col-sm-8 mt-3" action="/networks/new" method="POST">
+         <form class="col-sm-8 mt-3" action="<%= relative_path %>networks/new" method="POST">
            <div class="form-group">
              <label for="name">SSID</label>
              <input type="text" class="form-control" id="name" name="ssid" placeholder="Network name">

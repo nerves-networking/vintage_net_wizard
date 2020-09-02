@@ -16,6 +16,9 @@ defmodule VintageNetWizard do
     - `:ssl` - A Keyword list of `:ssl.tls_server_options`
     - `:on_exit` - `{module, function, args}` tuple specifying
     callback to perform after stopping the server.
+    - `:on_complete` - `{module, function, args}` tuple specifying
+    callback to run after completing configuration, but before
+    server is shutdown. Expected to be an mfa
 
   See `Plug.SSL.configure/1` for more information about the
   SSL options.

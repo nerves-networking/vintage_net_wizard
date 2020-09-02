@@ -158,6 +158,69 @@ config :vintage_net_wizard, captive_portal: false
 It is possible to write a smartphone app to configure your device using an API
 endpoint. Documentation for the API is in [json-api.md](json-api.md).
 
+## Using as a Plug
+
+VintageNetWizard uses `Plug.Router` under the hood and is dynamically routed
+which means you can plug it into an existing web app without running a separate
+server and port. This will only run routing and delivery of assets and will not
+put device into AP mode.
+
+**Using Plug.Router**
+```elixir
+forward "/wizard", to: VintageNetWizard.Web.Router
+```
+
+**Using Phoenix**
+```elixir
+scope "/", VintageNetWizard do
+  forward "/wizard", Web.Router
+end
+```
+
+```elixir
+scope "/", VintageNetWizard do
+  forward "/wizard", Web.Router
+end
+```
+
+You can also specify an `:on_complete` option to specify an action to perform
+when completing WiFi setup. Accepted values are:
+
+* a string path - This specifies the location to redirect to after completing
+setup and is useful if you want it to route to a different page within your app
+* `{module, function, args}` - tuple that defines a function to be run when
+configuration is completed.
+
+```elixir
+# Plug.Router
+forward "/wizard",
+  to: VintageNetWizard.Web.Router,
+  init_opts: [on_complete: {MyModule, :handle_complete, []}]
+```
+
+```elixir
+# Phoenix.Router
+scope "/", VintageNetWizard do
+  forward "/wizard", Web.Router, on_complete: "/my_app/index"
+end
+```
+
+If you wish to supply your own frontend UI, you can also use the JSON
+endpoints in `VintageNetWizard.Web.Api` to fetch the data as needed from
+the scope of your app:
+
+```elixir
+# Plug.Router
+forward "/wizard/api/v1", to: VintageNetWizard.Web.Api
+```
+
+```elixir
+# Phoenix.Router
+scope "/", VintageNetWizard do
+  forward "/wizard/api/v1", Web.Api
+end
+```
+
 ## Running the example
 
 The example builds a Nerves firmware image for supported Nerves devices
@@ -209,7 +272,9 @@ config :vintage_net_wizard,
   ssid: "MY_SSID"
 ```
 
-## Stop callback
+## Callbacks
+
+**On Exit**
 
 If your application runs a webserver or has other functionality that is
 incompatible with the wizard, you can use the `:on_exit` option to
@@ -225,6 +290,26 @@ defmodule MyApp do
   end
 
   def handle_on_exit() do
+    Logger.info("VintageNetWizard stopped")
+  end
+end
+```
+
+**On Complete**
+
+You can also specify a callback to be run when the configuration backend has completed,
+but before the server exits with the `:on_complete` option which functions the same way
+as `:on_exit` requiring `{module, function, args}` format.
+
+```elixir
+defmodule MyApp do
+  def start_wizard() do
+    VintageNetWizard.run_wizard(
+      on_complete: {__MODULE__, :handle_on_complete, []}
+    )
+  end
+
+  def handle_on_complete() do
     Logger.info("VintageNetWizard stopped")
   end
 end

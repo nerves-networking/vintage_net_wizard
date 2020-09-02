@@ -1,15 +1,14 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
 
-  alias VintageNetWizard.{WiFiConfiguration, BackendServer}
-  alias VintageNetWizard.Web.Endpoint
+  alias VintageNetWizard.{Callbacks, WiFiConfiguration, BackendServer}
   alias Plug.Conn
 
   use Plug.Router
 
   plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
   plug(:match)
-  plug(:dispatch)
+  plug(:dispatch, builder_opts())
 
   get "/configuration/status" do
     with status <- BackendServer.configuration_status(),
@@ -37,13 +36,12 @@ defmodule VintageNetWizard.Web.Api do
   get "/complete" do
     :ok = BackendServer.complete()
 
-    _ =
-      Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
-        # We don't want to stop the server before we
-        # send the response back.
-        :timer.sleep(3000)
-        Endpoint.stop_server()
-      end)
+    # Set the callback if provided as a Plug opt
+    if callback = opts[:on_complete] do
+      Callbacks.set_callbacks(on_complete: callback)
+    end
+
+    _ = Callbacks.on_complete()
 
     send_json(conn, 202, "")
   end

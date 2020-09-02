@@ -11,12 +11,14 @@
     ssid: document.getElementById("ssid").getAttribute("value")
   }
 
+  const relative_path = document.getElementById("relative-path").value;
+
   function runGetStatus() {
     setTimeout(getStatus, 1000);
   }
 
   function getStatus() {
-    fetch("/api/v1/configuration/status")
+    fetch(relative_path + "api/v1/configuration/status")
       .then(resp => resp.json())
       .then(handleStatusResponse)
       .catch(handleNetworkErrorResponse);
@@ -50,7 +52,7 @@
   }
 
   function createCompleteLink({ targetElem, view }) {
-    const button = document.createElement("button");
+    const button = document.createElement("a");
     var btnClass = "btn-primary";
     var btnText = "Complete";
 
@@ -61,18 +63,10 @@
 
     button.classList.add("btn");
     button.classList.add(btnClass);
-    button.addEventListener("click", handleCompleteClick); 
+    button.setAttribute("href", relative_path + "complete");
     button.innerHTML = btnText;
 
     targetElem.appendChild(button);
-  }
-
-  function handleCompleteClick(e) {
-    if (state.completeTimer) {
-      clearTimeout(state.completeTimer);
-      state.completeTimer = null;
-    }
-    complete();
   }
 
   function view({view, dots, ssid}) {
@@ -106,19 +100,11 @@
         </ul>
         <p>Check your setup and try configuring again. Or you can also skip verification
         to save the configuration as is.</p>
-        <a class="btn btn-primary" href="/">Configure</a>
+        <a class="btn btn-primary" href="${relative_path}">Configure</a>
         `, createCompleteLink];
       case "complete":
         return ["Configuration complete", null];
     }
-  }
-
-  function complete() {
-    fetch("/api/v1/complete")
-      .then(resp => {
-        state.view = "complete";
-        render(state);
-      });
   }
 
   function render(state) {
@@ -130,7 +116,7 @@
     }
   }
 
-  fetch("/api/v1/apply", {
+  fetch(relative_path + "api/v1/apply", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
