@@ -2,16 +2,16 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>VintageNet Wizard</title>
+    <title><%= title %></title>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container">
-       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+       <h1 class="text-right mt-2"><a href="/"><%= title %></a></h1>
 
        <div class="content">
-         WiFi configuration is now complete!
+         WiFi configuration is complete!
        </div>
      </div>
      <footer class="py-3 bg-white shadow-sm w-100 text-muted">

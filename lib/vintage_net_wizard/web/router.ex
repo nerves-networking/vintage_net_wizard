@@ -159,7 +159,8 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp render_page(conn, page, info \\ []) do
-    info = [device_info: BackendServer.device_info()] ++ info
+    title = Application.get_env(:vintage_net_wizard, :ui_title, "WiFi Setup Wizard")
+    info = [device_info: BackendServer.device_info(), title: title] ++ info
 
     resp =
       page
@@ -217,24 +218,28 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   defp configuration_status_details() do
-    case status = BackendServer.configuration_status() do
+    case BackendServer.configuration_status() do
       :good ->
         %{
-          value: status,
+          value: "Working",
           class: "text-success",
           title: "Device successfully connected to a network in the applied configuration"
         }
 
       :bad ->
         %{
-          value: status,
+          value: "Not Working",
           class: "text-danger",
           title:
             "Device was unable to connect to any network in the configuration due to bad password or a timeout while attempting."
         }
 
-      _ ->
-        %{value: status, class: "text-warning", title: "Device waiting to be configured."}
+      :not_configured ->
+        %{
+          value: "Not configured yet",
+          class: "text-warning",
+          title: "Device waiting to be configured."
+        }
     end
   end
 end

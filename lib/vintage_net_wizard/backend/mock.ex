@@ -29,7 +29,7 @@ defmodule VintageNetWizard.Backend.Mock do
   @impl VintageNetWizard.Backend
   def device_info(_state) do
     [
-      {"Wi-Fi Address", "11:22:33:44:55:66"},
+      {"WiFi address", "11:22:33:44:55:66"},
       {"Serial number", "12345678"},
       {"Firmware", "vintage_net_wizard"},
       {"Firmware version", "0.1.0"},

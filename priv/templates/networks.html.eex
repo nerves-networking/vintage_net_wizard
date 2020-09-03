@@ -2,15 +2,15 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>VintageNet Wizard</title>
+    <title><%= title %></title>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container access-points-container">
-       <h1 class="text-right mt-2"><a href="/">VintageNet Wizard</a></h1>
+       <h1 class="text-right mt-2"><a href="/"><%= title %></a></h1>
        <h3 class="text-left mt-2">
-        Configuration Status:
+        Configuration status:
         <span class="<%= configuration_status.class %>">
           <%= configuration_status.value%>
           <span style="bottom: 8px;right: 5px;position: relative" title="<%= configuration_status.title %>">
@@ -18,7 +18,7 @@
           </span>
         </span>
        </h3>
-       Choose the Wi-Fi network you want to add from the list below.
+       Choose a network from following list:
        <div class="my-3 p-3 bg-white rounded shadow-sm">
          <table class="table table-hover access-points-table">
              <thead>

@@ -64,7 +64,7 @@ defmodule VintageNetWizard.Backend.Default do
     mac_addr = VintageNet.get(["interface", state.ifname, "mac_address"])
 
     [
-      {"Wi-Fi Address", mac_addr},
+      {"WiFi address", mac_addr},
       {"Serial number", serial_number()},
       {"Firmware", kv["nerves_fw_product"]},
       {"Firmware version", kv["nerves_fw_version"]},
