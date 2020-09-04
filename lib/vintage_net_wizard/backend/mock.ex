@@ -11,23 +11,23 @@ defmodule VintageNetWizard.Backend.Mock do
 
   require Logger
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def init() do
     Logger.info("Go to http://localhost:#{Application.get_env(:vintage_net_wizard, :port)}/")
 
     initial_state()
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def apply(_configs, state) do
     Process.send_after(self(), {__MODULE__, :stop_server}, 2_000)
     {:ok, state}
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def access_points(%{access_points: access_points}), do: access_points
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def device_info() do
     [
       {"Wi-Fi Address", "11:22:33:44:55:66"},
@@ -38,13 +38,13 @@ defmodule VintageNetWizard.Backend.Mock do
     ]
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def reset(), do: initial_state()
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def complete(_configs, state), do: {:ok, state}
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def handle_info({__MODULE__, :stop_server}, %{configuration_status: :good} = state) do
     _ = Process.send_after(self(), {__MODULE__, :apply_config}, 1_000)
     {:noreply, state}
@@ -67,15 +67,15 @@ defmodule VintageNetWizard.Backend.Mock do
     {:noreply, state}
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def configuration_status(%{configuration_status: configuration_status}) do
     configuration_status
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def start_scan(state), do: state
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def stop_scan(state), do: state
 
   defp initial_state() do

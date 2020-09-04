@@ -1,12 +1,12 @@
 defmodule VintageNetWizard.Test.Backend do
   @behaviour VintageNetWizard.Backend
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def init() do
     {:ok, nil}
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def access_points(_) do
     [
       %VintageNetWiFi.AccessPoint{
@@ -22,31 +22,31 @@ defmodule VintageNetWizard.Test.Backend do
     ]
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def apply(_configs, state), do: {:ok, state}
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def handle_info(_, state), do: {:noreply, state}
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def device_info(), do: []
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def reset(), do: %{}
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def configuration_status(_state), do: :not_configured
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def stop_scan(state) do
     state
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def start_scan(state) do
     state
   end
 
-  @impl true
+  @impl VintageNetWizard.Backend
   def complete(_configs, state), do: {:ok, state}
 end

@@ -129,7 +129,7 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.call(__MODULE__, :complete)
   end
 
-  @impl true
+  @impl GenServer
   def init(backend) do
     {:ok,
      %State{
@@ -139,7 +139,7 @@ defmodule VintageNetWizard.BackendServer do
      }}
   end
 
-  @impl true
+  @impl GenServer
   def handle_call(
         :access_points,
         _from,
@@ -261,12 +261,12 @@ defmodule VintageNetWizard.BackendServer do
     {:reply, :ok, %{state | backend_state: new_backend_state}}
   end
 
-  @impl true
+  @impl GenServer
   def handle_cast({:subscribe, subscriber}, state) do
     {:noreply, %{state | subscriber: subscriber}}
   end
 
-  @impl true
+  @impl GenServer
   def handle_info(
         info,
         %State{
