@@ -61,7 +61,7 @@
 
     button.classList.add("btn");
     button.classList.add(btnClass);
-    button.addEventListener("click", handleCompleteClick); 
+    button.addEventListener("click", handleCompleteClick);
     button.innerHTML = btnText;
 
     targetElem.appendChild(button);
@@ -124,7 +124,7 @@
   function render(state) {
     const [innerHTML, action] = view(state);
     state.targetElem.innerHTML = innerHTML;
-    
+
     if (action) {
       action(state);
     }
