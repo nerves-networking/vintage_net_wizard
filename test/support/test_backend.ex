@@ -29,9 +29,6 @@ defmodule VintageNetWizard.Test.Backend do
   def handle_info(_, state), do: {:noreply, state}
 
   @impl VintageNetWizard.Backend
-  def device_info(_args), do: []
-
-  @impl VintageNetWizard.Backend
   def reset(_args), do: %{}
 
   @impl VintageNetWizard.Backend

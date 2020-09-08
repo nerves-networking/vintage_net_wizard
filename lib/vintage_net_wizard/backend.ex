@@ -7,6 +7,12 @@ defmodule VintageNetWizard.Backend do
   alias VintageNetWizard.WiFiConfiguration
   alias VintageNetWiFi.AccessPoint
 
+  @type device_info_name() :: String.t()
+
+  @type device_info_value() :: String.t()
+
+  @type opt() :: {:device_info, [{device_info_name(), device_info_value()}]}
+
   @type configuration_status() :: :not_configured | :good | :bad
 
   @doc """
@@ -38,11 +44,6 @@ defmodule VintageNetWizard.Backend do
   """
   @callback handle_info(any(), state :: any()) ::
               {:reply, any(), state :: any()} | {:noreply, state :: any()}
-
-  @doc """
-  Return information about the device for populating the web UI footer
-  """
-  @callback device_info(state :: any()) :: [{String.t(), String.t()}]
 
   @doc """
   Return the configuration status of a configuration that has been applied

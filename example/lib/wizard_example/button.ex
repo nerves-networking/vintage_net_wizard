@@ -36,7 +36,36 @@ defmodule WizardExample.Button do
   end
 
   def handle_info(:timeout, state) do
-    :ok = VintageNetWizard.run_wizard()
+    :ok = VintageNetWizard.run_wizard(device_info: get_device_info())
     {:noreply, state}
+  end
+
+  defp get_device_info() do
+    kv =
+      Nerves.Runtime.KV.get_all_active()
+      |> kv_to_map
+
+    mac_addr = VintageNet.get(["interface", "wlan0", "mac_address"])
+
+    [
+      {"Wi-Fi Address", mac_addr},
+      {"Serial number", serial_number()},
+      {"Firmware", kv["nerves_fw_product"]},
+      {"Firmware version", kv["nerves_fw_version"]},
+      {"Firmware UUID", kv["nerves_fw_uuid"]}
+    ]
+  end
+
+  defp kv_to_map(key_values) do
+    for kv <- key_values, into: %{}, do: kv
+  end
+
+  defp serial_number() do
+    with boardid_path when not is_nil(boardid_path) <- System.find_executable("boardid"),
+         {id, 0} <- System.cmd(boardid_path, []) do
+      String.trim(id)
+    else
+      _other -> "Unknown"
+    end
   end
 end
