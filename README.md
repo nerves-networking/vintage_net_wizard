@@ -129,6 +129,18 @@ VintageNetWizard.run_wizard(ssl: [keyfile: "/path/to/key.pem", certfile: "/path/
 To see all available options see `Plug.SSL.configure/1` and Erlang's `:ssl`
 module.
 
+### Device Info
+
+If you want to display extra data about the device in the footer of the UI you
+can pass in a list of key-value pairs to `VintageNetWizard.run_wizard/1`:
+
+```elixir
+VintageNetWizard.run_wizard(device_info: [{"Serial number", "1234"}, {"Version", "0.1.0"}])
+```
+
+The first item in the key-value pair is display name of the info and the second
+item will be the value of the item.
+
 ### Interface name
 
 VintageNetWizard uses `"wlan0"` by default. If you have more than one wireless

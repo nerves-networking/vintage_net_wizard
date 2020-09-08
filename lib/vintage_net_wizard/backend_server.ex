@@ -4,21 +4,30 @@ defmodule VintageNetWizard.BackendServer do
   """
   use GenServer
 
-  alias VintageNetWizard.WiFiConfiguration
+  alias VintageNetWizard.{Backend, WiFiConfiguration}
   alias VintageNetWiFi.AccessPoint
 
   defmodule State do
     @moduledoc false
-    defstruct subscriber: nil, backend: nil, backend_state: nil, configurations: []
+    defstruct subscriber: nil,
+              backend: nil,
+              backend_state: nil,
+              configurations: [],
+              device_info: []
   end
 
-  def child_spec(backend, ifname) do
-    %{id: __MODULE__, start: {__MODULE__, :start_link, [backend, ifname]}, restart: :transient}
+  def child_spec(backend, ifname, opts \\ []) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [backend, ifname, opts]},
+      restart: :transient
+    }
   end
 
-  @spec start_link(backend :: module(), VintageNet.ifname()) :: GenServer.on_start()
-  def start_link(backend, ifname) do
-    GenServer.start_link(__MODULE__, [backend, ifname], name: __MODULE__)
+  @spec start_link(backend :: module(), VintageNet.ifname(), [Backend.opt()]) ::
+          GenServer.on_start()
+  def start_link(backend, ifname, opts \\ []) do
+    GenServer.start_link(__MODULE__, [backend, ifname, opts], name: __MODULE__)
   end
 
   @doc """
@@ -134,12 +143,15 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   @impl GenServer
-  def init([backend, ifname]) do
+  def init([backend, ifname, opts]) do
+    device_info = Keyword.get(opts, :device_info, [])
+
     {:ok,
      %State{
        configurations: %{},
        backend: backend,
-       backend_state: apply(backend, :init, [ifname])
+       backend_state: apply(backend, :init, [ifname]),
+       device_info: device_info
      }}
   end
 
@@ -207,9 +219,9 @@ defmodule VintageNetWizard.BackendServer do
   def handle_call(
         :device_info,
         _from,
-        %State{backend: backend, backend_state: backend_state} = state
+        state
       ) do
-    {:reply, apply(backend, :device_info, [backend_state]), state}
+    {:reply, state.device_info, state}
   end
 
   def handle_call(:configurations, _from, %State{configurations: configs} = state) do

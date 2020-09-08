@@ -27,17 +27,6 @@ defmodule VintageNetWizard.Backend.Mock do
   def access_points(%{access_points: access_points}), do: access_points
 
   @impl VintageNetWizard.Backend
-  def device_info(_state) do
-    [
-      {"WiFi address", "11:22:33:44:55:66"},
-      {"Serial number", "12345678"},
-      {"Firmware", "vintage_net_wizard"},
-      {"Firmware version", "0.1.0"},
-      {"Firmware UUID", "30abd1f4-0e87-5ec8-d1c8-425114a21eec"}
-    ]
-  end
-
-  @impl VintageNetWizard.Backend
   def reset(_state), do: initial_state()
 
   @impl VintageNetWizard.Backend

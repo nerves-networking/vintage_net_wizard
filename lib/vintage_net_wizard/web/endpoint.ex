@@ -3,6 +3,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   Supervisor for the Web part of the VintageNet Wizard.
   """
   alias VintageNetWizard.{
+    Backend,
     BackendServer,
     Callbacks,
     WatchDog,
@@ -16,6 +17,7 @@ defmodule VintageNetWizard.Web.Endpoint do
           {:ssl, :ssl.tls_server_option()}
           | {:on_exit, {module(), atom(), list()}}
           | {:ifname, VintageNet.ifname()}
+          | Backend.opt()
 
   @doc false
   def start_link(args) do
@@ -147,8 +149,9 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   defp get_backend_spec(opts) do
     ifname = Keyword.get(opts, :ifname, "wlan0")
+    device_info = Keyword.get(opts, :device_info, [])
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
 
-    BackendServer.child_spec(backend, ifname)
+    BackendServer.child_spec(backend, ifname, device_info: device_info)
   end
 end

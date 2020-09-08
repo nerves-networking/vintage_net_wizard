@@ -56,23 +56,6 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
-  def device_info(state) do
-    kv =
-      Nerves.Runtime.KV.get_all_active()
-      |> kv_to_map
-
-    mac_addr = VintageNet.get(["interface", state.ifname, "mac_address"])
-
-    [
-      {"WiFi address", mac_addr},
-      {"Serial number", serial_number()},
-      {"Firmware", kv["nerves_fw_product"]},
-      {"Firmware version", kv["nerves_fw_version"]},
-      {"Firmware UUID", kv["nerves_fw_uuid"]}
-    ]
-  end
-
-  @impl VintageNetWizard.Backend
   def start_scan(state) do
     _ = scan(state)
     scan_ref = start_scan_timer()
@@ -189,18 +172,5 @@ defmodule VintageNetWizard.Backend.Default do
       data: %{access_points: %{}, configuration_status: :not_configured},
       ifname: ifname
     }
-  end
-
-  defp kv_to_map(key_values) do
-    for kv <- key_values, into: %{}, do: kv
-  end
-
-  defp serial_number() do
-    with boardid_path when not is_nil(boardid_path) <- System.find_executable("boardid"),
-         {id, 0} <- System.cmd(boardid_path, []) do
-      String.trim(id)
-    else
-      _other -> "Unknown"
-    end
   end
 end
