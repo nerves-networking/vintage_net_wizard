@@ -196,7 +196,7 @@ power to pin 11. If you have a Raspberry Pi hat with a button connected to a
 different GPIO pin, you can specify with pin to use in your config:
 
 ```elixir
-config :vintage_net_wizard, gpio_pin: 27
+config :wizard_example, gpio_pin: 27
 ```
 
 The next step is to build the firmware. Make sure that you've installed Nerves
