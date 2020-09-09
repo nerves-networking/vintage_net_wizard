@@ -8,17 +8,18 @@ defmodule VintageNetWizard do
   @doc """
   Run the wizard.
 
-  This means the WiFi module will be put into access point
-  mode and the web server will be started.
+  This means the WiFi module will be put into access point mode and the web
+  server will be started.
 
   Options:
 
-    - `:ssl` - A Keyword list of `:ssl.tls_server_options`
-    - `:on_exit` - `{module, function, args}` tuple specifying
-    callback to perform after stopping the server.
-
-  See `Plug.SSL.configure/1` for more information about the
-  SSL options.
+    * `:backend` - Implementation for communicating with the network drivers (defaults to `VintageNetWizard.Backend.Default`)
+    * `:captive_portal` - Whether to run in captive portal mode (defaults to `true`)
+    * `:device_info` - A list of string tuples to render in a table in the footer (see `README.md`)
+    * `:ifname` - The network interface to use (defaults to `"wlan0"`)
+    * `:inactivity_timeout` - Minutes to run before automatically stopping (defaults to 10 minutes)
+    * `:on_exit` - `{module, function, args}` tuple specifying callback to perform after stopping the server.
+    * `:ssl` - A Keyword list of `:ssl.tls_server_options`. See `Plug.SSL.configure/1`.
   """
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do
