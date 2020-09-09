@@ -48,7 +48,7 @@ defmodule WizardExample.Button do
     mac_addr = VintageNet.get(["interface", "wlan0", "mac_address"])
 
     [
-      {"Wi-Fi Address", mac_addr},
+      {"WiFi Address", mac_addr},
       {"Serial number", serial_number()},
       {"Firmware", kv["nerves_fw_product"]},
       {"Firmware version", kv["nerves_fw_version"]},
