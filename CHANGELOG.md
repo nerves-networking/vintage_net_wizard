@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.4.0
+
+This release has several changes to UI text to reduce jargon and make some
+elements configurable. In particular, the title and footer are now configurable.
+Given the breadth of styling and UI updates that have been proposed, it is
+likely for the configuration mechanism to change again.
+
+* New features
+  * The title for the UI was changed from "VintageNetWizard" to "WiFi Setup Wizard".
+  * The footer is now empty by default. See `WizardExample.Button` for how to
+    replicate the previous information in your project.
+  * An idle timer will now exit the wizard on inactivity. The default inactivity
+    timeout is 10 minutes. This prevents accidental button presses, etc. from
+    entering the wizard and remaining there forever.
+
 ## v0.3.0
 
 This release has modifications to support `vintage_net v0.9.1`. It contains no
