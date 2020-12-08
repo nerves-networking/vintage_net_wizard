@@ -37,6 +37,31 @@ defmodule VintageNetWizard do
   end
 
   @doc """
+  Conditionally run the wizard if there is no configurations present
+
+  This function is the same `VintageNetWizard.run_wizard/1` however it will
+  first check if there are any configurations for the interface.
+
+  This is useful if you want a device to start the wizard only if there are no
+  configurations for the interface. When there are configurations found for the
+  interface this function returns `:configured` to let the consuming application
+  know that the wizard wasn't needed.
+
+  If you want more control on how to start the wizard or if you want to force
+  start the wizard you can call `VintageNetWizard.run_wizard/1`.
+  """
+  @spec run_if_unconfigured([Endpoint.opt()]) :: :ok | :configured | {:error, String.t()}
+  def run_if_unconfigured(opts \\ []) do
+    ifname = Keyword.get(opts, :ifname, "wlan0")
+
+    if wifi_configured?(ifname) do
+      :configured
+    else
+      run_wizard(opts)
+    end
+  end
+
+  @doc """
   Stop the wizard.
 
   This will apply the current configuration in memory and completely
@@ -51,4 +76,18 @@ defmodule VintageNetWizard do
       error -> error
     end
   end
+
+  @doc """
+  Check if an interface has a configuration
+  """
+  @spec wifi_configured?(VintageNet.ifname()) :: boolean()
+  def wifi_configured?(ifname) do
+    VintageNet.get(["interface", ifname, "config"])
+    |> get_in([:vintage_net_wifi, :networks])
+    |> has_networks?()
+  end
+
+  defp has_networks?(nil), do: false
+  defp has_networks?([]), do: false
+  defp has_networks?(_networks), do: true
 end
