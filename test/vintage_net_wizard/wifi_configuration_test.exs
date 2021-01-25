@@ -2,16 +2,15 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
   use ExUnit.Case, async: true
 
   alias VintageNetWizard.WiFiConfiguration
-  alias VintageNetWizard.WiFiConfiguration.{NoSecurity, WPAPersonal, PEAPEnterprise}
 
   test "get the :none key_mgmt from NoSecurity config" do
-    config = %NoSecurity{ssid: "Free WIFI"}
+    config = %{ssid: "Free WIFI", key_mgmt: :none}
 
     assert :none == WiFiConfiguration.get_key_mgmt(config)
   end
 
   test "get the :wpa_psk key_mgmt from WPAPersonal config" do
-    config = %WPAPersonal{ssid: "Home", psk: "123123123"}
+    config = %{ssid: "Home", psk: "123123123", key_mgmt: :wpa_psk}
 
     assert :wpa_psk == WiFiConfiguration.get_key_mgmt(config)
   end
@@ -22,7 +21,8 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
       "key_mgmt" => "none"
     }
 
-    assert {:ok, %NoSecurity{}} = WiFiConfiguration.from_params(params)
+    assert {:ok, %{ssid: "Free WiFi", key_mgmt: :none}} =
+             WiFiConfiguration.json_to_network_config(params)
   end
 
   test "makes the right WiFi from params: WPAPersonal" do
@@ -32,34 +32,8 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
       "key_mgmt" => "wpa_psk"
     }
 
-    assert {:ok, %WPAPersonal{}} = WiFiConfiguration.from_params(params)
-  end
-
-  test "supports no security wifi config to be made into a vintage net config" do
-    config = %NoSecurity{ssid: "Free WIFI!", priority: 1}
-
-    expected_vintage_net_config = %{
-      ssid: config.ssid,
-      key_mgmt: :none,
-      mode: :infrastructure,
-      priority: 1
-    }
-
-    assert expected_vintage_net_config == WiFiConfiguration.to_vintage_net_configuration(config)
-  end
-
-  test "supports wpa personal wifi config to be made into a vintage net config" do
-    config = %WPAPersonal{ssid: "Home", priority: 1, psk: "password"}
-
-    expected_vintage_net_config = %{
-      ssid: config.ssid,
-      key_mgmt: :wpa_psk,
-      mode: :infrastructure,
-      psk: config.psk,
-      priority: 1
-    }
-
-    assert expected_vintage_net_config == WiFiConfiguration.to_vintage_net_configuration(config)
+    assert {:ok, %{ssid: "Home", psk: "123123123", key_mgmt: :wpa_psk}} =
+             WiFiConfiguration.json_to_network_config(params)
   end
 
   describe "Get a key_mgmt from a string" do
@@ -82,29 +56,29 @@ defmodule VintageNetWizard.WiFiConfigurationTest do
 
   describe "Get a human friendly name from a particular WiFiConfiguration" do
     test "NoSecurity" do
-      assert "None" == WiFiConfiguration.security_name(%NoSecurity{})
+      assert "None" == WiFiConfiguration.security_name(%{key_mgmt: :none})
     end
 
     test "WPAPersonal" do
-      assert "WPA Personal" == WiFiConfiguration.security_name(%WPAPersonal{})
+      assert "WPA Personal" == WiFiConfiguration.security_name(%{key_mgmt: :wpa_psk})
     end
 
     test "PEAPEnterprise" do
-      assert "WPA Enterprise" == WiFiConfiguration.security_name(%PEAPEnterprise{})
+      assert "WPA Enterprise" == WiFiConfiguration.security_name(%{key_mgmt: :wpa_eap})
     end
   end
 
   describe "get expected timeouts" do
     test "NoSecurity" do
-      assert 30_000 == WiFiConfiguration.timeout(%NoSecurity{})
+      assert 30_000 == WiFiConfiguration.timeout(%{key_mgmt: :none})
     end
 
     test "WPAPersonal" do
-      assert 30_000 == WiFiConfiguration.timeout(%WPAPersonal{})
+      assert 30_000 == WiFiConfiguration.timeout(%{key_mgmt: :wpa_psk})
     end
 
     test "PEAPEnterprise" do
-      assert 75_000 == WiFiConfiguration.timeout(%PEAPEnterprise{})
+      assert 75_000 == WiFiConfiguration.timeout(%{key_mgmt: :wpa_eap})
     end
   end
 end

@@ -4,7 +4,6 @@ defmodule VintageNetWizard.Web.ApiTest do
 
   alias VintageNetWizard.Web.Api
   alias VintageNetWizard.BackendServer
-  alias VintageNetWizard.WiFiConfiguration.{WPAPersonal, NoSecurity, PEAPEnterprise}
 
   @opts Api.init([])
 
@@ -188,8 +187,8 @@ defmodule VintageNetWizard.Web.ApiTest do
   end
 
   test "update configuration priority order" do
-    fake1 = %WPAPersonal{ssid: "fake1", psk: "123123123", priority: 1}
-    fake2 = %NoSecurity{ssid: "fake2", priority: 2}
+    fake1 = %{ssid: "fake1", psk: "123123123", priority: 1}
+    fake2 = %{ssid: "fake2", priority: 2}
 
     BackendServer.save(fake1)
     BackendServer.save(fake2)
@@ -209,22 +208,22 @@ defmodule VintageNetWizard.Web.ApiTest do
     fake2ssid = fake2.ssid
     fake1ssid = fake1.ssid
 
-    assert [%NoSecurity{ssid: ^fake2ssid}, %WPAPersonal{ssid: ^fake1ssid}] =
-             BackendServer.configurations()
+    assert [%{ssid: ^fake2ssid}, %{ssid: ^fake1ssid}] = BackendServer.configurations()
 
     :ok = BackendServer.reset()
   end
 
   test "get all the configurations, ensure passwords are not exposed" do
     :ok = BackendServer.reset()
-    fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
-    fake2 = %WPAPersonal{ssid: "fake2", psk: "password", priority: 2}
+    fake1 = %{ssid: "fake1", psk: "password", priority: 1, key_mgmt: :wpa_psk}
+    fake2 = %{ssid: "fake2", psk: "password", priority: 2, key_mgmt: :wpa_psk}
 
-    enterprise = %PEAPEnterprise{
+    enterprise = %{
       ssid: "enterprise",
       password: "password",
       user: "user",
-      priority: 3
+      priority: 3,
+      key_mgmt: :wpa_eap
     }
 
     BackendServer.save(fake1)
@@ -252,7 +251,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   test "delete an SSID configuration" do
     :ok = BackendServer.reset()
 
-    fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
+    fake1 = %{ssid: "fake1", psk: "password", priority: 1}
     BackendServer.save(fake1)
 
     {conn, body} = run_request(:delete, "/fake1/configuration")
@@ -280,7 +279,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   test "apply configurations" do
     :ok = BackendServer.reset()
 
-    fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
+    fake1 = %{ssid: "fake1", psk: "password", priority: 1}
     BackendServer.save(fake1)
 
     {conn, body} = run_request(:post, "/apply", body: "", content_type: "application/json")
@@ -294,7 +293,7 @@ defmodule VintageNetWizard.Web.ApiTest do
   test "completes configuration" do
     :ok = BackendServer.reset()
 
-    fake1 = %WPAPersonal{ssid: "fake1", psk: "password", priority: 1}
+    fake1 = %{ssid: "fake1", psk: "password", priority: 1}
     BackendServer.save(fake1)
 
     BackendServer.subscribe()

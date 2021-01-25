@@ -117,7 +117,7 @@ defmodule VintageNetWizard.Web.Api do
     conn
     |> get_body()
     |> Map.put("ssid", ssid)
-    |> WiFiConfiguration.from_params()
+    |> WiFiConfiguration.json_to_network_config()
   end
 
   defp make_error_message({:error, :password_required}) do

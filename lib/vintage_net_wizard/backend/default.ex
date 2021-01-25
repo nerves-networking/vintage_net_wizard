@@ -148,13 +148,10 @@ defmodule VintageNetWizard.Backend.Default do
   def handle_info(_, state), do: {:noreply, state}
 
   defp apply_configurations(wifi_configurations, state) do
-    vintage_net_config =
-      Enum.map(wifi_configurations, &WiFiConfiguration.to_vintage_net_configuration/1)
-
     VintageNet.configure(state.ifname, %{
       type: VintageNetWiFi,
       vintage_net_wifi: %{
-        networks: vintage_net_config
+        networks: wifi_configurations
       },
       ipv4: %{method: :dhcp}
     })
