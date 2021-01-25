@@ -2,12 +2,11 @@ defmodule VintageNetWizard.BackendServer.Test do
   use ExUnit.Case, async: true
 
   alias VintageNetWizard.BackendServer
-  alias VintageNetWizard.WiFiConfiguration.WPAPersonal
 
   test "Can save a WiFi configuration" do
     :ok = BackendServer.reset()
 
-    configuration = %WPAPersonal{ssid: "Test Network", psk: "12341234"}
+    configuration = %{ssid: "Test Network"}
 
     :ok = BackendServer.save(configuration)
 
@@ -17,9 +16,9 @@ defmodule VintageNetWizard.BackendServer.Test do
   test "sets the priority order of configurations" do
     :ok = BackendServer.reset()
 
-    configuration1 = %WPAPersonal{ssid: "Test Network", psk: "12341234"}
+    configuration1 = %{ssid: "Test Network", psk: "12341234", priority: nil}
 
-    configuration2 = %WPAPersonal{ssid: "Test Network2", psk: "12341234"}
+    configuration2 = %{ssid: "Test Network2", psk: "12341234", priority: nil}
 
     :ok = BackendServer.save(configuration1)
     :ok = BackendServer.save(configuration2)
@@ -39,7 +38,7 @@ defmodule VintageNetWizard.BackendServer.Test do
 
   test "delete a configuration" do
     :ok = BackendServer.reset()
-    configuration = %WPAPersonal{ssid: "Drop Me", psk: "12341234"}
+    configuration = %{ssid: "Drop Me"}
     :ok = BackendServer.save(configuration)
 
     assert [configuration] == BackendServer.configurations()

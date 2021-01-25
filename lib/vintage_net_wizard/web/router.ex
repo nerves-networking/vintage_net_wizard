@@ -39,7 +39,7 @@ defmodule VintageNetWizard.Web.Router do
     password = conn.body_params["password"]
     params = Map.put(conn.body_params, "ssid", ssid)
 
-    case WiFiConfiguration.from_params(params) do
+    case WiFiConfiguration.json_to_network_config(params) do
       {:ok, wifi_config} ->
         :ok = BackendServer.save(wifi_config)
         redirect(conn, "/")
@@ -103,7 +103,7 @@ defmodule VintageNetWizard.Web.Router do
 
     case Map.get(conn.body_params, "key_mgmt") do
       "none" ->
-        {:ok, config} = WiFiConfiguration.from_params(conn.body_params)
+        {:ok, config} = WiFiConfiguration.json_to_network_config(conn.body_params)
         :ok = BackendServer.save(config)
 
         redirect(conn, "/")

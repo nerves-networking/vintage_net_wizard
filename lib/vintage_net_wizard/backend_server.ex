@@ -4,7 +4,7 @@ defmodule VintageNetWizard.BackendServer do
   """
   use GenServer
 
-  alias VintageNetWizard.{Backend, WiFiConfiguration}
+  alias VintageNetWizard.Backend
   alias VintageNetWiFi.AccessPoint
 
   defmodule State do
@@ -96,9 +96,12 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   @doc """
-  Save a `WiFiConfiguration` to the backend
+  Save a network configuration to the backend
+
+  The network configuration is a map that can be included in the `:network`
+  field of a `VintageNetWiFi` configuration.
   """
-  @spec save(WiFiConfiguration.t()) :: :ok | {:error, any()}
+  @spec save(map()) :: :ok | {:error, any()}
   def save(config) do
     GenServer.call(__MODULE__, {:save, config})
   end
@@ -106,7 +109,7 @@ defmodule VintageNetWizard.BackendServer do
   @doc """
   Get a list of the current configurations
   """
-  @spec configurations() :: [WiFiConfiguration.t()]
+  @spec configurations() :: [map()]
   def configurations() do
     GenServer.call(__MODULE__, :configurations)
   end
@@ -225,7 +228,12 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   def handle_call(:configurations, _from, %State{configurations: configs} = state) do
-    {:reply, build_config_list(configs), state}
+    cleaned_configs =
+      configs
+      |> build_config_list()
+      |> Enum.map(&clean_config/1)
+
+    {:reply, cleaned_configs, state}
   end
 
   def handle_call(
@@ -325,5 +333,9 @@ defmodule VintageNetWizard.BackendServer do
       |> elem(1)
 
     priority_index + 1
+  end
+
+  defp clean_config(config) do
+    Map.drop(config, [:psk, :password])
   end
 end

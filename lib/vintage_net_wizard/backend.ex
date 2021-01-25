@@ -4,7 +4,6 @@ defmodule VintageNetWizard.Backend do
   messages, and scanning the network
   """
 
-  alias VintageNetWizard.WiFiConfiguration
   alias VintageNetWiFi.AccessPoint
 
   @type device_info_name() :: String.t()
@@ -31,8 +30,11 @@ defmodule VintageNetWizard.Backend do
 
   @doc """
   Apply the WiFi configurations
+
+  The configurations passed are network configurations that can be passed into
+  the `:network` list in a `VintageNetWiFi` configuration.
   """
-  @callback apply([WiFiConfiguration.t()], state :: any()) ::
+  @callback apply([map()], state :: any()) ::
               {:ok, state :: any()} | {:error, :invalid_state}
 
   @doc """
@@ -67,7 +69,7 @@ defmodule VintageNetWizard.Backend do
   @callback reset(state :: any()) :: state :: any()
 
   @doc """
-  Perform final completion steps.
+  Perform final completion steps for the network configurations
   """
-  @callback complete([WiFiConfiguration.t()], state :: any()) :: {:ok, state :: any()}
+  @callback complete([map()], state :: any()) :: {:ok, state :: any()}
 end

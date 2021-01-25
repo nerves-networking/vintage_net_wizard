@@ -11,7 +11,7 @@ defmodule VintageNetWizardTest do
     VintageNetWizard.run_wizard(on_exit: {__MODULE__, :callback_tester, [key]})
     VintageNetWizard.stop_wizard()
 
-    assert_receive key
+    assert_receive ^key
   end
 
   def callback_tester(key) do
