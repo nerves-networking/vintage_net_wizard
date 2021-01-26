@@ -18,8 +18,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
          %{
            ssid: ssid,
            key_mgmt: :none,
-           mode: :infrastructure,
-           priority: nil
+           mode: :infrastructure
          }}
 
       error ->
@@ -36,8 +35,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
          ssid: ssid,
          mode: :infrastructure,
          key_mgmt: :wpa_psk,
-         psk: password,
-         priority: nil
+         psk: password
        }}
     else
       error -> error
@@ -57,8 +55,7 @@ defmodule VintageNetWizard.WiFiConfiguration do
          phase2: "auth=MSCHAPV2",
          ssid: ssid,
          identity: user,
-         password: password,
-         priority: nil
+         password: password
        }}
     else
       error -> error

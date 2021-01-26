@@ -150,8 +150,13 @@ defmodule VintageNetWizard.Web.Endpoint do
   defp get_backend_spec(opts) do
     ifname = Keyword.get(opts, :ifname, "wlan0")
     device_info = Keyword.get(opts, :device_info, [])
+    configurations = Keyword.get(opts, :configurations, [])
+
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
 
-    BackendServer.child_spec(backend, ifname, device_info: device_info)
+    BackendServer.child_spec(backend, ifname,
+      device_info: device_info,
+      configurations: configurations
+    )
   end
 end

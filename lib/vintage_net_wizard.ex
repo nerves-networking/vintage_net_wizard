@@ -24,6 +24,8 @@ defmodule VintageNetWizard do
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do
     ifname = Keyword.get(opts, :ifname, "wlan0")
+    configurations = get_network_configs(ifname)
+    opts = Keyword.put(opts, :configurations, configurations)
 
     with :ok <- APMode.into_ap_mode(ifname),
          :ok <- Endpoint.start_server(opts),
@@ -90,4 +92,13 @@ defmodule VintageNetWizard do
   defp has_networks?(nil), do: false
   defp has_networks?([]), do: false
   defp has_networks?(_networks), do: true
+
+  defp get_network_configs(ifname) do
+    config = VintageNet.get(["interface", ifname, "config"])
+
+    case get_in(config, [:vintage_net_wifi, :networks]) do
+      nil -> []
+      networks -> networks
+    end
+  end
 end

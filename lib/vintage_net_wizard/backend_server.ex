@@ -12,7 +12,7 @@ defmodule VintageNetWizard.BackendServer do
     defstruct subscriber: nil,
               backend: nil,
               backend_state: nil,
-              configurations: [],
+              configurations: %{},
               device_info: []
   end
 
@@ -149,9 +149,14 @@ defmodule VintageNetWizard.BackendServer do
   def init([backend, ifname, opts]) do
     device_info = Keyword.get(opts, :device_info, [])
 
+    configurations =
+      opts
+      |> Keyword.get(:configurations, [])
+      |> Enum.into(%{}, fn config -> {config.ssid, config} end)
+
     {:ok,
      %State{
-       configurations: %{},
+       configurations: configurations,
        backend: backend,
        backend_state: apply(backend, :init, [ifname]),
        device_info: device_info
@@ -199,7 +204,7 @@ defmodule VintageNetWizard.BackendServer do
       Enum.map(configurations, fn {ssid, config} ->
         priority = get_priority_for_ssid(indexed_priority_order, ssid)
 
-        {ssid, %{config | priority: priority}}
+        {ssid, Map.put(config, :priority, priority)}
       end)
       |> Enum.into(%{})
 
@@ -318,7 +323,17 @@ defmodule VintageNetWizard.BackendServer do
   defp build_config_list(configs) do
     configs
     |> Enum.into([], &elem(&1, 1))
-    |> Enum.sort(&(&1.priority <= &2.priority))
+    |> Enum.sort(fn config1, config2 ->
+      config1_priority = get_in(config1, [:priority])
+      config2_priority = get_in(config2, [:priority])
+
+      case {config1_priority, config2_priority} do
+        {nil, nil} -> false
+        {nil, _} -> false
+        {_, nil} -> true
+        {p1, p2} -> p1 <= p2
+      end
+    end)
   end
 
   defp maybe_send(nil, _message), do: :ok
