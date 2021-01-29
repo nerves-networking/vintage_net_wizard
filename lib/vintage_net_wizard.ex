@@ -20,6 +20,7 @@ defmodule VintageNetWizard do
     * `:inactivity_timeout` - Minutes to run before automatically stopping (defaults to 10 minutes)
     * `:on_exit` - `{module, function, args}` tuple specifying callback to perform after stopping the server.
     * `:ssl` - A Keyword list of `:ssl.tls_server_options`. See `Plug.SSL.configure/1`.
+    * `:ui` - a subset of UI configuration for title, title color, and button color.
   """
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do

@@ -1,6 +1,6 @@
 "use strict";
 
-(() => {
+function applyConfiguration(button_color) {
   const state = {
     view: "trying",
     dots: "",
@@ -57,6 +57,10 @@
     if (view === "configurationBad") {
       btnClass = "btn-danger";
       btnText = "Complete Without Verification";
+    }
+
+    if (view != "configurationBad") {
+      button.style.backgroundColor = button_color;
     }
 
     button.classList.add("btn");
@@ -136,4 +140,4 @@
       "Content-Type": "application/json"
     }
   }).then(resp => runGetStatus());
-})();
+}

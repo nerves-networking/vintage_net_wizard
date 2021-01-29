@@ -18,7 +18,7 @@ defmodule VintageNetWizard.Web.Router do
   # it just polling this endpoint but still be inactive.
   plug(VintageNetWizard.Plugs.Activity, excluding: ["/api/v1/access_points"])
   plug(:match)
-  plug(:dispatch)
+  plug(:dispatch, builder_opts())
 
   get "/" do
     case BackendServer.configurations() do
@@ -26,7 +26,7 @@ defmodule VintageNetWizard.Web.Router do
         redirect(conn, "/networks")
 
       configs ->
-        render_page(conn, "index.html",
+        render_page(conn, "index.html", opts,
           configs: configs,
           configuration_status: configuration_status_details(),
           format_security: &WiFiConfiguration.security_name/1,
@@ -48,7 +48,7 @@ defmodule VintageNetWizard.Web.Router do
         {:ok, key_mgmt} = WiFiConfiguration.key_mgmt_from_string(conn.body_params["key_mgmt"])
         error_message = password_error_message(error)
 
-        render_password_page(conn, key_mgmt,
+        render_password_page(conn, key_mgmt, opts,
           ssid: ssid,
           error: error_message,
           password: password,
@@ -63,7 +63,7 @@ defmodule VintageNetWizard.Web.Router do
       |> Enum.find(&(&1.ssid == ssid))
       |> get_key_mgmt_from_ap()
 
-    render_password_page(conn, key_mgmt, ssid: ssid, password: "", error: "", user: "")
+    render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
   end
 
   get "/redirect" do
@@ -83,19 +83,19 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/hotspot-detect.html" do
-    render_page(conn, "apple_captive_portal.html", dns_name: get_redirect_dnsname(conn))
+    render_page(conn, "apple_captive_portal.html", opts, dns_name: get_redirect_dnsname(conn))
   end
 
   get "/library/test/success.html" do
-    render_page(conn, "apple_captive_portal.html", dns_name: get_redirect_dnsname(conn))
+    render_page(conn, "apple_captive_portal.html", opts, dns_name: get_redirect_dnsname(conn))
   end
 
   get "/networks" do
-    render_page(conn, "networks.html", configuration_status: configuration_status_details())
+    render_page(conn, "networks.html", opts, configuration_status: configuration_status_details())
   end
 
   get "/networks/new" do
-    render_page(conn, "network_new.html")
+    render_page(conn, "network_new.html", opts)
   end
 
   post "/networks/new" do
@@ -110,12 +110,12 @@ defmodule VintageNetWizard.Web.Router do
 
       key_mgmt ->
         key_mgmt = String.to_existing_atom(key_mgmt)
-        render_password_page(conn, key_mgmt, ssid: ssid, password: "", error: "", user: "")
+        render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
     end
   end
 
   get "/apply" do
-    render_page(conn, "apply.html", ssid: VintageNetWizard.APMode.ssid())
+    render_page(conn, "apply.html", opts, ssid: VintageNetWizard.APMode.ssid())
   end
 
   get "/complete" do
@@ -129,7 +129,7 @@ defmodule VintageNetWizard.Web.Router do
         Endpoint.stop_server()
       end)
 
-    render_page(conn, "complete.html")
+    render_page(conn, "complete.html", opts)
   end
 
   forward("/api/v1", to: VintageNetWizard.Web.Api)
@@ -158,9 +158,8 @@ defmodule VintageNetWizard.Web.Router do
     |> send_resp(302, "")
   end
 
-  defp render_page(conn, page, info \\ []) do
-    title = Application.get_env(:vintage_net_wizard, :ui_title, "WiFi Setup Wizard")
-    info = [device_info: BackendServer.device_info(), title: title] ++ info
+  defp render_page(conn, page, opts, info \\ []) do
+    info = [device_info: BackendServer.device_info(), ui: get_ui_config(opts)] ++ info
 
     resp =
       page
@@ -171,12 +170,27 @@ defmodule VintageNetWizard.Web.Router do
     send_resp(conn, 200, resp)
   end
 
-  defp render_password_page(conn, :wpa_psk, info) do
-    render_page(conn, "configure_password.html", info)
+  defp get_ui_config(opts) do
+    default_ui_config = %{
+      title: "WiFi Setup Wizard",
+      title_color: "#11151A",
+      button_color: "#007bff"
+    }
+
+    ui =
+      opts
+      |> Keyword.get(:ui, [])
+      |> Enum.into(%{})
+
+    Map.merge(default_ui_config, ui)
   end
 
-  defp render_password_page(conn, :wpa_eap, info) do
-    render_page(conn, "configure_enterprise.html", info)
+  defp render_password_page(conn, :wpa_psk, opts, info) do
+    render_page(conn, "configure_password.html", opts, info)
+  end
+
+  defp render_password_page(conn, :wpa_eap, opts, info) do
+    render_page(conn, "configure_enterprise.html", opts, info)
   end
 
   defp template_file(page) do
