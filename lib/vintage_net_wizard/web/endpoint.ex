@@ -13,10 +13,20 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   use DynamicSupervisor
 
+  @typedoc """
+  UI specific configuration
+
+  * `:title` - the title of the HTML pages that will be displayed to the user.
+  * `:title_color` - color of the title for branding purposes
+  * `:button_color` - color of the buttons for branding purposes
+  """
+  @type ui_opt :: {:title, String.t()} | {:title_color, String.t()} | {:button_color, String.t()}
+
   @type opt ::
           {:ssl, :ssl.tls_server_option()}
           | {:on_exit, {module(), atom(), list()}}
           | {:ifname, VintageNet.ifname()}
+          | {:ui, [ui_opt()]}
           | Backend.opt()
 
   @doc false
@@ -86,11 +96,11 @@ defmodule VintageNetWizard.Web.Endpoint do
     DynamicSupervisor.init(strategy: :one_for_one, max_children: 4)
   end
 
-  defp dispatch do
+  defp dispatch(opts) do
     [
       {:_,
        [
-         {:_, Plug.Cowboy.Handler, {Router, []}}
+         {:_, Plug.Cowboy.Handler, {Router, opts}}
        ]}
     ]
   end
@@ -127,7 +137,7 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   defp maybe_use_ssl(use_ssl = true, opts) do
     ssl_options = Keyword.get(opts, :ssl)
-    options = [dispatch: dispatch(), port: get_port(use_ssl)]
+    options = [dispatch: dispatch(opts), port: get_port(use_ssl)]
 
     Plug.Cowboy.child_spec(
       plug: Router,
@@ -136,12 +146,12 @@ defmodule VintageNetWizard.Web.Endpoint do
     )
   end
 
-  defp maybe_use_ssl(_no_ssl, _opts) do
+  defp maybe_use_ssl(_no_ssl, opts) do
     Plug.Cowboy.child_spec(
       plug: Router,
       scheme: :http,
       options: [
-        dispatch: dispatch(),
+        dispatch: dispatch(opts),
         port: get_port()
       ]
     )

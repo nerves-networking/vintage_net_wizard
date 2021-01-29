@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title><%= title %></title>
+    <title><%= ui.title %></title>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100">
     <div class="container">
-      <h1 class="text-right mt-2"><a href="/"><%= title %></a></h1>
+      <h1 class="text-right mt-2"><a href="/" style="color: <%= ui.title_color %>"><%= ui.title %></a></h1>
 
       <div class="container">
         <div class="text-center">
@@ -37,7 +37,9 @@
             <%= if error != "" do %>
               <p class="text-danger"><%= error %></p>
             <% end %>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary" style="background-color:<%= ui.button_color %>">
+              Submit
+            </button>
           </form>
         </div>
       </div> <!-- end form container -->

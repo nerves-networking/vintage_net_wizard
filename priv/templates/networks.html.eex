@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title><%= title %></title>
+    <title><%= ui.title %></title>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container access-points-container">
-       <h1 class="text-right mt-2"><a href="/"><%= title %></a></h1>
+       <h1 class="text-right mt-2"><a href="/" style="color: <%= ui.title_color %>"><%= ui.title %></a></h1>
        <h3 class="text-left mt-2">
         Configuration status:
         <span class="<%= configuration_status.class %>">
@@ -33,7 +33,7 @@
          </table>
        </div>
 
-       <a class="btn btn-primary" href="/networks/new">Add another network</a>
+       <a class="btn btn-primary" href="/networks/new" style="background-color:<%= ui.button_color %>">Add another network</a>
      </div>
 
      <footer class="py-3 bg-white shadow-sm w-100 text-muted">

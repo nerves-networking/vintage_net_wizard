@@ -93,6 +93,21 @@ configuration again, such as holding a button for 5+ seconds. Take a look at
 [Running the example](#running-the-example) section for steps on setting up
 a button and running a quick example firmware on a device.
 
+### UI Customization
+
+`VintageNetWizard` allows you to add customization to the UI. The three UI
+items that can be customized are: `:title`, `:title_color`, and
+`:button_color`.
+
+```elixir
+VintageNetWizard.run_wizard(
+  ui: [title: "My WiFi Wizard", title_color: "red", button_color: "#F0F0AD"]
+)
+```
+
+Each configuration option is optional and will fall back to
+`VintageNetWizard`s default colors and title.
+
 ### DNS in AP-mode
 
 When the wizard is running, users go to either `http://192.168.0.1/` or

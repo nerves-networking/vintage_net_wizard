@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title><%= title %></title>
+    <title><%= ui.title %></title>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
      <div class="container access-points-container">
-       <h1 class="text-right mt-2"><a href="/"><%= title %></a></h1>
+       <h1 class="text-right mt-2"><a href="/" style="color: <%= ui.title_color %>"><%= ui.title %></a></h1>
        <h3 class="text-left mt-2">
         Configuration status:
         <span class="<%= configuration_status.class %>">
@@ -58,10 +58,16 @@
 
        <p><i>Drag the networks to change the order that they will be tried</i></p>
 
-       <a class="btn btn-primary" href="/networks">Add a new network</a>
+       <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/networks">
+         Add a new network
+       </a>
        <%= if length(configs) > 0 do %>
-         <a class="btn btn-primary" href="/apply">Apply configuration</a>
-         <a class="btn btn-secondary" href="/complete" title="This will apply the configuration without any attempt to verify a successful network connection.">Complete without verification</a>
+         <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/apply">
+           Apply configuration
+         </a>
+         <a class="btn btn-secondary" href="/complete" title="This will apply the configuration without any attempt to verify a successful network connection.">
+           Complete without verification
+         </a>
        <% end %>
      </div>
 
