@@ -3,7 +3,10 @@
 #
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
-use Mix.Config
+import Config
+
+# Enable the Nerves integration with Mix
+Application.start(:nerves_bootstrap)
 
 config :example, target: Mix.target()
 
@@ -12,13 +15,10 @@ config :example, target: Mix.target()
 
 config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 
-# Use shoehorn to start the main application. See the shoehorn
-# docs for separating out critical OTP applications such as those
-# involved with firmware updates.
+# Set the SOURCE_DATE_EPOCH date for reproducible builds.
+# See https://reproducible-builds.org/docs/source-date-epoch/ for more information
 
-config :shoehorn,
-  init: [:nerves_runtime, :nerves_pack],
-  app: Mix.Project.config()[:app]
+config :nerves, source_date_epoch: "1611961839"
 
 # Use Ringlogger as the logger backend and remove :console.
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
@@ -26,6 +26,8 @@ config :shoehorn,
 
 config :logger, backends: [RamoopsLogger, RingLogger]
 
-if Mix.target() != :host do
+if Mix.target() == :host or Mix.target() == :"" do
+  import_config "host.exs"
+else
   import_config "target.exs"
 end
