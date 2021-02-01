@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.1
+
+* Enhancements
+  * Can add some custom branding to the UI such as page title, title color, and
+    button color.
+  * Will display pre-existing configurations on the configuration page.
+  * Update example app to use `nerves_pack` and updated nerves systems.
+
+* Bug Fixes
+  * Fix a bug where starting `VintageNetWizard` would delete any pre-existing
+    configurations.
+
 ## v0.4.0
 
 This release has several changes to UI text to reduce jargon and make some
