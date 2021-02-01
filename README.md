@@ -66,7 +66,7 @@ you're not, see that project first.
 to your `mix` dependencies like so:
 
 ```elixir
-   {:vintage_net_wizard, "~> 0.1"}
+   {:vintage_net_wizard, "~> 0.4"}
 ```
 
 The configuration wizard is not started by default to allow for more control
