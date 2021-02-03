@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.2
+
+* Bug Fixes
+  * Fix a runtime error on the apply page.
+  * Fix "undefined" as the wizard name during application of configuration in the
+    dynamic content.
+
 ## v0.4.1
 
 * Enhancements
