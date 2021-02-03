@@ -1,6 +1,6 @@
 "use strict";
 
-function applyConfiguration(button_color) {
+function applyConfiguration(title, button_color) {
   const state = {
     view: "trying",
     dots: "",
@@ -8,7 +8,8 @@ function applyConfiguration(button_color) {
     targetElem: document.querySelector(".content"),
     configurationStatus: "not_configured",
     completed: false,
-    ssid: document.getElementById("ssid").getAttribute("value")
+    ssid: document.getElementById("ssid").getAttribute("value"),
+    title: title
   }
 
   function runGetStatus() {

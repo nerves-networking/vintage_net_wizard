@@ -24,6 +24,6 @@
          <% end %>
      </footer>
      <script src="/js/apply.js"></script>
-     <script>applyConfiguration("<%= ui.button_color %>")</script>
+     <script>applyConfiguration("<%= ui.title %>", "<%= ui.button_color %>")</script>
   </body>
 </html>
