@@ -12,7 +12,7 @@
        <div id="ssid" value="<%= ssid %>" hidden></div>
 
        <div class="content">
-        <p>Please wait while the <%= title %> verifies your configuration.</p>
+        <p>Please wait while the <%= ui.title %> verifies your configuration.</p>
 
         <p>If this page doesn't update in 15-30 seconds, check that you're connected to
         the access point named "<b><%= ssid %></b>"</p>
@@ -28,6 +28,6 @@
          <% end %>
      </footer>
      <script src="/js/apply.js"></script>
-     <script>applyConfiguration("<%= ui.button_color %>")</script>
+     <script>applyConfiguration("<%= ui.title %>", "<%= ui.button_color %>")</script>
   </body>
 </html>
