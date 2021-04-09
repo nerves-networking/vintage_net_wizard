@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.3
+
+* Enhancements
+  * Improve mobile experience. Thanks to Ole Michaelis for this update.
+
 ## v0.4.2
 
 * Bug Fixes
