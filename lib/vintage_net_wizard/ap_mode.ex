@@ -47,11 +47,12 @@ defmodule VintageNetWizard.APMode do
         end: {192, 168, 0, 254},
         max_leases: 235,
         options: %{
-          dns: [our_ip_address],
-          subnet: {255, 255, 255, 0},
-          router: [our_ip_address],
-          domain: our_name,
-          search: [our_name]
+          :dns => [our_ip_address],
+          :subnet => {255, 255, 255, 0},
+          :router => [our_ip_address],
+          :domain => our_name,
+          :search => [our_name],
+          160 => ~s("#{our_name}")
         }
       },
       dnsd: %{

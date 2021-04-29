@@ -14,11 +14,12 @@ defmodule VintageNetWizard.APModeTest do
         end: {192, 168, 0, 254},
         max_leases: 235,
         options: %{
-          dns: [{192, 168, 0, 1}],
-          domain: "our_name",
-          router: [{192, 168, 0, 1}],
-          search: ["our_name"],
-          subnet: {255, 255, 255, 0}
+          :dns => [{192, 168, 0, 1}],
+          :domain => "our_name",
+          :router => [{192, 168, 0, 1}],
+          :search => ["our_name"],
+          :subnet => {255, 255, 255, 0},
+          160 => ~s("our_name")
         },
         start: {192, 168, 0, 20}
       },
