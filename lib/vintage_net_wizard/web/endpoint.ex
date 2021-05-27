@@ -66,29 +66,50 @@ defmodule VintageNetWizard.Web.Endpoint do
   @doc """
   Stop the web server
   """
-  @spec stop_server() :: :ok | {:error, :not_found}
-  def stop_server() do
-    case DynamicSupervisor.which_children(__MODULE__) do
-      [] ->
-        {:error, :not_found}
+  @spec stop_server(VintageNetWizard.stop_reason()) :: :ok
+  def stop_server(stop_reason) do
+    _ =
+      get_children()
+      |> stop_some_children()
+      |> handle_watchdog(stop_reason)
+      |> handle_callbacks()
 
-      children ->
-        # Ensure we terminate callbacks last after all other children
-        # and the callbacks have been executed
-        callbacks_child =
-          Enum.reduce(children, nil, fn {_, child, _, [mod]}, acc ->
-            if mod == Callbacks do
-              child
-            else
-              :ok = DynamicSupervisor.terminate_child(__MODULE__, child)
-              acc
-            end
-          end)
+    :ok
+  end
 
-        _ = Callbacks.on_exit()
+  defp stop_some_children(children) do
+    to_stop = Map.drop(children, [WatchDog, Callbacks])
 
-        _ = DynamicSupervisor.terminate_child(__MODULE__, callbacks_child)
-    end
+    _ =
+      for {_mod, child} <- to_stop do
+        :ok = DynamicSupervisor.terminate_child(__MODULE__, child)
+      end
+
+    children
+  end
+
+  # if the reason for stopping is a timeout then we don't try to stop
+  # the WatchDog as it will stop itself.
+  defp handle_watchdog(children, :timeout), do: children
+
+  defp handle_watchdog(children, _other) do
+    :ok = DynamicSupervisor.terminate_child(__MODULE__, children[WatchDog])
+    children
+  end
+
+  defp handle_callbacks(children) do
+    _ = Callbacks.on_exit()
+
+    _ = DynamicSupervisor.terminate_child(__MODULE__, children[Callbacks])
+    children
+  end
+
+  defp get_children() do
+    __MODULE__
+    |> DynamicSupervisor.which_children()
+    |> Enum.reduce(%{}, fn {_, child, _, [mod]}, acc ->
+      Map.put(acc, mod, child)
+    end)
   end
 
   @impl DynamicSupervisor

@@ -42,7 +42,7 @@ defmodule VintageNetWizard.Web.Api do
         # We don't want to stop the server before we
         # send the response back.
         :timer.sleep(3000)
-        Endpoint.stop_server()
+        Endpoint.stop_server(:shutdown)
       end)
 
     send_json(conn, 202, "")

@@ -6,7 +6,7 @@ defmodule VintageNetWizard.WatchDog do
   # this server from shutting down the wizard call `pet/0` to reset the
   # timeout. The timeout should be in minutes.
 
-  use GenServer
+  use GenServer, restart: :transient
 
   require Logger
 
@@ -40,7 +40,7 @@ defmodule VintageNetWizard.WatchDog do
   @impl GenServer
   def handle_info(:timeout, inactivity_timeout) do
     Logger.info("[VintageNetWizard] inactivity timeout, shutting down wizard")
-    :ok = VintageNetWizard.stop_wizard()
+    :ok = VintageNetWizard.stop_wizard(:timeout)
     {:stop, :normal, inactivity_timeout}
   end
 
