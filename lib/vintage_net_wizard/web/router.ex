@@ -126,7 +126,7 @@ defmodule VintageNetWizard.Web.Router do
         # We don't want to stop the server before we
         # send the response back.
         :timer.sleep(3000)
-        Endpoint.stop_server()
+        Endpoint.stop_server(:shutdown)
       end)
 
     render_page(conn, "complete.html", opts)

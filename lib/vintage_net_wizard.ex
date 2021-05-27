@@ -5,6 +5,8 @@ defmodule VintageNetWizard do
 
   alias VintageNetWizard.{BackendServer, APMode, Web.Endpoint}
 
+  @type stop_reason() :: :shutdown | :timeout
+
   @doc """
   Run the wizard.
 
@@ -70,13 +72,14 @@ defmodule VintageNetWizard do
   This will apply the current configuration in memory and completely
   stop the web and backend processes.
   """
-  @spec stop_wizard() :: :ok | {:error, String.t()}
-  def stop_wizard() do
+  @spec stop_wizard(stop_reason()) :: :ok | {:error, String.t()}
+  def stop_wizard(stop_reason \\ :shutdown) do
     with :ok <- BackendServer.complete(),
-         :ok <- Endpoint.stop_server() do
+         :ok <- Endpoint.stop_server(stop_reason) do
       :ok
     else
-      error -> error
+      error ->
+        error
     end
   end
 
