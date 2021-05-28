@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.4
+
+* Fixes
+  * Fixed an issue that prevented the wizard from timing out due to inactivity. See PR #217.
+
 ## v0.4.3
 
 * Enhancements
