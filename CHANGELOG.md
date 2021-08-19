@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.5 - 2021-08-14
+
+* Added
+  * Support for WPA3/WPA2 transitional networks. The connection still uses WPA2
+    even if WPA3 is supported by the WiFi module.
+
 ## v0.4.4
 
 * Fixes
