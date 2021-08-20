@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.4.5 - 2021-08-14
+## v0.4.6 - 2021-08-20
+
+* Changed
+  * Support `:phoenix_html` `~> 2.13 or ~> 3.0`. The `v0.4.5` release removed
+    support for `~> 2.13`, but it turns out that not everyone has updated and
+    `vintage_net_wizard` works with both.
+
+## v0.4.5 - 2021-08-20
 
 * Added
   * Support for WPA3/WPA2 transitional networks. The connection still uses WPA2
