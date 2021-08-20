@@ -9,7 +9,7 @@ defmodule WizardExample.MixProject do
     [
       app: @app,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.11",
       archives: [nerves_bootstrap: "~> 1.10"],
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
@@ -37,7 +37,7 @@ defmodule WizardExample.MixProject do
       {:ring_logger, "~> 0.8.1"},
       {:ramoops_logger, "~> 0.3.0"},
       {:toolshed, "~> 0.2.13"},
-      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
