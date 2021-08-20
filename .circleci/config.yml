@@ -108,5 +108,4 @@ workflows:
       - build_elixir_1_12_otp_24
       - build_elixir_1_11_otp_23
       - build_elixir_1_10_otp_23
-      - build_elixir_1_9_otp_22
       - build_example_elixir_1_11_otp_23
