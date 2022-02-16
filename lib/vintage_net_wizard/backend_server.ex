@@ -281,6 +281,17 @@ defmodule VintageNetWizard.BackendServer do
   def handle_call(
         :complete,
         _from,
+        %State{backend_state: %{data: %{configuration_status: :good}}} = state
+      ) do
+    # As the configuration status is good, we are already completed setup and the configurations
+    # have been blanked in `handle_info/3` - calling complete on the backend will disconnect us and
+    # write over the saved configuration. Do nothing.
+    {:reply, :ok, state}
+  end
+
+  def handle_call(
+        :complete,
+        _from,
         %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
           state
       ) do
