@@ -2,6 +2,7 @@ defmodule VintageNetWizard.BackendServer.Test do
   use ExUnit.Case, async: true
 
   alias VintageNetWizard.BackendServer
+  alias VintageNetWizard.BackendServer.State
 
   test "Can save a WiFi configuration" do
     :ok = BackendServer.reset()
@@ -58,5 +59,32 @@ defmodule VintageNetWizard.BackendServer.Test do
   test "can complete with no configurations" do
     :ok = BackendServer.reset()
     assert :ok = BackendServer.complete()
+  end
+
+  describe "on completion" do
+    defmodule FakeBackend do
+      def complete(wifi_configurations, backend_state) do
+        send(self(), {:complete_called, wifi_configurations, backend_state})
+        {:ok, backend_state}
+      end
+    end
+
+    test "if the configuration status is not `:good`, calls complete on the backend" do
+      BackendServer.handle_call(:complete, :ignored, %State{
+        backend: FakeBackend,
+        backend_state: %{data: %{configuration_status: :not_configured}}
+      })
+
+      assert_received {:complete_called, [], _backend_state}
+    end
+
+    test "if the configuration status is `:good` then does not call complete on the backend" do
+      BackendServer.handle_call(:complete, :ignored, %State{
+        backend: FakeBackend,
+        backend_state: %{data: %{configuration_status: :good}}
+      })
+
+      refute_received {:complete_called, _, _}
+    end
   end
 end
