@@ -71,7 +71,7 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
-  def reset(state), do: initial_state(ifname: state.ifname)
+  def reset(state), do: initial_state(state.ifname)
 
   @impl VintageNetWizard.Backend
   def handle_info(:configuration_timeout, %{data: data, ifname: ifname} = state) do
