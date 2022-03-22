@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :vintage_net_wizard,
   backend: VintageNetWizard.Backend.Mock,
