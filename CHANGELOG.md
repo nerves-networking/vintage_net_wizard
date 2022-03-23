@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.7 - 2022-03-23
+
+* Fixed
+  * `VintageNetWizard.Backend.Default` reset callback implementation
+    (@jeanparpaillon)
+
 ## v0.4.6 - 2021-08-20
 
 * Changed
