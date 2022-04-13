@@ -201,6 +201,13 @@ config :vintage_net_wizard,
   inactivity_timeout: <timeout in minutes>
 ```
 
+The timeout can also be explicitly disabled by supplying `:infinity`:
+
+```elixir
+config :vintage_net_wizard,
+  inactivity_timeout: :infinity
+```
+
 ## JSON API
 
 It is possible to write a smartphone app to configure your device using an API

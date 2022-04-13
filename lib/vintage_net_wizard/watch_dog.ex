@@ -4,7 +4,8 @@ defmodule VintageNetWizard.WatchDog do
   # This server is used to watch for activity in the wizard. If the inactivity
   # timeout is triggered this server will shutdown the wizard. In order to keep
   # this server from shutting down the wizard call `pet/0` to reset the
-  # timeout. The timeout should be in minutes.
+  # timeout. The timeout should be in minutes, or `:infinity` to disable the
+  # timeout entirely.
 
   use GenServer, restart: :transient
 
@@ -27,12 +28,20 @@ defmodule VintageNetWizard.WatchDog do
   end
 
   @impl GenServer
-  def init(inactivity_timeout_seconds) do
+  def init(:infinity) do
+    {:ok, :infinity}
+  end
+
+  def init(inactivity_timeout_seconds) when is_integer(inactivity_timeout_seconds) do
     inactivity_timeout = inactivity_timeout_seconds * 60_000
     {:ok, inactivity_timeout, inactivity_timeout}
   end
 
   @impl GenServer
+  def handle_call(:pet, _from, :infinity) do
+    {:reply, :ok, :infinity}
+  end
+
   def handle_call(:pet, _from, inactivity_timeout) do
     {:reply, :ok, inactivity_timeout, inactivity_timeout}
   end
