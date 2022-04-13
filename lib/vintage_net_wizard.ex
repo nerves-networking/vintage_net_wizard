@@ -19,7 +19,7 @@ defmodule VintageNetWizard do
     * `:captive_portal` - Whether to run in captive portal mode (defaults to `true`)
     * `:device_info` - A list of string tuples to render in a table in the footer (see `README.md`)
     * `:ifname` - The network interface to use (defaults to `"wlan0"`)
-    * `:inactivity_timeout` - Minutes to run before automatically stopping (defaults to 10 minutes)
+    * `:inactivity_timeout` - Minutes to run before automatically stopping (defaults to 10 minutes) or `:infinity` to disable the timeout
     * `:on_exit` - `{module, function, args}` tuple specifying callback to perform after stopping the server.
     * `:ssl` - A Keyword list of `:ssl.tls_server_options`. See `Plug.SSL.configure/1`.
     * `:ui` - a subset of UI configuration for title, title color, and button color.
