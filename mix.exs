@@ -8,7 +8,7 @@ defmodule VintageNetWizard.MixProject do
     [
       app: :vintage_net_wizard,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
