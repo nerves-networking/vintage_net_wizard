@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.4.8 - 2022-04-29
+
+* Added
+  * Pass `:infinity` to the `:inactivity_timeout` option to keep the wizard
+    running indefinitely regardless of user activity (@ConnorRigby)
+
+* Fixed
+  * Avoid overwriting connection details on shutdown (@paulanthonywilson)
+  * Issue when connecting to WPA2/3 networks due to deciding authentication
+    needs based on the composite set flags supplied by the wpa_supplicant
+
 ## v0.4.7 - 2022-03-23
 
 * Fixed
