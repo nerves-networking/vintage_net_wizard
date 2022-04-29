@@ -262,32 +262,21 @@ This is the WiFi radio band that the access point is using.
 ### Flags
 
 Flags are reported by access points. They can be used to know whether a password
-is required to join the network. For example, a password is required for access
-points with `"wpa2_psk_*"`.
-
-```s
-"wpa2_psk_ccmp" - WPA2 security with a pre-shared key is supported
-"wpa2_eap_ccmp" - WPA2 security with enterprise security is supported
-"wpa2_psk_ccmp_tkip" - WPA2 security with a pre-shared key is supported
-"wpa_psk_ccmp_tkip" - WPA security with a pre-shared key is supported
-"ibss" - A long legged wading bird
-"mesh" - Mesh network supported
-"ess" - Extended service set network
-"p2p" - This is a peer-to-peer WiFi connection
-"wps" - WiFi Protected Setup supported
-"rsn_ccmp" - Robust secure network
-```
+is required to join the network. Example flags are `"wpa2"`, `"psk"`, and
+`"eap"`. Flags are documented in the [`vintage_net_wifi`
+documentation](https://hexdocs.pm/vintage_net_wifi/VintageNetWiFi.AccessPoint.html)
 
 ### KeyManagement
 
-Key management tells the device what kind of WiFi security method it should use
-when connecting to an access point. Sometimes this can be determined from the
-`Flags`. To connect to a hidden access point, the user will need to say whether
-a password is needed.
+Key management is an interpretation of the `Flags` that determines what
+information that the user needs to provide to connect to the access point.  For
+hidden access points where the `Flags` are unavailable, the user will need to
+pick one of these.
 
 ```s
 "none" - No security
 "wpa_psk" - WPA or WPA2 with a pre-shared key
+"wpa_eap" - WPA or WPA2 with a username and password
 ```
 
 ### WiFiConfiguration

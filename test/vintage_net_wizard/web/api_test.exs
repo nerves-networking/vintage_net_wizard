@@ -17,7 +17,7 @@ defmodule VintageNetWizard.Web.ApiTest do
 
     assert ap["ssid"] == "Testing all the things!"
     assert ap["band"] == "wifi_5_ghz"
-    assert ap["flags"] == ["wpa2_psk_ccmp", "ess"]
+    assert ap["flags"] == ["wpa2", "psk", "ccmp", "ess"]
     assert ap["signal_percent"] == 57
     assert ap["channel"] == 149
     assert ap["frequency"] == 5745
