@@ -13,7 +13,7 @@ defmodule VintageNetWizard.Test.Backend do
         band: :wifi_5_ghz,
         bssid: "8a:8a:20:88:7a:50",
         channel: 149,
-        flags: [:wpa2_psk_ccmp, :ess],
+        flags: [:wpa2, :psk, :ccmp, :ess],
         frequency: 5745,
         signal_dbm: -76,
         signal_percent: 57,

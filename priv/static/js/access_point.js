@@ -80,7 +80,7 @@
 
   function getSecurityDisplayName(flags) {
     if (isWPAPersonal(flags)) {
-      return "WPA2 Personal";
+      return "WPA Personal";
     } else if (isWPAEnterprise(flags)) {
       return "WPA Enterprise";
     } else {
@@ -112,17 +112,11 @@
   }
 
   function isWPAPersonal(flags) {
-    const supportedPersonalWPAFlags = [
-      "wpa2_psk_ccmp",
-      "wpa2_psk_ccmp_tkip",
-      "wpa_psk_ccmp_tkip"
-    ];
-
-    return flags.some(flag => supportedPersonalWPAFlags.includes(flag));
+    return flags.includes("psk");
   }
 
   function isWPAEnterprise(flags) {
-    return flags.includes("wpa2_eap_ccmp");
+    return flags.includes("eap");
   }
 })()
 

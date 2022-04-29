@@ -214,20 +214,11 @@ defmodule VintageNetWizard.Web.Router do
 
   defp get_key_mgmt_from_ap(%{flags: flags}) do
     cond do
-      :wpa2_eap_ccmp in flags ->
+      :psk in flags ->
+        :wpa_psk
+
+      :eap in flags ->
         :wpa_eap
-
-      :wpa2_psk_ccmp in flags ->
-        :wpa_psk
-
-      :wpa2_psk_sae_ccmp in flags ->
-        :wpa_psk
-
-      :wpa2_psk_ccmp_tkip in flags ->
-        :wpa_psk
-
-      :wpa_psk_ccmp_tkip in flags ->
-        :wpa_psk
 
       true ->
         :none
