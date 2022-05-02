@@ -64,7 +64,7 @@ defmodule VintageNetWizard.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_html, "~> 2.13 or ~> 3.0"},
       {:jason, "~> 1.0"},
-      {:vintage_net, "~> 0.10.0 or ~> 0.11.0"},
+      {:vintage_net, "~> 0.10.0 or ~> 0.11.0 or ~> 0.12.0"},
       {:vintage_net_wifi, "~> 0.10.6 or ~> 0.11.0"},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},

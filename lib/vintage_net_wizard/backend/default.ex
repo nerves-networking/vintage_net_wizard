@@ -11,8 +11,8 @@ defmodule VintageNetWizard.Backend.Default do
 
   @impl VintageNetWizard.Backend
   def init(ifname) do
-    :ok = VintageNet.subscribe(["interface", ifname, "connection"])
-    :ok = VintageNet.subscribe(["interface", ifname, "wifi", "access_points"])
+    VintageNet.subscribe(["interface", ifname, "connection"])
+    VintageNet.subscribe(["interface", ifname, "wifi", "access_points"])
 
     initial_state(ifname)
   end
