@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.9 - 2022-05-04
+
+* Changed
+  * Update to allow `:vintage_net` `v0.12.0`
+
 ## v0.4.8 - 2022-04-29
 
 * Added
