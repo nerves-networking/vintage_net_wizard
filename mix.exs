@@ -15,7 +15,6 @@ defmodule VintageNetWizard.MixProject do
       deps: deps(),
       dialyzer: dialyzer(),
       docs: docs(),
-      aliases: [docs: ["docs", &copy_images/1]],
       package: package(),
       description: description(),
       preferred_cli_env: [
@@ -81,16 +80,12 @@ defmodule VintageNetWizard.MixProject do
 
   defp docs do
     [
+      assets: "assets",
       extras: ["README.md", "json-api.md", "CHANGELOG.md"],
       main: "readme",
       source_ref: "v#{@version}",
       source_url: @source_url,
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
-  end
-
-  # Copy the images referenced by docs, since ex_doc doesn't do this.
-  defp copy_images(_) do
-    File.cp_r("assets", "doc/assets")
   end
 end
