@@ -26,6 +26,7 @@ defmodule VintageNetWizard.Web.Endpoint do
           {:ssl, :ssl.tls_server_option()}
           | {:on_exit, {module(), atom(), list()}}
           | {:ifname, VintageNet.ifname()}
+          | {:ap_ifname, VintageNet.ifname()}
           | {:ui, [ui_opt()]}
           | Backend.opt()
 
@@ -180,12 +181,14 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   defp get_backend_spec(opts) do
     ifname = Keyword.get(opts, :ifname, "wlan0")
+    ap_ifname = Keyword.get(opts, :ap_ifname, ifname)
     device_info = Keyword.get(opts, :device_info, [])
     configurations = Keyword.get(opts, :configurations, [])
 
     backend = Application.get_env(:vintage_net_wizard, :backend, VintageNetWizard.Backend.Default)
 
     BackendServer.child_spec(backend, ifname,
+      ap_ifname: ap_ifname,
       device_info: device_info,
       configurations: configurations
     )

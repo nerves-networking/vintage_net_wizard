@@ -10,11 +10,12 @@ defmodule VintageNetWizard.Backend.Default do
   alias VintageNetWizard.{APMode, WiFiConfiguration}
 
   @impl VintageNetWizard.Backend
-  def init(ifname) do
+  def init(ifname, ap_ifname) do
+    # ["interface", ifname, "connection"] info never received when uap0 and wlan0
     VintageNet.subscribe(["interface", ifname, "connection"])
     VintageNet.subscribe(["interface", ifname, "wifi", "access_points"])
 
-    initial_state(ifname)
+    initial_state(ifname, ap_ifname)
   end
 
   @impl VintageNetWizard.Backend
@@ -71,13 +72,13 @@ defmodule VintageNetWizard.Backend.Default do
   end
 
   @impl VintageNetWizard.Backend
-  def reset(state), do: initial_state(state.ifname)
+  def reset(state), do: initial_state(state.ifname, state.ap_ifname)
 
   @impl VintageNetWizard.Backend
-  def handle_info(:configuration_timeout, %{data: data, ifname: ifname} = state) do
+  def handle_info(:configuration_timeout, %{data: data, ap_ifname: ap_ifname} = state) do
     # If we get this timeout, something went wrong trying to apply
     # the configuration, i.e. bad password or faulty network
-    :ok = APMode.into_ap_mode(ifname)
+    :ok = APMode.into_ap_mode(ap_ifname)
 
     data =
       data
@@ -107,17 +108,19 @@ defmodule VintageNetWizard.Backend.Default do
 
   def handle_info(
         {VintageNet, ["interface", ifname, "connection"], _, connectivity, _},
-        %{state: :applying, data: data, ifname: ifname} = state
+        %{state: :applying, data: data, ifname: ifname, ap_ifname: ap_ifname} = state
       )
       when connectivity in [:lan, :internet] do
     # Everything connected, so cancel our timeout
+    # NOTE - When entering the wrong password, status reported by VIntageNet alternates between :disconnected and :lan
+    #        When :lan is seen, success is assumed though it might be immediately followed by a :disconnected
     _ = Process.cancel_timer(data.apply_configuration_timer)
 
     # sometimes writing configs and reloading and re-initializing
     # wifi runs into a race condition. So, we wait a little
     # before trying to re-initialize the interface.
     Process.sleep(4_000)
-    :ok = APMode.into_ap_mode(ifname)
+    :ok = APMode.into_ap_mode(ap_ifname)
 
     data =
       data
@@ -145,7 +148,9 @@ defmodule VintageNetWizard.Backend.Default do
     end
   end
 
-  def handle_info(_, state), do: {:noreply, state}
+  def handle_info(_info, state) do
+    {:noreply, state}
+  end
 
   defp apply_configurations(wifi_configurations, state) do
     VintageNet.configure(state.ifname, %{
@@ -162,12 +167,13 @@ defmodule VintageNetWizard.Backend.Default do
   defp scan(%{state: :configuring, ifname: ifname}), do: VintageNet.scan(ifname)
   defp scan(_), do: {:error, :invalid_state}
 
-  defp initial_state(ifname) do
+  defp initial_state(ifname, ap_ifname) do
     %{
       state: :configuring,
       scan_ref: nil,
       data: %{access_points: %{}, configuration_status: :not_configured},
-      ifname: ifname
+      ifname: ifname,
+      ap_ifname: ap_ifname
     }
   end
 end
