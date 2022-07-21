@@ -2,7 +2,7 @@ defmodule VintageNetWizard.Test.Backend do
   @behaviour VintageNetWizard.Backend
 
   @impl VintageNetWizard.Backend
-  def init(_ifname) do
+  def init(_ifname, _ap_ifname) do
     {:ok, nil}
   end
 

@@ -19,6 +19,7 @@ defmodule VintageNetWizard do
     * `:captive_portal` - Whether to run in captive portal mode (defaults to `true`)
     * `:device_info` - A list of string tuples to render in a table in the footer (see `README.md`)
     * `:ifname` - The network interface to use (defaults to `"wlan0"`)
+    * `:ap_ifname` - The network interface to use to run the endpoint. Defaults to the value of `ifname`.
     * `:inactivity_timeout` - Minutes to run before automatically stopping (defaults to 10 minutes) or `:infinity` to disable the timeout
     * `:on_exit` - `{module, function, args}` tuple specifying callback to perform after stopping the server.
     * `:ssl` - A Keyword list of `:ssl.tls_server_options`. See `Plug.SSL.configure/1`.
@@ -27,10 +28,16 @@ defmodule VintageNetWizard do
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do
     ifname = Keyword.get(opts, :ifname, "wlan0")
+    ap_ifname = Keyword.get(opts, :ap_ifname, ifname)
     configurations = get_network_configs(ifname)
-    opts = Keyword.put(opts, :configurations, configurations)
 
-    with :ok <- APMode.into_ap_mode(ifname),
+    opts =
+      opts
+      |> Keyword.put(:configurations, configurations)
+      |> Keyword.put(:ifname, ifname)
+      |> Keyword.put(:ap_ifname, ap_ifname)
+
+    with :ok <- APMode.into_ap_mode(ap_ifname),
          :ok <- Endpoint.start_server(opts),
          :ok <- BackendServer.start_scan() do
       :ok

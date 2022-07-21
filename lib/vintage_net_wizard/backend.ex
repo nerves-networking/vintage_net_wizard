@@ -19,11 +19,11 @@ defmodule VintageNetWizard.Backend do
   @doc """
   Do any initialization work like subscribing to messages
 
-  Will be passed the interface name that the backend should use. By default
-  this will be `"wlan0"`. If you want to use a different interface name you
-  can pass that in an option to `VintageNetWizard.run_wizard/1`.
+  Will be passed the interface names that the backend should use to scan and to set AP mode. By default
+  both will be `"wlan0"`. If you want to use different interface names you
+  can pass them in as options to `VintageNetWizard.run_wizard/1`.
   """
-  @callback init(VintageNet.ifname()) :: state :: any()
+  @callback init(VintageNet.ifname(), VintageNet.ifname()) :: state :: any()
 
   @doc """
   Get all the access points that the backend knowns about

@@ -18,6 +18,23 @@ defmodule VintageNetWizard.APMode do
   end
 
   @doc """
+  Change the WIFi module to exit AP mode and apply the wifi configs.
+  """
+  @spec exit_ap_mode(VintageNet.ifname(), [map()]) :: :ok | {:error, any()}
+  def exit_ap_mode(ifname, networks) do
+    configuration = VintageNet.get_configuration(ifname)
+
+    no_ap_mode =
+      configuration
+      |> Map.put(:ipv4, %{method: :dhcp})
+      |> Map.put(:vintage_net_wifi, %{networks: networks})
+      |> Map.delete(:dhcpd)
+      |> Map.delete(:dnsd)
+
+    VintageNet.configure(ifname, no_ap_mode)
+  end
+
+  @doc """
   Return a configuration to put VintageNet into AP mode
   """
   @spec ap_mode_configuration(String.t(), String.t()) :: map()

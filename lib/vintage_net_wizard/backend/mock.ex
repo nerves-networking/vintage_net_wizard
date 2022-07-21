@@ -11,7 +11,7 @@ defmodule VintageNetWizard.Backend.Mock do
   require Logger
 
   @impl VintageNetWizard.Backend
-  def init(_ifname) do
+  def init(_ifname, _ap_ifname) do
     Logger.info("Go to http://localhost:#{Application.get_env(:vintage_net_wizard, :port)}/")
 
     initial_state()

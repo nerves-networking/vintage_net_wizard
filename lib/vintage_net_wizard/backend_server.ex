@@ -4,7 +4,7 @@ defmodule VintageNetWizard.BackendServer do
   """
   use GenServer
 
-  alias VintageNetWizard.Backend
+  alias VintageNetWizard.{APMode, Backend}
   alias VintageNetWiFi.AccessPoint
 
   defmodule State do
@@ -13,7 +13,9 @@ defmodule VintageNetWizard.BackendServer do
               backend: nil,
               backend_state: nil,
               configurations: %{},
-              device_info: []
+              device_info: [],
+              ap_ifname: nil,
+              ifname: nil
   end
 
   def child_spec(backend, ifname, opts \\ []) do
@@ -154,12 +156,17 @@ defmodule VintageNetWizard.BackendServer do
       |> Keyword.get(:configurations, [])
       |> Enum.into(%{}, fn config -> {config.ssid, config} end)
 
+    ap_ifname = Keyword.fetch!(opts, :ap_ifname)
+
     {:ok,
      %State{
        configurations: configurations,
        backend: backend,
-       backend_state: apply(backend, :init, [ifname]),
-       device_info: device_info
+       # Scanning is done by ifname
+       backend_state: apply(backend, :init, [ifname, ap_ifname]),
+       device_info: device_info,
+       ifname: ifname,
+       ap_ifname: ap_ifname
      }}
   end
 
@@ -253,12 +260,23 @@ defmodule VintageNetWizard.BackendServer do
   def handle_call(
         :apply,
         _from,
-        %State{backend: backend, configurations: wifi_configs, backend_state: backend_state} =
-          state
+        %State{
+          backend: backend,
+          configurations: wifi_configs,
+          backend_state: backend_state,
+          ifname: ifname
+        } = state
       ) do
+    old_connection = old_connection(ifname)
+
     case apply(backend, :apply, [build_config_list(wifi_configs), backend_state]) do
       {:ok, new_backend_state} ->
-        {:reply, :ok, %{state | backend_state: new_backend_state}}
+        updated_state = %{state | backend_state: new_backend_state}
+        # If applying the new configuration does not change the connection,
+        # send a message to that effect so the Wizard does not timeout
+        # waiting for one from VintageNet
+        maybe_send_connection_info(updated_state, old_connection)
+        {:reply, :ok, updated_state}
 
       {:error, _} = error ->
         {:reply, error, state}
@@ -286,6 +304,7 @@ defmodule VintageNetWizard.BackendServer do
     # As the configuration status is good, we are already completed setup and the configurations
     # have been blanked in `handle_info/3` - calling complete on the backend will disconnect us and
     # write over the saved configuration. Do nothing.
+    :ok = deconfigure_ap_ifname(state)
     {:reply, :ok, state}
   end
 
@@ -298,6 +317,7 @@ defmodule VintageNetWizard.BackendServer do
     {:ok, new_backend_state} =
       apply(backend, :complete, [build_config_list(wifi_configs), backend_state])
 
+    :ok = deconfigure_ap_ifname(state)
     {:reply, :ok, %{state | backend_state: new_backend_state}}
   end
 
@@ -324,6 +344,7 @@ defmodule VintageNetWizard.BackendServer do
         # idle state with good configuration means we've completed setup
         # and wizard has been shut down. So let's clear configurations
         # so aren't hanging around in memory
+
         {:noreply, %{state | configurations: %{}, backend_state: new_backend_state}}
 
       {:noreply, new_backend_state} ->
@@ -363,5 +384,37 @@ defmodule VintageNetWizard.BackendServer do
 
   defp clean_config(config) do
     Map.drop(config, [:psk, :password])
+  end
+
+  defp old_connection(ifname) do
+    [{_, connection}] = VintageNet.get_by_prefix(["interface", ifname, "connection"])
+
+    connection
+  end
+
+  defp maybe_send_connection_info(%State{ifname: ifname}, old_connection) do
+    [{_, new_connection}] = VintageNet.get_by_prefix(["interface", ifname, "connection"])
+
+    if old_connection == new_connection do
+      info =
+        {VintageNet, ["interface", ifname, "connection"], old_connection, new_connection, %{}}
+
+      send(self(), info)
+    else
+      :ok
+    end
+  end
+
+  defp deconfigure_ap_ifname(state) do
+    if state.ifname != state.ap_ifname do
+      VintageNet.deconfigure(state.ap_ifname)
+    else
+      if state.ifname do
+        networks = build_config_list(state.configurations)
+        APMode.exit_ap_mode(state.ifname, networks)
+      else
+        :ok
+      end
+    end
   end
 end
