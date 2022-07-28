@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.10 - 2022-07-28
+
+* Changed
+  * Support WiFi modules that expose two WiFi interfaces - one intended for
+    station mode and one intended for AP mode. This allows network connectivity
+    to be checked while using the wizard. (@jfcloutier)
+
 ## v0.4.9 - 2022-05-04
 
 * Changed
