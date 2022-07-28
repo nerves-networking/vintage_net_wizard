@@ -32,15 +32,14 @@ defmodule WizardExample.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.7.0", runtime: false},
-      {:shoehorn, "~> 0.8.0"},
+      {:nerves, "~> 1.8.0", runtime: false},
+      {:shoehorn, "~> 0.9.0"},
       {:ring_logger, "~> 0.8.1"},
-      {:ramoops_logger, "~> 0.3.0"},
       {:toolshed, "~> 0.2.13"},
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
 
       # Dependencies for all targets except :host
-      {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
+      {:nerves_runtime, "~> 0.13.1", targets: @all_targets},
       {:nerves_pack, "~> 0.7.0", targets: @all_targets},
       {:vintage_net_wizard, path: "..", targets: @all_targets, override: true},
       {:circuits_gpio, "~> 1.0.0", targets: @all_targets},
