@@ -19,9 +19,9 @@ install_system_deps: &install_system_deps
         apk add build-base linux-headers libmnl-dev libnl3-dev
 
 jobs:
-  build_elixir_1_13_otp_24:
+  build_elixir_1_13_otp_25:
     docker:
-      - image: hexpm/elixir:1.13.4-erlang-24.3.3-alpine-3.15.3
+      - image: hexpm/elixir:1.13.4-erlang-25.0.2-alpine-3.16.0
     <<: *defaults
     steps:
       - checkout
@@ -46,7 +46,7 @@ jobs:
 
   build_elixir_1_12_otp_24:
     docker:
-      - image: hexpm/elixir:1.12.3-erlang-24.1.1-alpine-3.14.0
+      - image: hexpm/elixir:1.12.3-erlang-24.3.4.2-alpine-3.16.0
     <<: *defaults
     steps:
       - checkout
@@ -66,13 +66,13 @@ jobs:
       - run: mix deps.get
       - run: mix test
 
-  build_example_elixir_1_13_otp_24:
+  build_example_elixir_1_13_otp_25:
     docker:
-      - image: nervesproject/nerves_system_br:1.18.6
+      - image: nervesproject/nerves_system_br:1.20.4
     environment:
       MIX_TARGET: rpi0
       MIX_ENV: prod
-      ELIXIR_VERSION: 1.13.3-otp-24
+      ELIXIR_VERSION: 1.13.4-otp-25
       LC_ALL: C.UTF-8
     working_directory: ~/repo/example
     steps:
@@ -94,7 +94,7 @@ workflows:
   version: 2
   build_test:
     jobs:
-      - build_elixir_1_13_otp_24
+      - build_elixir_1_13_otp_25
       - build_elixir_1_12_otp_24
       - build_elixir_1_11_otp_23
-      - build_example_elixir_1_13_otp_24
+      - build_example_elixir_1_13_otp_25
