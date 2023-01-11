@@ -21,6 +21,7 @@ defmodule VintageNetWizard.MixProject do
         docs: :docs,
         "hex.publish": :docs,
         "hex.build": :docs,
+        credo: :test,
         "coveralls.circle": :test
       ]
     ]
@@ -65,6 +66,7 @@ defmodule VintageNetWizard.MixProject do
       {:jason, "~> 1.0"},
       {:vintage_net, "~> 0.10.0 or ~> 0.11.0 or ~> 0.12.0"},
       {:vintage_net_wifi, "~> 0.10.6 or ~> 0.11.0"},
+      {:credo, "~> 1.2", only: :test, runtime: false},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:dialyxir, "~> 1.2.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.13", only: :test, runtime: false}
