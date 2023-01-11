@@ -4,14 +4,24 @@ defmodule VintageNetWizard.BackendServer.Test do
   alias VintageNetWizard.BackendServer
   alias VintageNetWizard.BackendServer.State
 
-  test "Can save a WiFi configuration" do
+  test "Can save a non-hidden WiFi configuration" do
+    :ok = BackendServer.reset()
+
+    configuration = %{ssid: "Testing all the things!"}
+
+    :ok = BackendServer.save(configuration)
+
+    assert [configuration] == BackendServer.configurations()
+  end
+
+  test "Can save a hidden WiFi configuration" do
     :ok = BackendServer.reset()
 
     configuration = %{ssid: "Test Network"}
 
     :ok = BackendServer.save(configuration)
 
-    assert [configuration] == BackendServer.configurations()
+    assert [Map.put(configuration, :scan_ssid, 1)] == BackendServer.configurations()
   end
 
   test "sets the priority order of configurations" do
@@ -37,12 +47,23 @@ defmodule VintageNetWizard.BackendServer.Test do
     :ok = BackendServer.reset()
   end
 
-  test "delete a configuration" do
+  test "delete a non-hidden configuration" do
+    :ok = BackendServer.reset()
+    configuration = %{ssid: "Testing all the things!"}
+    :ok = BackendServer.save(configuration)
+
+    assert [configuration] == BackendServer.configurations()
+    assert :ok == BackendServer.delete_configuration(configuration.ssid)
+
+    assert [] == BackendServer.configurations()
+  end
+
+  test "delete a hidden configuration" do
     :ok = BackendServer.reset()
     configuration = %{ssid: "Drop Me"}
     :ok = BackendServer.save(configuration)
 
-    assert [configuration] == BackendServer.configurations()
+    assert [Map.put(configuration, :scan_ssid, 1)] == BackendServer.configurations()
     assert :ok == BackendServer.delete_configuration(configuration.ssid)
 
     assert [] == BackendServer.configurations()

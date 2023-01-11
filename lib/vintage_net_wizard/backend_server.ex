@@ -227,8 +227,17 @@ defmodule VintageNetWizard.BackendServer do
     {:reply, status, state}
   end
 
-  def handle_call({:save, config}, _from, %{configurations: configs} = state) do
-    {:reply, :ok, %{state | configurations: Map.put(configs, config.ssid, config)}}
+  def handle_call(
+        {:save, config},
+        _from,
+        %{configurations: configs, backend: backend, backend_state: backend_state} = state
+      ) do
+    access_points = apply(backend, :access_points, [backend_state])
+    not_hidden? = Enum.any?(access_points, &(&1.ssid == config.ssid))
+    # Scan if ssid is hidden
+    full_config = if not_hidden?, do: config, else: Map.put(config, :scan_ssid, 1)
+
+    {:reply, :ok, %{state | configurations: Map.put(configs, config.ssid, full_config)}}
   end
 
   def handle_call(
