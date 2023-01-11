@@ -79,12 +79,11 @@ defmodule VintageNetWizard.Web.Endpoint do
   end
 
   defp stop_some_children(children) do
-    to_stop = Map.drop(children, [WatchDog, Callbacks])
-
-    _ =
-      for {_mod, child} <- to_stop do
-        :ok = DynamicSupervisor.terminate_child(__MODULE__, child)
-      end
+    children
+    |> Map.drop([WatchDog, Callbacks])
+    |> Enum.each(fn {_mod, child} ->
+      :ok = DynamicSupervisor.terminate_child(__MODULE__, child)
+    end)
 
     children
   end
