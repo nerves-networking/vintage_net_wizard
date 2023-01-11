@@ -132,7 +132,7 @@ defmodule VintageNetWizard.Web.Endpoint do
     Application.get_env(:vintage_net_wizard, :port, default_port)
   end
 
-  defp maybe_with_redirect(_use_captive_portal = true, use_ssl?) do
+  defp maybe_with_redirect(true = _use_captive_portal, use_ssl?) do
     # Captive Portal needs port 80. If we're not listening on that
     # then we start a RedirectRouter to forward port 80 traffic
     # to our defined port
@@ -157,7 +157,7 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   defp maybe_with_redirect(_no_captive_portal, _), do: {:ok, :ignore}
 
-  defp maybe_use_ssl(use_ssl = true, opts) do
+  defp maybe_use_ssl(true = use_ssl, opts) do
     ssl_options = Keyword.get(opts, :ssl)
     options = [dispatch: dispatch(opts), port: get_port(use_ssl)]
 

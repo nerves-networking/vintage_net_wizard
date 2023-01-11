@@ -1,4 +1,5 @@
 defmodule VintageNetWizard.Test.Backend do
+  @moduledoc false
   @behaviour VintageNetWizard.Backend
 
   @impl VintageNetWizard.Backend

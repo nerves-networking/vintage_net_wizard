@@ -76,7 +76,7 @@ defmodule VintageNetWizard.BackendServer do
   @doc """
   Get the current state of the WiFi configuration
   """
-  @spec configuration_state() :: %State{}
+  @spec configuration_state() :: map()
   def configuration_state() do
     GenServer.call(__MODULE__, :configuration_state)
   end

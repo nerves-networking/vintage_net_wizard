@@ -1,4 +1,5 @@
 defmodule VintageNetWizard.Callbacks do
+  @moduledoc false
   use Agent
 
   require Logger
