@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.11 - 2023-01-11
+
+* Changed
+  * Fixed issue preventing hidden WiFi access points from working. (@jfcloutier)
+
 ## v0.4.10 - 2022-07-28
 
 * Changed
