@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.12 - 2023-01-20
+
+* Changed
+  * Update to allow `:vintage_net` `v0.13.0`
+
 ## v0.4.11 - 2023-01-11
 
 * Changed
