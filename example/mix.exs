@@ -32,10 +32,10 @@ defmodule WizardExample.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.8.0", runtime: false},
+      {:nerves, "~> 1.10", runtime: false},
       {:shoehorn, "~> 0.9.0"},
-      {:ring_logger, "~> 0.8.1"},
-      {:toolshed, "~> 0.2.13"},
+      {:ring_logger, "~> 0.9"},
+      {:toolshed, "~> 0.3"},
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
 
       # Dependencies for all targets except :host
