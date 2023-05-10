@@ -40,7 +40,7 @@ defmodule VintageNetWizard.APMode do
   @spec ap_mode_configuration(String.t(), String.t()) :: map()
   def ap_mode_configuration(hostname, our_name) do
     ssid = sanitize_hostname_for_ssid(hostname)
-    our_ip_address = {192, 168, 0, 1}
+    our_ip_address = {172, 16, 61, 0}
 
     %{
       type: VintageNetWiFi,
@@ -60,8 +60,8 @@ defmodule VintageNetWizard.APMode do
       },
       dhcpd: %{
         # These are defaults and are reproduced here as documentation
-        start: {192, 168, 0, 20},
-        end: {192, 168, 0, 254},
+        start: {172, 16, 61, 20},
+        end: {172, 16, 61, 254},
         max_leases: 235,
         options: %{
           dns: [our_ip_address],

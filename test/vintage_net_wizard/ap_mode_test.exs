@@ -8,21 +8,21 @@ defmodule VintageNetWizard.APModeTest do
 
     expected = %{
       type: VintageNetWiFi,
-      ipv4: %{address: {192, 168, 0, 1}, method: :static, prefix_length: 24},
+      ipv4: %{address: {172, 16, 61, 0}, method: :static, prefix_length: 24},
       vintage_net_wifi: %{networks: [%{key_mgmt: :none, mode: :ap, ssid: "hostname"}]},
       dhcpd: %{
-        end: {192, 168, 0, 254},
+        end: {172, 16, 61, 254},
         max_leases: 235,
         options: %{
-          dns: [{192, 168, 0, 1}],
+          dns: [{172, 16, 61, 0}],
           domain: "our_name",
-          router: [{192, 168, 0, 1}],
+          router: [{172, 16, 61, 0}],
           search: ["our_name"],
           subnet: {255, 255, 255, 0}
         },
-        start: {192, 168, 0, 20}
+        start: {172, 16, 61, 20}
       },
-      dnsd: %{records: [{"our_name", {192, 168, 0, 1}}]}
+      dnsd: %{records: [{"our_name", {172, 16, 61, 0}}]}
     }
 
     assert expected == config
