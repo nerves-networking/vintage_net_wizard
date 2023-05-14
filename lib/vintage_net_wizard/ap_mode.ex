@@ -4,6 +4,8 @@ defmodule VintageNetWizard.APMode do
   """
 
   @default_hostname "vintage_net_wizard"
+  @default_dns_name "wifi.config"
+  @default_subnet {192, 168, 0, 0}
 
   @doc """
   Change the WiFi module into access point mode
@@ -11,9 +13,13 @@ defmodule VintageNetWizard.APMode do
   @spec into_ap_mode(VintageNet.ifname()) :: :ok | {:error, any()}
   def into_ap_mode(ifname) do
     hostname = get_hostname()
-    our_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
+    our_name = Application.get_env(:vintage_net_wizard, :dns_name, @default_dns_name)
 
-    config = ap_mode_configuration(hostname, our_name)
+    subnet =
+      Application.get_env(:vintage_net_wizard, :subnet, @default_subnet)
+      |> VintageNet.IP.ip_to_tuple!()
+
+    config = ap_mode_configuration(hostname, our_name, subnet)
     VintageNet.configure(ifname, config, persist: false)
   end
 
@@ -34,13 +40,26 @@ defmodule VintageNetWizard.APMode do
     VintageNet.configure(ifname, no_ap_mode)
   end
 
+  defp create_ip_24(subnet, host) when host > 0 and host < 255 do
+    {a, b, c, _} = subnet
+    {a, b, c, host}
+  end
+
   @doc """
   Return a configuration to put VintageNet into AP mode
+
+  * `hostname` - the device's hostname which will be modified to be the AP's SSID
+  * `our_name` - the name for clients to use when connecting to the wizard if
+                 not using the IP address.
+  * `class_c_subnet` - A class C subnet to use for all of the IP addresses on
+                 this network.
   """
-  @spec ap_mode_configuration(String.t(), String.t()) :: map()
-  def ap_mode_configuration(hostname, our_name) do
+  @spec ap_mode_configuration(String.t(), String.t(), :inet.ip4_address()) :: map()
+  def ap_mode_configuration(hostname, our_name, class_c_subnet) do
     ssid = sanitize_hostname_for_ssid(hostname)
-    our_ip_address = {192, 168, 0, 1}
+
+    subnet_mask = VintageNet.IP.prefix_length_to_subnet_mask(:inet, 24)
+    our_ip_address = create_ip_24(class_c_subnet, 1)
 
     %{
       type: VintageNetWiFi,
@@ -59,13 +78,12 @@ defmodule VintageNetWizard.APMode do
         prefix_length: 24
       },
       dhcpd: %{
-        # These are defaults and are reproduced here as documentation
-        start: {192, 168, 0, 20},
-        end: {192, 168, 0, 254},
+        start: create_ip_24(class_c_subnet, 20),
+        end: create_ip_24(class_c_subnet, 254),
         max_leases: 235,
         options: %{
           dns: [our_ip_address],
-          subnet: {255, 255, 255, 0},
+          subnet: subnet_mask,
           router: [our_ip_address],
           domain: our_name,
           search: [our_name]
