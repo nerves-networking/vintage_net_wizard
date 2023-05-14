@@ -111,12 +111,13 @@ Each configuration option is optional and will fall back to
 ### DNS in AP-mode
 
 When the wizard is running, users go to either `http://192.168.0.1/` or
-`http://wifi.config/` to access the web user interface. The latter can be
+`http://wifi.config/` to access the web user interface. Both can be
 changed via the `config.exs`:
 
 ```elixir
 config :vintage_net_wizard,
-  dns_name: "my-wifi-config.com"
+  dns_name: "my-wifi-config.com",
+  subnet: "192.168.0.0"
 ```
 
 ### Port
