@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.13 - 2023-05-15
+
+* Changed
+  * Support changing the IP subnet used by the wizard. This lets you set it to
+    something less likely to be seen than 192.168.0.0/24. See PR #318.
+
 ## v0.4.12 - 2023-01-20
 
 * Changed

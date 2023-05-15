@@ -1,7 +1,7 @@
 defmodule VintageNetWizard.MixProject do
   use Mix.Project
 
-  @version "0.4.12"
+  @version "0.4.13"
   @source_url "https://github.com/nerves-networking/vintage_net_wizard"
 
   def project do
