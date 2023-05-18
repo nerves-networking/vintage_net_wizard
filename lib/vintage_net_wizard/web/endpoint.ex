@@ -93,7 +93,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   defp handle_watchdog(children, :timeout), do: children
 
   defp handle_watchdog(children, _other) do
-    :ok = DynamicSupervisor.terminate_child(__MODULE__, children[WatchDog])
+    _ = DynamicSupervisor.terminate_child(__MODULE__, children[WatchDog])
     children
   end
 
