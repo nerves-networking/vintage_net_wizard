@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.14 - 2023-05-26
+
+* Changed
+  * Ignore result when terminating WatchDog GenServer to avoid an extraneous
+    crash.
+
 ## v0.4.13 - 2023-05-15
 
 * Changed
