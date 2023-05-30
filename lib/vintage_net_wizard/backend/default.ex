@@ -108,7 +108,7 @@ defmodule VintageNetWizard.Backend.Default do
 
   def handle_info(
         {VintageNet, ["interface", ifname, "connection"], _, connectivity, _},
-        %{state: :applying, data: data, ifname: ifname, ap_ifname: ap_ifname} = state
+        %{state: :applying, data: data, ifname: ifname} = state
       )
       when connectivity in [:lan, :internet] do
     # Everything connected, so cancel our timeout
@@ -120,7 +120,6 @@ defmodule VintageNetWizard.Backend.Default do
     # wifi runs into a race condition. So, we wait a little
     # before trying to re-initialize the interface.
     Process.sleep(4_000)
-    :ok = APMode.into_ap_mode(ap_ifname)
 
     data =
       data
