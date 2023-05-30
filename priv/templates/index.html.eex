@@ -66,9 +66,6 @@
          <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/apply">
            Apply configuration
          </a>
-         <a class="btn btn-secondary" href="/complete" title="This will apply the configuration without any attempt to verify a successful network connection.">
-           Complete without verification
-         </a>
        <% end %>
      </div>
 
