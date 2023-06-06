@@ -172,6 +172,7 @@ defmodule VintageNetWizard.Web.Router do
       page
       |> template_file()
       |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
+      # credo:disable-for-next-line
       |> Phoenix.HTML.Engine.encode_to_iodata!()
 
     send_resp(conn, 200, resp)

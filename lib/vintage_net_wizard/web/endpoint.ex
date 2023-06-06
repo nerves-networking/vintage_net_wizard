@@ -31,6 +31,7 @@ defmodule VintageNetWizard.Web.Endpoint do
           | Backend.opt()
 
   @doc false
+  @spec start_link(any()) :: Supervisor.on_start()
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
