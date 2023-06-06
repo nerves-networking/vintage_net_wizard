@@ -84,6 +84,7 @@ defmodule VintageNetWizard.BackendServer.Test do
 
   describe "on completion" do
     defmodule FakeBackend do
+      @spec complete(any(), any()) :: {:ok, any()}
       def complete(wifi_configurations, backend_state) do
         send(self(), {:complete_called, wifi_configurations, backend_state})
         {:ok, backend_state}

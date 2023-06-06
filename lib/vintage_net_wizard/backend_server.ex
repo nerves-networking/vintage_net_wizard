@@ -18,6 +18,7 @@ defmodule VintageNetWizard.BackendServer do
               ifname: nil
   end
 
+  @spec child_spec(any(), any(), keyword()) :: map()
   def child_spec(backend, ifname, opts \\ []) do
     %{
       id: __MODULE__,
@@ -119,6 +120,7 @@ defmodule VintageNetWizard.BackendServer do
   @doc """
   Get the current configuration status
   """
+  @spec configuration_status() :: any()
   def configuration_status() do
     GenServer.call(__MODULE__, :configuration_status)
   end
