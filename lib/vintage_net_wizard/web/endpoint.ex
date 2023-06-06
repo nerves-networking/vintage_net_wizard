@@ -2,16 +2,16 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
+  use DynamicSupervisor
+
   alias VintageNetWizard.{
     Backend,
     BackendServer,
     Callbacks,
     WatchDog,
-    Web.Router,
-    Web.RedirectRouter
+    Web.RedirectRouter,
+    Web.Router
   }
-
-  use DynamicSupervisor
 
   @typedoc """
   UI specific configuration

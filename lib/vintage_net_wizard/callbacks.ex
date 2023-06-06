@@ -20,12 +20,10 @@ defmodule VintageNetWizard.Callbacks do
   end
 
   defp apply_callback({mod, fun, args}) do
-    try do
-      apply(mod, fun, args)
-    rescue
-      err ->
-        Logger.error("[VintageNetWizard] Failed to run callback: #{inspect(err)}")
-    end
+    apply(mod, fun, args)
+  rescue
+    err ->
+      Logger.error("[VintageNetWizard] Failed to run callback: #{inspect(err)}")
   end
 
   defp apply_callback(invalid), do: {:error, "invalid callback: #{inspect(invalid)}"}
