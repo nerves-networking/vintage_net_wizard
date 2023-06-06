@@ -4,15 +4,18 @@ defmodule VintageNetWizard.Callbacks do
 
   require Logger
 
+  @spec start_link(any()) :: any()
   def start_link(callbacks) do
     callbacks = Enum.reduce(callbacks, [], &validate_callback/2)
     Agent.start_link(fn -> callbacks end, name: __MODULE__)
   end
 
+  @spec list() :: any()
   def list() do
     Agent.get(__MODULE__, & &1)
   end
 
+  @spec on_exit() :: any()
   def on_exit() do
     list()
     |> Keyword.get(:on_exit)

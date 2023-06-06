@@ -14,6 +14,7 @@ defmodule VintageNetWizardTest do
     assert_receive ^key
   end
 
+  @spec callback_tester(any()) :: any()
   def callback_tester(key) do
     # This is to be called from {m, f, a} callback and
     # sends the message back to this process for
