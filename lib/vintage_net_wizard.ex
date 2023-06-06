@@ -3,7 +3,7 @@ defmodule VintageNetWizard do
   Documentation for VintageNetWizard.
   """
 
-  alias VintageNetWizard.{BackendServer, APMode, Web.Endpoint}
+  alias VintageNetWizard.{APMode, BackendServer, Web.Endpoint}
 
   @type stop_reason() :: :shutdown | :timeout
 

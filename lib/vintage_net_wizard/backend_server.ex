@@ -4,8 +4,8 @@ defmodule VintageNetWizard.BackendServer do
   """
   use GenServer
 
-  alias VintageNetWizard.{APMode, Backend}
   alias VintageNetWiFi.AccessPoint
+  alias VintageNetWizard.{APMode, Backend}
 
   defmodule State do
     @moduledoc false
