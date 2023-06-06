@@ -1,11 +1,12 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
 
-  alias VintageNetWizard.{WiFiConfiguration, BackendServer}
-  alias VintageNetWizard.Web.Endpoint
-  alias Plug.Conn
-
   use Plug.Router
+
+  alias Plug.Conn
+  alias VintageNetWizard.BackendServer
+  alias VintageNetWizard.Web.Endpoint
+  alias VintageNetWizard.WiFiConfiguration
 
   plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
   plug(:match)
