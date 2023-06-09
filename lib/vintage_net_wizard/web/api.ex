@@ -11,6 +11,10 @@ defmodule VintageNetWizard.Web.Api do
   plug(:match)
   plug(:dispatch)
 
+  get "/hw_check" do
+    send_json(conn, 200, Jason.encode!(BackendServer.get_hwcheck()))
+  end
+
   get "/configuration/status" do
     with status <- BackendServer.configuration_status(),
          {:ok, json_status} <- Jason.encode(status) do
@@ -24,6 +28,22 @@ defmodule VintageNetWizard.Web.Api do
       |> to_json()
 
     send_json(conn, 200, access_points)
+  end
+
+  put "/open_lock" do
+    conn
+    |> get_body()
+    |> BackendServer.set_open_lock()
+
+    send_json(conn, 204, "")
+  end
+
+  put "/closed_lock" do
+    conn
+    |> get_body()
+    |> BackendServer.set_close_lock()
+
+    send_json(conn, 204, "")
   end
 
   put "/ssids" do
@@ -54,6 +74,39 @@ defmodule VintageNetWizard.Web.Api do
       |> Jason.encode()
 
     send_json(conn, 200, json)
+  end
+
+  post "/cam1" do
+
+    BackendServer.set_cam(0, true)
+
+    Process.sleep(3_000) # espera 2 segundo
+
+    {:ok, binary} = File.read("/root/cam0.jpg")
+
+    send_imagen(conn, 200, binary)
+  end
+
+  post "/cam2" do
+
+    BackendServer.set_cam(1, true)
+
+    Process.sleep(3_000) # espera 2 segundo
+
+    {:ok, binary} = File.read("/root/cam1.jpg")
+
+    send_imagen(conn, 200, binary)
+  end
+
+  post "/cam3" do
+
+    BackendServer.set_cam(2, true)
+
+    Process.sleep(3_000) # espera 2 segundo
+
+    {:ok, binary} = File.read("/root/cam2.jpg")
+
+    send_imagen(conn, 200, binary)
   end
 
   post "/apply" do
@@ -154,4 +207,11 @@ defmodule VintageNetWizard.Web.Api do
       message: "A user is required."
     })
   end
+
+  defp send_imagen(conn, status_code, binary) do
+    conn
+    |> put_resp_content_type("image/jpeg")
+    |> send_resp(status_code, binary)
+  end
+
 end
