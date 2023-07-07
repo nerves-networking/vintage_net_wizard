@@ -59,9 +59,13 @@ defmodule VintageNetWizard.Web.Router do
 
   get "/ssid/:ssid" do
     key_mgmt =
-      BackendServer.access_points()
-      |> Enum.find(&(&1.ssid == ssid))
-      |> get_key_mgmt_from_ap()
+                case BackendServer.access_points()
+                     |> Enum.find(&(&1.ssid == ssid)) do
+                  nil ->    BackendServer.configurations()
+                            |> Enum.find(&(&1.ssid == ssid))
+                            |> Map.get(:key_mgmt)
+                  result -> get_key_mgmt_from_ap(result)
+                end
 
     render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
   end
