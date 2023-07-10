@@ -34,6 +34,7 @@
          </table>
        </div>
 
+       <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/hw">Hardware Check</a>
        <a class="btn btn-primary" href="/networks/new" style="background-color:<%= ui.button_color %>">Add another network</a>
      </div>
 
