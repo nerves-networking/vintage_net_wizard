@@ -8,8 +8,14 @@
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
-     <div class="container access-points-container">
-       <h1 class="text-right mt-2"><a href="/" style="color: <%= ui.title_color %>"><%= ui.title %></a></h1>
+<!-- Header -->
+	<nav class="sticky top-0 w-full block bg-white px-6 py-5 z-10 header">
+		<div class="container mx-auto relative flex items-center justifybetween">
+			<div class= doow-0">
+				<a href="/">
+					<img class="text-right mt-2" src="/static/images/in2_logo.svg" alt="Intuitivo">
+				</a>
+			</div>
        <h3 class="text-left mt-2">
         Configuration status:
         <span class="<%= configuration_status.class %>">
@@ -19,6 +25,238 @@
           </span>
         </span>
        </h3>
+			<div class="grid grid-flow-col gap-2">
+				<div class="flex items-center mr-4">
+					
+					<div class="flex-shrink-0">
+          <%= for {mac_address, current_version, expected_version} <- device_info do %>
+           <div class="row">
+             <strong class="col-sm-2">nerves@<%= device_info.mac_address %></strong>
+           </div>
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> Current: <%= device_info.current_version %>
+						</p>
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> Expected: <%= device_info.expected_version %>
+						</p>
+         <% end %>  
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</nav>
+	<!-- End Header -->
+	<div class="app-content"></div>
+	
+	<div class="w-full px-8 py-4 bg-purple-700 text-right footer">
+		<div class="container mx-auto">
+			<span class="text-xs text-white">© 2022, Intuitivo Inc. </span>
+		</div>
+	</div>
+<div name="welcome-container">
+	<div class="container mx-auto py-2 px-6 pb-12 welcome-container">
+		<div class="w-full mt-10 mb-4">
+    				
+    <div class="">
+          <%= for {key, value} <- device_info do %>
+           <div class="row">
+             <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong><%= key %></strong>: <%= value %></p>
+           </div>
+         <% end %>  
+						<div>
+			<div class="flex-none items-center col-start-1 col-end-3 whitespace-no-wrap">
+				<span class="inline mr-4 text-2xl font-bold">Let's configure your Intuitivo Box</span>
+			</div>
+			<div class="flex-none col-end-7 col-span-2"></div>
+		</div>
+		<div class="in2-panel mb-12">
+			<h2 class="text-gray-900 text-lg mb-6 font-medium title-font bg-gray-200 rounded-t-lg px-5 py-3">Component's input
+				positions</h2>
+			<div class="lg:max-h-[80%] lg:max-w-[80%] md:h-auto w-full md:object-contain object-center mb-2 mx-auto">
+				<img src="/static/images/kit_instructions_rpi4_232.jpg" alt="connection-example">
+			</div>
+			<p class="text-sm italic text-center mb-2 text-gray-600">Make sure all components are connected like the picture
+				above</p>
+		</div>
+		<div class="w-full mt-10 mb-4">
+			<div class="flex grow items-center whitespace-no-wrap">
+				<span class="inline-flex grow mr-4 text-2xl font-bold">Now let's check everything's working</span>
+				<a class="inline-flex grow-0 fill-current text-gray-600 transition-none duration-200 ease-in-out hover:text-gray-900"
+					href="mailto:support@intuitivo.ai">
+					<svg class="inline" width="15" height="15" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
+						<path
+							d="M7.55424 4.05884C6.91894 4.05884 6.38865 4.28075 5.96424 4.64119C5.53982 5.00163 5.29144 5.29413 5.21997 6.17648H6.51571C6.54394 5.73531 6.64938 5.6334 6.83159 5.46575C7.01379 5.2981 7.24012 5.1931 7.51144 5.1931C7.78277 5.1931 8.0038 5.26987 8.17497 5.44501C8.34659 5.61972 8.43218 5.83413 8.43218 6.09796C8.43218 6.36178 8.34968 6.5806 8.186 6.75928L7.40424 7.53972C7.17571 7.76825 7.12806 7.95178 7.06012 8.09075C6.99218 8.22972 7.05879 8.44104 7.05879 8.72649V9.26472H7.94115V8.89766C7.94115 8.61266 8.06865 8.39119 8.19747 8.23413C8.24688 8.17722 8.34438 8.10751 8.42732 8.02546C8.50938 7.94296 8.62497 7.84678 8.74277 7.73604C8.86056 7.62575 8.96335 7.53443 9.03483 7.46296C9.10585 7.39193 9.21306 7.27016 9.34894 7.09898C9.58409 6.81354 9.70409 6.45663 9.70409 6.02825C9.70409 5.40707 9.50556 4.92399 9.10585 4.57722C8.70527 4.23178 8.18953 4.05884 7.55424 4.05884Z">
+						</path>
+						<path
+							d="M7.47356 9.76978C7.24856 9.76978 7.05621 9.84875 6.89518 10.0054C6.73459 10.1624 6.6543 10.3495 6.6543 10.5674C6.6543 10.7849 6.73636 10.9707 6.90047 11.1242C7.06459 11.2777 7.25915 11.354 7.48371 11.354C7.70871 11.354 7.9015 11.2755 8.06209 11.1189C8.22224 10.9618 8.30297 10.7743 8.30297 10.5568C8.30297 10.3393 8.22047 10.1536 8.05636 9.99963C7.89312 9.8461 7.69856 9.76978 7.47356 9.76978Z">
+						</path>
+						<path
+							d="M7.5 0C3.35779 0 0 3.35779 0 7.5C0 11.6422 3.35779 15 7.5 15C11.6422 15 15 11.6422 15 7.5C15 3.35779 11.6422 0 7.5 0ZM7.5 13.6765C4.08882 13.6765 1.32353 10.9112 1.32353 7.5C1.32353 4.08882 4.08882 1.32353 7.5 1.32353C10.9112 1.32353 13.6765 4.08882 13.6765 7.5C13.6765 10.9112 10.9112 13.6765 7.5 13.6765Z">
+						</path>
+					</svg>
+					<span class="text-xs font-medium ml-1">Report a problem</span>
+				</a>
+			</div>
+			<div class="flex-none col-end-7 col-span-2"></div>
+		</div>
+		<div class="in2-panel mb-12">
+			<h2 class="text-gray-900 text-lg mb-6 font-medium title-font bg-gray-200 rounded-t-lg px-5 py-3">Component's
+				checkup</h2>
+			<div class="container mx-auto">
+				<div class="grid grid-flow-row gap-4 md:grid-cols-3 md:gap-6">
+					<div class="col-span-1 test-col test-cam">
+						<div
+							class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content">
+							<span
+								class="bg-gray-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl test-col-name">
+								CAMERAS
+							</span>
+						</div>
+						<div class="relative flex-shrink-0 h-8 w-8 my-3 p-3 rounded-full bg-gray-400 flex items-center justifycenter text-xs font- dod">
+							<div class="row">
+                <img class=" object-center object-cover rounded-full h-1 w-3" src="io-01.jpg" alt="">
+							  <img class=" object-center object-cover rounded-full h-1 w-3" src="io-02.jpg" alt="">
+							  <img class=" object-center object-cover rounded-full h-1 w-3" src="io-03.jpg" alt="">
+							</div>
+							<%# <p class="test-item cam2">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Camera 3
+							</p> %>
+            </div>
+							<div class="flex grow w-full text-center mt-6 items-end">
+								<button class="btn btn-primary btn-w-full btn-test">
+									<span>Test</span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<% if "Imbera" == "imbera" do %>
+					<div class="col-span-1 test-col test-door">
+						<div
+							class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content">
+							<span
+								class="bg-gray-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl test-col-name">
+								DOOR
+							</span>
+							<p class="test-item unlock">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Unlock
+							</p>
+							<p class="test-item lock">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Lock
+							</p>
+							<p class="test-item status">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Status
+							</p>
+							<div class="flex grow w-full text-center mt-6 items-end">
+								<button class="btn btn-primary btn-w-full btn-test">
+									<span>Test</span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<% end %>
+					<% if "Imbera" == "imbera" do %>
+					<div class="col-span-1 test-col test-cooler">
+						<div
+							class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content">
+							<span
+								class="bg-gray-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl test-col-name">
+								COOLER
+							</span>
+							<p class="test-item temp">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Temperature
+							</p>
+							<p class="test-item volt">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Voltage
+							</p>
+							<p class="test-item alerts">
+								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+										clip-rule="evenodd"></path>
+								</svg>
+								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd"
+										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+										clip-rule="evenodd" />
+								</svg>
+								Alerts
+							</p>
+							<div class="flex grow w-full text-center mt-6 items-end">
+								<button class="btn btn-primary btn-w-full btn-test">
+									<span>Test</span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+     <div class="container access-points-container">
+       
        Choose a network from following list:
        <div class="my-3 p-3 bg-white rounded shadow-sm">
          <table class="table table-hover access-points-table">
@@ -37,14 +275,20 @@
        <a class="btn btn-primary" href="/networks/new" style="background-color:<%= ui.button_color %>">Add another network</a>
      </div>
 
+     <div>
+     <button class="btn btn-in2green start-button">
+					<span class="button-text">Start</span>
+					 (if device_info.starting do<span class="button-text-loading hidden">Starting...</span>
+				</button>
+				<button class="btn btn-secondary reboot-button">
+					<span class="button-text text-red-500">Reboot</span>
+					 if device_info.rebooting do %><span class="button-text-loading text-red-500 hidden">Rebooting...</span>
+				</button>
+     </div>
+
      <footer class="py-3 bg-white shadow-sm w-100 text-muted">
        <div class="container">
-         <%= for {info_name, info_data} <- device_info do %>
-           <div class="row">
-             <strong class="col-sm-2"><%= info_name %></strong>
-             <span class="col"><%= info_data %></span>
-           </div>
-         <% end %>
+         
         </div>
      </footer>
      <script src="/js/access_point.js"></script>
