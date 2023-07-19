@@ -82,7 +82,7 @@ defmodule VintageNetWizard.Web.Api do
 
     BackendServer.set_cam(0, true)
 
-    Process.sleep(2_000) # espera 2 segundo
+    Process.sleep(3_000) # espera 2 segundo
 
     {:ok, binary} = File.read("/root/cam0.jpg")
 
