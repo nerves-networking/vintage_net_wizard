@@ -21,6 +21,8 @@ defmodule VintageNetWizard.BackendServer do
               hw_check: %{},
               open_lock: false,
               close_lock: false,
+              lock: false,
+              door: %{},
               cam0: false,
               cam1: false,
               cam2: false
@@ -159,6 +161,14 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.cast(__MODULE__, {:set_hw_check, hw_check})
   end
 
+  def set_door(door) do
+    GenServer.cast(__MODULE__, {:set_door, door})
+  end
+
+  def change_lock(value) do
+    GenServer.cast(__MODULE__, {:change_lock, value})
+  end
+
   def set_open_lock(open_lock) do
     GenServer.cast(__MODULE__, {:set_open_lock, open_lock})
   end
@@ -173,6 +183,14 @@ defmodule VintageNetWizard.BackendServer do
 
   def get_hwcheck() do
     GenServer.call(__MODULE__, :get_hwcheck)
+  end
+
+  def get_door() do
+    GenServer.call(__MODULE__, :get_door)
+  end
+
+  def get_lock() do
+    GenServer.call(__MODULE__, :get_lock)
   end
 
   def get_open_lock() do
@@ -233,6 +251,26 @@ defmodule VintageNetWizard.BackendServer do
           2 -> {:reply, state.cam2, state}
         end
 
+  end
+
+  @impl GenServer
+  def handle_call(
+        :get_lock,
+        _from,
+          state
+      ) do
+
+    {:reply, state.lock, state}
+  end
+
+  @impl GenServer
+  def handle_call(
+        :get_door,
+        _from,
+          state
+      ) do
+
+    {:reply, state.door, state}
   end
 
   @impl GenServer
@@ -418,6 +456,16 @@ defmodule VintageNetWizard.BackendServer do
   @impl GenServer
   def handle_cast({:set_hw_check, hw_check}, state) do
     {:noreply, %{state | hw_check: hw_check}}
+  end
+
+  @impl GenServer
+  def handle_cast({:set_door, door}, state) do
+    {:noreply, %{state | door: door}}
+  end
+
+  @impl GenServer
+  def handle_cast({:change_lock, value}, state) do
+    {:noreply, %{state | lock: value}}
   end
 
   @impl GenServer

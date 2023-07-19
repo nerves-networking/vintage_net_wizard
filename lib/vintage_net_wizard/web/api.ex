@@ -20,8 +20,9 @@ defmodule VintageNetWizard.Web.Api do
 
   get "/door" do
     #TODO: Call Backedn getting pin state
-    response = %{door: "closed"}
-    Logger.info("Response=> #{inspect(response)}")
+    #response = %{door: "closed"}
+    #Logger.info("Response=> #{inspect(response)}")
+    response = BackendServer.get_door()
     send_json(conn, 200, Jason.encode!(response))
   end
 
@@ -41,29 +42,8 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   put "/lock" do
-    body = 
-      conn
-      |> get_body()
-    
-    Logger.info("Lock body #{inspect(body)}")
 
-    send_json(conn, 204, Jason.encode!(%{lock: "changed"}))
-  end
-
-  ## @phonnz: dunno why separated requests and 204 response 
-  ## Can't be a state change? 
-  put "/open_lock" do
-    conn
-    |> get_body()
-    |> BackendServer.set_open_lock()
-
-    send_json(conn, 204, "")
-  end
-
-  put "/closed_lock" do
-    conn
-    |> get_body()
-    |> BackendServer.set_close_lock()
+    BackendServer.change_lock(true)
 
     send_json(conn, 204, "")
   end
@@ -102,7 +82,7 @@ defmodule VintageNetWizard.Web.Api do
 
     BackendServer.set_cam(0, true)
 
-    Process.sleep(3_000) # espera 2 segundo
+    Process.sleep(2_000) # espera 2 segundo
 
     {:ok, binary} = File.read("/root/cam0.jpg")
 
