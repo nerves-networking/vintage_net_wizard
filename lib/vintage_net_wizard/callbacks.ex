@@ -4,7 +4,10 @@ defmodule VintageNetWizard.Callbacks do
 
   require Logger
 
-  @spec start_link(any()) :: any()
+  @type callback :: {:on_exit, {module(), atom(), any()}}
+  @type callbacks :: [callback]
+
+  @spec start_link(callbacks) :: GenServer.on_start()
   def start_link(callbacks) do
     callbacks = Enum.reduce(callbacks, [], &validate_callback/2)
     Agent.start_link(fn -> callbacks end, name: __MODULE__)
