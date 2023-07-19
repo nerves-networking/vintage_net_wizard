@@ -13,17 +13,15 @@ defmodule VintageNetWizard.Web.Api do
   plug(:dispatch)
 
   get "/hw_check" do
-    response = BackendServer.get_hwcheck()
-    Logger.info("Response=> #{inspect(response)}")
-    send_json(conn, 200, Jason.encode!(response))
+    send_json(conn, 200, Jason.encode!(BackendServer.get_hwcheck()))
   end
 
   get "/door" do
-    #TODO: Call Backedn getting pin state
-    #response = %{door: "closed"}
-    #Logger.info("Response=> #{inspect(response)}")
-    response = BackendServer.get_door()
-    send_json(conn, 200, Jason.encode!(response))
+    send_json(conn, 200, Jason.encode!(BackendServer.get_door()))
+  end
+
+  get "/status_lock" do
+    send_json(conn, 200, Jason.encode!(BackendServer.get_lock()))
   end
 
   get "/configuration/status" do

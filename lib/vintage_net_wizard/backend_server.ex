@@ -19,10 +19,9 @@ defmodule VintageNetWizard.BackendServer do
               ap_ifname: nil,
               ifname: nil,
               hw_check: %{},
-              open_lock: false,
-              close_lock: false,
               lock: false,
               door: %{},
+              status_lock: %{},
               cam0: false,
               cam1: false,
               cam2: false
@@ -165,16 +164,12 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.cast(__MODULE__, {:set_door, door})
   end
 
+  def set_lock(lock) do
+    GenServer.cast(__MODULE__, {:set_lock, lock})
+  end
+
   def change_lock(value) do
     GenServer.cast(__MODULE__, {:change_lock, value})
-  end
-
-  def set_open_lock(open_lock) do
-    GenServer.cast(__MODULE__, {:set_open_lock, open_lock})
-  end
-
-  def set_close_lock(close_lock) do
-    GenServer.cast(__MODULE__, {:set_close_lock, close_lock})
   end
 
   def set_cam(cam, value) do
@@ -193,12 +188,8 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.call(__MODULE__, :get_lock)
   end
 
-  def get_open_lock() do
-    GenServer.call(__MODULE__, :get_open_lock)
-  end
-
-  def get_close_lock() do
-    GenServer.call(__MODULE__, :get_close_lock)
+  def get_change_lock() do
+    GenServer.call(__MODULE__, :get_change_lock)
   end
 
   def get_cam(cam) do
@@ -256,6 +247,16 @@ defmodule VintageNetWizard.BackendServer do
   @impl GenServer
   def handle_call(
         :get_lock,
+        _from,
+          state
+      ) do
+
+    {:reply, state.status_lock, state}
+  end
+
+  @impl GenServer
+  def handle_call(
+        :get_change_lock,
         _from,
           state
       ) do
@@ -464,19 +465,15 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   @impl GenServer
+  def handle_cast({:set_lock, lock}, state) do
+    {:noreply, %{state | status_lock: lock}}
+  end
+
+  @impl GenServer
   def handle_cast({:change_lock, value}, state) do
     {:noreply, %{state | lock: value}}
   end
 
-  @impl GenServer
-  def handle_cast({:set_open_lock, open_lock}, state) do
-    {:noreply, %{state | open_lock: open_lock["open_lock"]}}
-  end
-
-  @impl GenServer
-  def handle_cast({:set_close_lock, close_lock}, state) do
-    {:noreply, %{state | close_lock: close_lock["closed_lock"]}}
-  end
 
   @impl GenServer
   def handle_cast({:set_cam, cam, value}, state) do
