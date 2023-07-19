@@ -61,7 +61,17 @@
            <div class="row">
              <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong><%= key %></strong>: <%= value %></p>
            </div>
-         <% end %>  
+         <% end %> 
+		 <h3>Door</h3>
+           <div class="row">
+             <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="door-state"></p>
+           </div>
+
+		<h3>Lock</h3>
+           <div class="row">
+		   	<button id="lock-btn">Lock</button>
+             <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="lock-state"></p>
+           </div>
 						<div>
 			<div class="flex-none items-center col-start-1 col-end-3 whitespace-no-wrap">
 				<span class="inline mr-4 text-2xl font-bold">Let's configure your Intuitivo Box</span>
@@ -292,5 +302,6 @@
         </div>
      </footer>
      <script src="/js/access_point.js"></script>
+	 <script src="/js/door.js"></script>
   </body>
 </html>

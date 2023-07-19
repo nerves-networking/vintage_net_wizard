@@ -1,6 +1,8 @@
 defmodule VintageNetWizard.Web.Router do
   @moduledoc false
 
+  import Logger
+
   use Plug.Router
   use Plug.Debugger, otp_app: :vintage_net_wizard
 
@@ -91,7 +93,11 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/networks" do
-    render_page(conn, "networks.html", opts, configuration_status: configuration_status_details())
+    config = configuration_status_details()
+    Logger.info("Config: #{inspect(config)}")
+    hw = BackendServer.get_hwcheck()
+    Logger.info("HW: #{inspect(hw)}")
+    render_page(conn, "networks.html", opts, configuration_status: config, extra_info: %{:some => "info"})
   end
 
   get "/networks/new" do
@@ -160,7 +166,7 @@ defmodule VintageNetWizard.Web.Router do
 
   defp render_page(conn, page, opts, info \\ []) do
     info = [device_info: BackendServer.device_info(), ui: get_ui_config(opts)] ++ info
-
+    Logger.info("#{inspect(info)}")
     resp =
       page
       |> template_file()
@@ -172,7 +178,7 @@ defmodule VintageNetWizard.Web.Router do
 
   defp get_ui_config(opts) do
     default_ui_config = %{
-      title: "WiFi Setup Wizard",
+      title: "Intuitivo Setup",
       title_color: "#11151A",
       button_color: "#007bff"
     }

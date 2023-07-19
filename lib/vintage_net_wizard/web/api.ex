@@ -1,5 +1,6 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
+  import Logger
 
   alias VintageNetWizard.{WiFiConfiguration, BackendServer}
   alias VintageNetWizard.Web.Endpoint
@@ -12,7 +13,16 @@ defmodule VintageNetWizard.Web.Api do
   plug(:dispatch)
 
   get "/hw_check" do
-    send_json(conn, 200, Jason.encode!(BackendServer.get_hwcheck()))
+    response = BackendServer.get_hwcheck()
+    Logger.info("Response=> #{inspect(response)}")
+    send_json(conn, 200, Jason.encode!(response))
+  end
+
+  get "/door" do
+    #TODO: Call Backedn getting pin state
+    response = %{door: "closed"}
+    Logger.info("Response=> #{inspect(response)}")
+    send_json(conn, 200, Jason.encode!(response))
   end
 
   get "/configuration/status" do
@@ -30,6 +40,18 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, access_points)
   end
 
+  put "/lock" do
+    body = 
+      conn
+      |> get_body()
+    
+    Logger.info("Lock body #{inspect(body)}")
+
+    send_json(conn, 204, Jason.encode!(%{lock: "changed"}))
+  end
+
+  ## @phonnz: dunno why separated requests and 204 response 
+  ## Can't be a state change? 
   put "/open_lock" do
     conn
     |> get_body()
