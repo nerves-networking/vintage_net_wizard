@@ -35,7 +35,7 @@ defmodule VintageNetWizard.Callbacks do
 
   defp validate_callback({key, invalid}, acc) do
     _ =
-      Logger.warn(
+      Logger.warning(
         "Skipping invalid callback option for #{inspect(key)}\n\tgot: #{inspect(invalid)}\n\texpected: {module, function, [args]}"
       )
 
