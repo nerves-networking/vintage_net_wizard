@@ -268,7 +268,7 @@ defmodule VintageNetWizard.Web.ApiTest do
     :ok = BackendServer.reset()
     {conn, body} = run_request(:post, "/apply", body: "", content_type: "application/json")
 
-    assert conn.status == 404
+    assert conn.status == 202
 
     assert body == %{
              "error" => "no_configurations",
