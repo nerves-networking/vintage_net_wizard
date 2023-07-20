@@ -2,8 +2,8 @@ defmodule VintageNetWizard.Web.ApiTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias VintageNetWizard.BackendServer
   alias VintageNetWizard.Web.Api
+  alias VintageNetWizard.BackendServer
 
   @opts Api.init([])
 
@@ -268,7 +268,7 @@ defmodule VintageNetWizard.Web.ApiTest do
     :ok = BackendServer.reset()
     {conn, body} = run_request(:post, "/apply", body: "", content_type: "application/json")
 
-    assert conn.status == 202
+    assert conn.status == 404
 
     assert body == %{
              "error" => "no_configurations",
