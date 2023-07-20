@@ -76,9 +76,16 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, json)
   end
 
+  get "/cams" do
+
+    BackendServer.set_cam(true)
+
+    send_json(conn, 200, "")
+  end
+
   post "/cam1" do
 
-    BackendServer.set_cam(0, true)
+    #BackendServer.set_cam(0, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
@@ -89,7 +96,7 @@ defmodule VintageNetWizard.Web.Api do
 
   post "/cam2" do
 
-    BackendServer.set_cam(1, true)
+    #BackendServer.set_cam(1, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
@@ -100,7 +107,7 @@ defmodule VintageNetWizard.Web.Api do
 
   post "/cam3" do
 
-    BackendServer.set_cam(2, true)
+    #BackendServer.set_cam(2, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
