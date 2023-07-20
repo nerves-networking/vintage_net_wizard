@@ -4,19 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title><%= ui.title %></title>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
   </head>
   <body class="bg-light h-100 d-flex flex-column">
-<!-- Header -->
+  <!-- Header -->
 	<nav class="sticky top-0 w-full block bg-white px-6 py-5 z-10 header">
-		<div class="container mx-auto relative flex items-center justifybetween">
-			<div class= doow-0">
+		<div class="container mx-auto relative flex items-center justify-between">
+			<div class="grow-0">
 				<a href="/">
-					<img class="text-right mt-2" src="/static/images/in2_logo.svg" alt="Intuitivo">
+					<img class="block h-8 w-auto" src="/images/in2_logo.svg" alt="Intuitivo">
 				</a>
 			</div>
-       <h3 class="text-left mt-2">
+			<div class="grid grid-flow-col gap-2">
+				<div class="flex items-center mr-4">
+					<div class="flex-shrink-0">
+						<%= for {k, v} <- device_info do %>
+						<div class="row">
+							<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong class="col-sm-2"><%= k %></strong>: <%= v %>
+							</p>	
+						</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+		</div>
+		<h3 class="text-left mt-2">
         Configuration status:
         <span class="<%= configuration_status.class %>">
           <%= configuration_status.value%>
@@ -25,54 +42,11 @@
           </span>
         </span>
        </h3>
-			<div class="grid grid-flow-col gap-2">
-				<div class="flex items-center mr-4">
-
-					<div class="flex-shrink-0">
-          <%= for {mac_address, current_version, expected_version} <- device_info do %>
-           <div class="row">
-             <strong class="col-sm-2">nerves@<%= device_info.mac_address %></strong>
-           </div>
-						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> Current: <%= device_info.current_version %>
-						</p>
-						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> Expected: <%= device_info.expected_version %>
-						</p>
-         <% end %>
-					</div>
-				</div>
-
-			</div>
-		</div>
 	</nav>
 	<!-- End Header -->
-	<div class="app-content"></div>
-
-	<div class="w-full px-8 py-4 bg-purple-700 text-right footer">
-		<div class="container mx-auto">
-			<span class="text-xs text-white">© 2022, Intuitivo Inc. </span>
-		</div>
-	</div>
-<div name="welcome-container">
-	<div class="container mx-auto py-2 px-6 pb-12 welcome-container">
+	<div class="app-content">
+		<div class="container mx-auto py-2 px-6 pb-12 welcome-container">
 		<div class="w-full mt-10 mb-4">
-
-    <div class="">
-          <%= for {key, value} <- device_info do %>
-           <div class="row">
-             <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong><%= key %></strong>: <%= value %></p>
-           </div>
-         <% end %>
-		 <h3>Door</h3>
-           <div class="row">
-             <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="door-state"></p>
-           </div>
-
-		<h3>Lock</h3>
-           <div class="row">
-		   	<button id="lock-btn">Lock</button>
-             <p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="lock-state"></p>
-           </div>
-						<div>
 			<div class="flex-none items-center col-start-1 col-end-3 whitespace-no-wrap">
 				<span class="inline mr-4 text-2xl font-bold">Let's configure your Intuitivo Box</span>
 			</div>
@@ -82,7 +56,7 @@
 			<h2 class="text-gray-900 text-lg mb-6 font-medium title-font bg-gray-200 rounded-t-lg px-5 py-3">Component's input
 				positions</h2>
 			<div class="lg:max-h-[80%] lg:max-w-[80%] md:h-auto w-full md:object-contain object-center mb-2 mx-auto">
-				<img src="/static/images/kit_instructions_rpi4_232.jpg" alt="connection-example">
+				<img src="/images/kit_instructions_rpi4_232.jpg" alt="connection-example">
 			</div>
 			<p class="text-sm italic text-center mb-2 text-gray-600">Make sure all components are connected like the picture
 				above</p>
@@ -114,151 +88,42 @@
 			<div class="container mx-auto">
 				<div class="grid grid-flow-row gap-4 md:grid-cols-3 md:gap-6">
 					<div class="col-span-1 test-col test-cam">
-						<div
-							class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content">
-							<span
-								class="bg-gray-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl test-col-name">
-								CAMERAS
-							</span>
-						</div>
-						<div class="relative flex-shrink-0 h-8 w-8 my-3 p-3 rounded-full bg-gray-400 flex items-center justifycenter text-xs font- dod">
-							<div class="row">
-                			  <img id="cam0" class=" object-center object-cover rounded-full h-1 w-3" src="io-01.jpg" alt="">
-							  <img id="cam1" class=" object-center object-cover rounded-full h-1 w-3" src="io-02.jpg" alt="">
-							  <img id="cam2" class=" object-center object-cover rounded-full h-1 w-3" src="io-03.jpg" alt="">
-							</div>
-							<%# <p class="test-item cam2">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Camera 3
-							</p> %>
-            </div>
-							<div class="flex grow w-full text-center mt-6 items-end">
-								<button class="btn btn-primary btn-w-full btn-test">
-									<span>Test</span>
-								</button>
-							</div>
-						</div>
+						<img id="cam0" class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content" src="io-01.jpg" alt="cam0">
 					</div>
-					<% if "Imbera" == "imbera" do %>
-					<div class="col-span-1 test-col test-door">
-						<div
-							class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content">
-							<span
-								class="bg-gray-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl test-col-name">
-								DOOR
-							</span>
-							<p class="test-item unlock">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Unlock
-							</p>
-							<p class="test-item lock">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Lock
-							</p>
-							<p class="test-item status">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Status
-							</p>
-							<div class="flex grow w-full text-center mt-6 items-end">
-								<button class="btn btn-primary btn-w-full btn-test">
-									<span>Test</span>
-								</button>
-							</div>
-						</div>
+					<div class="col-span-1 test-col test-cam">
+						<img id="cam1" class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content" src="io-02.jpg" alt="cam1">
 					</div>
-					<% end %>
-					<% if "Imbera" == "imbera" do %>
-					<div class="col-span-1 test-col test-cooler">
-						<div
-							class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content">
-							<span
-								class="bg-gray-500 text-white px-3 py-1 tracking-widest text-xs absolute right-0 top-0 rounded-bl test-col-name">
-								COOLER
-							</span>
-							<p class="test-item temp">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Temperature
-							</p>
-							<p class="test-item volt">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Voltage
-							</p>
-							<p class="test-item alerts">
-								<svg class="h-5 w-5 mr-2 success-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clip-rule="evenodd"></path>
-								</svg>
-								<svg class="h-5 w-5 mr-2 failed-icon" viewBox="0 0 20 20" fill="currentColor">
-									<path fill-rule="evenodd"
-										d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-										clip-rule="evenodd" />
-								</svg>
-								Alerts
-							</p>
-							<div class="flex grow w-full text-center mt-6 items-end">
-								<button class="btn btn-primary btn-w-full btn-test">
-									<span>Test</span>
-								</button>
-							</div>
-						</div>
+					<div class="col-span-1 test-col test-cam">
+						<img id="cam2" class="h-full p-6 rounded-lg border-2 border-gray-500 flex flex-col relative overflow-hidden test-col-content" src="io-03.jpg" alt="cam2">  
+					</div>
+				</div>
+			</div>
+			<div class="grid grid-flow-row gap-4 md:grid-cols-3 md:gap-6">
+				<div class="col-span-1 test-col test-cam">
+					<%= for {key, value} <- device_info do %>
+					<div class="row">
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong><%= key %></strong>: <%= value %></p>
 					</div>
 					<% end %>
 				</div>
+				<div class="col-span-1 test-col test-cam">
+					<h3>Door</h3>
+					<div class="row">
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="door-state"></p>
+					</div>
+				</div>
+				<div class="col-span-1 test-col test-cam">
+					<h3>Lock</h3>
+					<div class="row">
+						<button id="lock-btn" class="btn btn-in2green start-button">Lock</button>
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="lock-state"></p>
+					</div>
+				</div>
+			</div>	
+		</div>
+						
+							
+					
 			</div>
 		</div>
 	</div>
@@ -266,7 +131,6 @@
 
 
      <div class="container access-points-container">
-
        Choose a network from following list:
        <div class="my-3 p-3 bg-white rounded shadow-sm">
          <table class="table table-hover access-points-table">
@@ -282,25 +146,20 @@
          </table>
        </div>
 
-       <a class="btn btn-primary" href="/networks/new" style="background-color:<%= ui.button_color %>">Add another network</a>
+       <a class="btn btn-in2green start-button" href="/networks/new" >Add another network</a>
      </div>
 
      <div>
-     <button class="btn btn-in2green start-button">
-					<span class="button-text">Start</span>
-					 (if device_info.starting do<span class="button-text-loading hidden">Starting...</span>
-				</button>
-				<button class="btn btn-secondary reboot-button">
-					<span class="button-text text-red-500">Reboot</span>
-					 if device_info.rebooting do %><span class="button-text-loading text-red-500 hidden">Rebooting...</span>
-				</button>
+     
      </div>
 
-     <footer class="py-3 bg-white shadow-sm w-100 text-muted">
-       <div class="container">
+	</div>
 
-        </div>
-     </footer>
+	<div class="w-full px-8 py-4 bg-purple-700 text-right footer">
+		<div class="container mx-auto">
+			<span class="text-xs text-white">© 2023, Intuitivo Inc. </span>
+		</div>
+	</div>
      <script src="/js/access_point.js"></script>
 	 <script src="/js/door.js"></script>
   </body>
