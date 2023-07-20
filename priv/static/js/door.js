@@ -99,6 +99,7 @@
   }
 
   LockBtn.addEventListener("click", ({ target }) => {
+    disableBtn(LockBtn, true);
     fetch("/api/v1/lock", {
         method: "PUT",
         headers: {
@@ -106,7 +107,12 @@
         },
         body: ""
       })
+      setTimeout(() => disableBtn(LockBtn, false), 1000);
   });
+
+  function disableBtn(btn, disabled){
+    btn.disabled = disabled; 
+   }
 
 })()
 

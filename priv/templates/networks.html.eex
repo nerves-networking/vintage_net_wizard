@@ -20,18 +20,6 @@
 					<img class="block h-8 w-auto" src="/images/in2_logo.svg" alt="Intuitivo">
 				</a>
 			</div>
-			<div class="grid grid-flow-col gap-2">
-				<div class="flex items-center mr-4">
-					<div class="flex-shrink-0">
-						<%= for {k, v} <- device_info do %>
-						<div class="row">
-							<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong class="col-sm-2"><%= k %></strong>: <%= v %>
-							</p>	
-						</div>
-						<% end %>
-					</div>
-				</div>
-			</div>
 			<h3 class="text-left mt-2">
 			Configuration status:
 			<span class="<%= configuration_status.class %>">
@@ -100,24 +88,26 @@
 			</div>
 			<div class="grid grid-flow-row gap-4 md:grid-cols-3 md:gap-6">
 				<div class="col-span-1 test-col test-cam">
+					<h3 class="text-gray-900 text-lg mb-6 font-medium title-font rounded-t-lg py-3">Device</h3>
 					<%= for {key, value} <- device_info do %>
 					<div class="row">
-						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong><%= key %></strong>: <%= value %></p>
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v px-3"> <strong><%= key %></strong>: <%= value %></p>
 					</div>
 					<% end %>
 				</div>
 				<div class="col-span-1 test-col test-cam">
-					<h3>Door</h3>
+					<h3 class="text-gray-900 text-lg mb-6 font-medium title-font rounded-t-lg py-3">Door</h3>
 					<div class="row">
-						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="door-state"></p>
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v px-3"> <strong>State</strong>: <p id="door-state"></p>
 					</div>
 				</div>
-				<div class="col-span-1 test-col test-cam">
-					<h3>Lock</h3>
+				<div class="col-span-1 test-col test-cam py-2 px-1">
+					<h3 class="text-gray-900 text-lg mb-6 font-medium title-font rounded-t-lg py-3">Lock</h3>
 					<div class="row">
-						<button id="lock-btn" class="btn btn-in2green start-button">Lock</button>
-						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v"> <strong>State</strong>: <p id="lock-state"></p>
+						<p class="text-xs font-normal text-gray-600 -mt-1 kit-firmware-v px-3"> 
+						<strong>State</strong>: <p id="lock-state"></p>
 					</div>
+					<div class="row float-right "><button id="lock-btn" class="btn btn-in2green start-button mr-5">Lock</button></div>
 				</div>
 			</div>	
 		</div>
