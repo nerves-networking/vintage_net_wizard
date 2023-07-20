@@ -2,8 +2,8 @@ defmodule VintageNetWizard.Web.ApiTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias VintageNetWizard.Web.Api
   alias VintageNetWizard.BackendServer
+  alias VintageNetWizard.Web.Api
 
   @opts Api.init([])
 
