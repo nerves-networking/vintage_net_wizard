@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.15 - 2023-07-19
+
+* Changed
+  * Update to support Elixir 1.15.4 and OTP 26.
+
 ## v0.4.14 - 2023-05-26
 
 * Changed
