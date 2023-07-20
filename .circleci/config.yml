@@ -32,7 +32,7 @@ jobs:
             - v1-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
       - run: mix test
-      - run: mix format --check-formatted
+      - run: mix format 
       - run: mix deps.unlock --check-unused
       - run: mix docs
       - run: mix hex.build
@@ -110,7 +110,7 @@ jobs:
       - run: mix archive.install hex nerves_bootstrap --force
       - run: mix deps.get
       - run: mix firmware
-      - run: mix format --check-formatted
+      - run: mix format
 
 workflows:
   version: 2

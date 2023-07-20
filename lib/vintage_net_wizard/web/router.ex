@@ -104,7 +104,7 @@ defmodule VintageNetWizard.Web.Router do
     Logger.info("Config: #{inspect(config)}")
     hw = BackendServer.get_hwcheck()
     Logger.info("HW: #{inspect(hw)}")
-    render_page(conn, "networks.html", opts, configuration_status: config, extra_info: %{:some => "info"})
+    render_page(conn, "networks.html", opts, configuration_status: config)
   end
 
   get "/networks/new" do
