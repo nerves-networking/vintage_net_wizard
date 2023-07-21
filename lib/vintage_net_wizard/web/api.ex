@@ -1,11 +1,13 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
-
-  alias VintageNetWizard.{WiFiConfiguration, BackendServer}
-  alias VintageNetWizard.Web.Endpoint
-  alias Plug.Conn
+  import Logger
 
   use Plug.Router
+
+  alias Plug.Conn
+  alias VintageNetWizard.BackendServer
+  alias VintageNetWizard.Web.Endpoint
+  alias VintageNetWizard.WiFiConfiguration
 
   plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
   plug(:match)
@@ -13,6 +15,14 @@ defmodule VintageNetWizard.Web.Api do
 
   get "/hw_check" do
     send_json(conn, 200, Jason.encode!(BackendServer.get_hwcheck()))
+  end
+
+  get "/door" do
+    send_json(conn, 200, Jason.encode!(BackendServer.get_door()))
+  end
+
+  get "/status_lock" do
+    send_json(conn, 200, Jason.encode!(BackendServer.get_lock()))
   end
 
   get "/configuration/status" do
@@ -30,18 +40,9 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, access_points)
   end
 
-  put "/open_lock" do
-    conn
-    |> get_body()
-    |> BackendServer.set_open_lock()
+  put "/lock" do
 
-    send_json(conn, 204, "")
-  end
-
-  put "/closed_lock" do
-    conn
-    |> get_body()
-    |> BackendServer.set_close_lock()
+    BackendServer.change_lock(true)
 
     send_json(conn, 204, "")
   end

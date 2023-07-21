@@ -3,9 +3,9 @@ defmodule VintageNetWizard.WiFiConfiguration do
   Module for working with various WiFi configurations
   """
 
-  @type key_mgmt() :: :none | :wpa_psk | :wpa_eap
-
   alias VintageNetWizard.WiFiConfiguration.Params
+
+  @type key_mgmt() :: :none | :wpa_psk | :wpa_eap
 
   @doc """
   Make a network config from a JSON request from the `VintageNetWizard` client

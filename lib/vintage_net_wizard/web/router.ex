@@ -1,6 +1,8 @@
 defmodule VintageNetWizard.Web.Router do
   @moduledoc false
 
+  import Logger
+
   use Plug.Router
   use Plug.Debugger, otp_app: :vintage_net_wizard
   import Logger
@@ -76,9 +78,16 @@ defmodule VintageNetWizard.Web.Router do
 
   get "/ssid/:ssid" do
     key_mgmt =
-      BackendServer.access_points()
-      |> Enum.find(&(&1.ssid == ssid))
-      |> get_key_mgmt_from_ap()
+      case BackendServer.access_points()
+           |> Enum.find(&(&1.ssid == ssid)) do
+        nil ->
+          BackendServer.configurations()
+          |> Enum.find(&(&1.ssid == ssid))
+          |> Map.get(:key_mgmt)
+
+        result ->
+          get_key_mgmt_from_ap(result)
+      end
 
     render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
   end
@@ -108,7 +117,11 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/networks" do
-    render_page(conn, "networks.html", opts, configuration_status: configuration_status_details())
+    config = configuration_status_details()
+    Logger.info("Config: #{inspect(config)}")
+    hw = BackendServer.get_hwcheck()
+    Logger.info("HW: #{inspect(hw)}")
+    render_page(conn, "networks.html", opts, configuration_status: config)
   end
 
   get "/networks/new" do
@@ -177,11 +190,12 @@ defmodule VintageNetWizard.Web.Router do
 
   defp render_page(conn, page, opts, info \\ []) do
     info = [device_info: BackendServer.device_info(), ui: get_ui_config(opts)] ++ info
-
+    Logger.info("#{inspect(info)}")
     resp =
       page
       |> template_file()
       |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
+      # credo:disable-for-next-line
       |> Phoenix.HTML.Engine.encode_to_iodata!()
 
     send_resp(conn, 200, resp)
@@ -189,7 +203,7 @@ defmodule VintageNetWizard.Web.Router do
 
   defp get_ui_config(opts) do
     default_ui_config = %{
-      title: "WiFi Setup Wizard",
+      title: "Intuitivo Setup",
       title_color: "#11151A",
       button_color: "#007bff"
     }
