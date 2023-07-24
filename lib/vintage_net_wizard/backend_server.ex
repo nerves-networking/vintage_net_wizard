@@ -3,11 +3,10 @@ defmodule VintageNetWizard.BackendServer do
   Server for managing a VintageNet.Backend implementation
   """
   use GenServer
-
   require Logger
 
-  alias VintageNetWizard.{APMode, Backend}
   alias VintageNetWiFi.AccessPoint
+  alias VintageNetWizard.{APMode, Backend}
 
   defmodule State do
     @moduledoc false
@@ -19,13 +18,13 @@ defmodule VintageNetWizard.BackendServer do
               ap_ifname: nil,
               ifname: nil,
               hw_check: %{},
-              open_lock: false,
-              close_lock: false,
-              cam0: false,
-              cam1: false,
-              cam2: false
+              lock: false,
+              door: %{},
+              status_lock: %{},
+              cam: false
   end
 
+  @spec child_spec(any(), any(), keyword()) :: map()
   def child_spec(backend, ifname, opts \\ []) do
     %{
       id: __MODULE__,
@@ -127,6 +126,7 @@ defmodule VintageNetWizard.BackendServer do
   @doc """
   Get the current configuration status
   """
+  @spec configuration_status() :: any()
   def configuration_status() do
     GenServer.call(__MODULE__, :configuration_status)
   end
@@ -159,32 +159,40 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.cast(__MODULE__, {:set_hw_check, hw_check})
   end
 
-  def set_open_lock(open_lock) do
-    GenServer.cast(__MODULE__, {:set_open_lock, open_lock})
+  def set_door(door) do
+    GenServer.cast(__MODULE__, {:set_door, door})
   end
 
-  def set_close_lock(close_lock) do
-    GenServer.cast(__MODULE__, {:set_close_lock, close_lock})
+  def set_lock(lock) do
+    GenServer.cast(__MODULE__, {:set_lock, lock})
   end
 
-  def set_cam(cam, value) do
-    GenServer.cast(__MODULE__, {:set_cam, cam, value})
+  def change_lock(value) do
+    GenServer.cast(__MODULE__, {:change_lock, value})
+  end
+
+  def set_cam(value) do
+    GenServer.cast(__MODULE__, {:set_cam, value})
   end
 
   def get_hwcheck() do
     GenServer.call(__MODULE__, :get_hwcheck)
   end
 
-  def get_open_lock() do
-    GenServer.call(__MODULE__, :get_open_lock)
+  def get_door() do
+    GenServer.call(__MODULE__, :get_door)
   end
 
-  def get_close_lock() do
-    GenServer.call(__MODULE__, :get_close_lock)
+  def get_lock() do
+    GenServer.call(__MODULE__, :get_lock)
   end
 
-  def get_cam(cam) do
-    GenServer.call(__MODULE__, {:get_cam, cam})
+  def get_change_lock() do
+    GenServer.call(__MODULE__, :get_change_lock)
+  end
+
+  def get_cam() do
+    GenServer.call(__MODULE__, :get_cam)
   end
 
   @impl GenServer
@@ -203,7 +211,7 @@ defmodule VintageNetWizard.BackendServer do
        configurations: configurations,
        backend: backend,
        # Scanning is done by ifname
-       backend_state: apply(backend, :init, [ifname, ap_ifname]),
+       backend_state: backend.init(ifname, ap_ifname),
        device_info: device_info,
        ifname: ifname,
        ap_ifname: ap_ifname
@@ -222,17 +230,42 @@ defmodule VintageNetWizard.BackendServer do
 
   @impl GenServer
   def handle_call(
-        {:get_cam, cam},
+        :get_cam,
         _from,
           state
       ) do
 
-        case cam do
-          0 -> {:reply, state.cam0, state}
-          1 -> {:reply, state.cam1, state}
-          2 -> {:reply, state.cam2, state}
-        end
+        {:reply, state.cam, state}
+  end
 
+  @impl GenServer
+  def handle_call(
+        :get_lock,
+        _from,
+          state
+      ) do
+
+    {:reply, state.status_lock, state}
+  end
+
+  @impl GenServer
+  def handle_call(
+        :get_change_lock,
+        _from,
+          state
+      ) do
+
+    {:reply, state.lock, state}
+  end
+
+  @impl GenServer
+  def handle_call(
+        :get_door,
+        _from,
+          state
+      ) do
+
+    {:reply, state.door, state}
   end
 
   @impl GenServer
@@ -261,7 +294,7 @@ defmodule VintageNetWizard.BackendServer do
         _from,
         %State{backend: backend, backend_state: backend_state} = state
       ) do
-    access_points = apply(backend, :access_points, [backend_state])
+    access_points = backend.access_points(backend_state)
     {:reply, access_points, state}
   end
 
@@ -270,7 +303,7 @@ defmodule VintageNetWizard.BackendServer do
         _from,
         %State{backend: backend, backend_state: backend_state} = state
       ) do
-    new_backend_state = apply(backend, :start_scan, [backend_state])
+    new_backend_state = backend.start_scan(backend_state)
 
     {:reply, :ok, %{state | backend_state: new_backend_state}}
   end
@@ -280,7 +313,7 @@ defmodule VintageNetWizard.BackendServer do
         _from,
         %State{backend: backend, backend_state: backend_state} = state
       ) do
-    new_backend_state = apply(backend, :stop_scan, [backend_state])
+    new_backend_state = backend.stop_scan(backend_state)
 
     {:reply, :ok, %{state | backend_state: new_backend_state}}
   end
@@ -308,7 +341,7 @@ defmodule VintageNetWizard.BackendServer do
         _from,
         %State{backend: backend, backend_state: backend_state} = state
       ) do
-    status = apply(backend, :configuration_status, [backend_state])
+    status = backend.configuration_status(backend_state)
     {:reply, status, state}
   end
 
@@ -317,7 +350,7 @@ defmodule VintageNetWizard.BackendServer do
         _from,
         %{configurations: configs, backend: backend, backend_state: backend_state} = state
       ) do
-    access_points = apply(backend, :access_points, [backend_state])
+    access_points = backend.access_points(backend_state)
     not_hidden? = Enum.any?(access_points, &(&1.ssid == config.ssid))
     # Scan if ssid is hidden
     full_config = if not_hidden?, do: config, else: Map.put(config, :scan_ssid, 1)
@@ -363,7 +396,7 @@ defmodule VintageNetWizard.BackendServer do
       ) do
     old_connection = old_connection(ifname)
 
-    case apply(backend, :apply, [build_config_list(wifi_configs), backend_state]) do
+    case backend.apply(build_config_list(wifi_configs), backend_state) do
       {:ok, new_backend_state} ->
         updated_state = %{state | backend_state: new_backend_state}
         # If applying the new configuration does not change the connection,
@@ -378,7 +411,7 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   def handle_call(:reset, _from, %State{backend: backend, backend_state: backend_state} = state) do
-    new_state = apply(backend, :reset, [backend_state])
+    new_state = backend.reset(backend_state)
     {:reply, :ok, %{state | configurations: %{}, backend_state: new_state}}
   end
 
@@ -409,7 +442,7 @@ defmodule VintageNetWizard.BackendServer do
           state
       ) do
     {:ok, new_backend_state} =
-      apply(backend, :complete, [build_config_list(wifi_configs), backend_state])
+      backend.complete(build_config_list(wifi_configs), backend_state)
 
     :ok = deconfigure_ap_ifname(state)
     {:reply, :ok, %{state | backend_state: new_backend_state}}
@@ -421,24 +454,25 @@ defmodule VintageNetWizard.BackendServer do
   end
 
   @impl GenServer
-  def handle_cast({:set_open_lock, open_lock}, state) do
-    {:noreply, %{state | open_lock: open_lock["open_lock"]}}
+  def handle_cast({:set_door, door}, state) do
+    {:noreply, %{state | door: door}}
   end
 
   @impl GenServer
-  def handle_cast({:set_close_lock, close_lock}, state) do
-    {:noreply, %{state | close_lock: close_lock["closed_lock"]}}
+  def handle_cast({:set_lock, lock}, state) do
+    {:noreply, %{state | status_lock: lock}}
   end
 
   @impl GenServer
-  def handle_cast({:set_cam, cam, value}, state) do
+  def handle_cast({:change_lock, value}, state) do
+    {:noreply, %{state | lock: value}}
+  end
 
-    case cam do
-      0 -> {:noreply, %{state | cam0: value}}
-      1 -> {:noreply, %{state | cam1: value}}
-      2 -> {:noreply, %{state | cam2: value}}
-    end
 
+  @impl GenServer
+  def handle_cast({:set_cam, value}, state) do
+
+    {:noreply, %{state | cam: value}}
   end
 
   @impl GenServer

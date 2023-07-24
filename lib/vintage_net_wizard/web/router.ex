@@ -1,6 +1,7 @@
 defmodule VintageNetWizard.Web.Router do
   @moduledoc false
 
+
   use Plug.Router
   use Plug.Debugger, otp_app: :vintage_net_wizard
 
@@ -10,7 +11,6 @@ defmodule VintageNetWizard.Web.Router do
     WiFiConfiguration
   }
 
-  plug(Plug.Logger, log: :debug)
   plug(Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/")
   plug(Plug.Parsers, parsers: [Plug.Parsers.URLENCODED, :json], json_decoder: Jason)
   # This route is polled by the front end to update its list of access points.
@@ -59,9 +59,16 @@ defmodule VintageNetWizard.Web.Router do
 
   get "/ssid/:ssid" do
     key_mgmt =
-      BackendServer.access_points()
-      |> Enum.find(&(&1.ssid == ssid))
-      |> get_key_mgmt_from_ap()
+      case BackendServer.access_points()
+           |> Enum.find(&(&1.ssid == ssid)) do
+        nil ->
+          BackendServer.configurations()
+          |> Enum.find(&(&1.ssid == ssid))
+          |> Map.get(:key_mgmt)
+
+        result ->
+          get_key_mgmt_from_ap(result)
+      end
 
     render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
   end
@@ -91,7 +98,8 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/networks" do
-    render_page(conn, "networks.html", opts, configuration_status: configuration_status_details())
+    config = configuration_status_details()
+    render_page(conn, "networks.html", opts, configuration_status: config)
   end
 
   get "/networks/new" do
@@ -119,14 +127,14 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/complete" do
-    :ok = BackendServer.complete()
+    #:ok = BackendServer.complete()
 
     _ =
       Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
         # We don't want to stop the server before we
         # send the response back.
         :timer.sleep(3000)
-        Endpoint.stop_server(:shutdown)
+        #Endpoint.stop_server(:shutdown)
       end)
 
     render_page(conn, "complete.html", opts)
@@ -160,11 +168,11 @@ defmodule VintageNetWizard.Web.Router do
 
   defp render_page(conn, page, opts, info \\ []) do
     info = [device_info: BackendServer.device_info(), ui: get_ui_config(opts)] ++ info
-
     resp =
       page
       |> template_file()
       |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
+      # credo:disable-for-next-line
       |> Phoenix.HTML.Engine.encode_to_iodata!()
 
     send_resp(conn, 200, resp)
@@ -172,7 +180,7 @@ defmodule VintageNetWizard.Web.Router do
 
   defp get_ui_config(opts) do
     default_ui_config = %{
-      title: "WiFi Setup Wizard",
+      title: "Intuitivo Setup",
       title_color: "#11151A",
       button_color: "#007bff"
     }

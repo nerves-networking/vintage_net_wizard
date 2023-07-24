@@ -2,16 +2,16 @@ defmodule VintageNetWizard.Web.Endpoint do
   @moduledoc """
   Supervisor for the Web part of the VintageNet Wizard.
   """
+  use DynamicSupervisor
+
   alias VintageNetWizard.{
     Backend,
     BackendServer,
     Callbacks,
     WatchDog,
-    Web.Router,
-    Web.RedirectRouter
+    Web.RedirectRouter,
+    Web.Router
   }
-
-  use DynamicSupervisor
 
   @typedoc """
   UI specific configuration
@@ -31,6 +31,7 @@ defmodule VintageNetWizard.Web.Endpoint do
           | Backend.opt()
 
   @doc false
+  @spec start_link(any()) :: Supervisor.on_start()
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
@@ -47,7 +48,7 @@ defmodule VintageNetWizard.Web.Endpoint do
   def start_server(opts \\ []) do
     use_ssl? = Keyword.has_key?(opts, :ssl)
     use_captive_portal? = Application.get_env(:vintage_net_wizard, :captive_portal, true)
-    inactivity_timeout = Application.get_env(:vintage_net_wizard, :inactivity_timeout, 10)
+    inactivity_timeout = Application.get_env(:vintage_net_wizard, :inactivity_timeout, :infinity)
     callbacks = Keyword.take(opts, [:on_exit])
 
     with spec <- maybe_use_ssl(use_ssl?, opts),

@@ -1,11 +1,13 @@
 defmodule VintageNetWizard.Web.Api do
   @moduledoc false
-
-  alias VintageNetWizard.{WiFiConfiguration, BackendServer}
-  alias VintageNetWizard.Web.Endpoint
-  alias Plug.Conn
+  import Logger
 
   use Plug.Router
+
+  alias Plug.Conn
+  alias VintageNetWizard.BackendServer
+  alias VintageNetWizard.Web.Endpoint
+  alias VintageNetWizard.WiFiConfiguration
 
   plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
   plug(:match)
@@ -13,6 +15,14 @@ defmodule VintageNetWizard.Web.Api do
 
   get "/hw_check" do
     send_json(conn, 200, Jason.encode!(BackendServer.get_hwcheck()))
+  end
+
+  get "/door" do
+    send_json(conn, 200, Jason.encode!(BackendServer.get_door()))
+  end
+
+  get "/status_lock" do
+    send_json(conn, 200, Jason.encode!(BackendServer.get_lock()))
   end
 
   get "/configuration/status" do
@@ -30,18 +40,9 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, access_points)
   end
 
-  put "/open_lock" do
-    conn
-    |> get_body()
-    |> BackendServer.set_open_lock()
+  put "/lock" do
 
-    send_json(conn, 204, "")
-  end
-
-  put "/closed_lock" do
-    conn
-    |> get_body()
-    |> BackendServer.set_close_lock()
+    BackendServer.change_lock(true)
 
     send_json(conn, 204, "")
   end
@@ -55,14 +56,14 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   get "/complete" do
-    :ok = BackendServer.complete()
+    #:ok = BackendServer.complete()
 
     _ =
       Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
         # We don't want to stop the server before we
         # send the response back.
         :timer.sleep(3000)
-        Endpoint.stop_server(:shutdown)
+        #Endpoint.stop_server(:shutdown)
       end)
 
     send_json(conn, 202, "")
@@ -76,9 +77,16 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, json)
   end
 
+  get "/cams" do
+
+    BackendServer.set_cam(true)
+
+    send_json(conn, 200, "")
+  end
+
   post "/cam1" do
 
-    BackendServer.set_cam(0, true)
+    #BackendServer.set_cam(0, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
@@ -89,7 +97,7 @@ defmodule VintageNetWizard.Web.Api do
 
   post "/cam2" do
 
-    BackendServer.set_cam(1, true)
+    #BackendServer.set_cam(1, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
@@ -100,7 +108,7 @@ defmodule VintageNetWizard.Web.Api do
 
   post "/cam3" do
 
-    BackendServer.set_cam(2, true)
+    #BackendServer.set_cam(2, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
