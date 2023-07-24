@@ -56,14 +56,14 @@ defmodule VintageNetWizard.Web.Api do
   end
 
   get "/complete" do
-    :ok = BackendServer.complete()
+    #:ok = BackendServer.complete()
 
     _ =
       Task.Supervisor.start_child(VintageNetWizard.TaskSupervisor, fn ->
         # We don't want to stop the server before we
         # send the response back.
         :timer.sleep(3000)
-        Endpoint.stop_server(:shutdown)
+        #Endpoint.stop_server(:shutdown)
       end)
 
     send_json(conn, 202, "")
@@ -77,9 +77,16 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, json)
   end
 
+  get "/cams" do
+
+    BackendServer.set_cam(true)
+
+    send_json(conn, 200, "")
+  end
+
   post "/cam1" do
 
-    BackendServer.set_cam(0, true)
+    #BackendServer.set_cam(0, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
@@ -90,7 +97,7 @@ defmodule VintageNetWizard.Web.Api do
 
   post "/cam2" do
 
-    BackendServer.set_cam(1, true)
+    #BackendServer.set_cam(1, true)
 
     Process.sleep(3_000) # espera 2 segundo
 
@@ -101,7 +108,7 @@ defmodule VintageNetWizard.Web.Api do
 
   post "/cam3" do
 
-    BackendServer.set_cam(2, true)
+    #BackendServer.set_cam(2, true)
 
     Process.sleep(3_000) # espera 2 segundo
 

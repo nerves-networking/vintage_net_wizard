@@ -63,7 +63,7 @@
            Hardware Check
         </a>
        <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/networks">
-         Add a new network
+         Hardware Check
        </a>
        <%= if length(configs) > 0 do %>
          <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/apply">

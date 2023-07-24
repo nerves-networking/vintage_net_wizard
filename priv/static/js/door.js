@@ -11,8 +11,11 @@
   getDoorState();
   setInterval(getDoorState, 1000);
 
+  getLockState();
+  setInterval(getLockState, 1000);
+
   getCams();
-  setInterval(getCams, 10000);
+  setInterval(getCams, 4000);
 
 
   async function fetchBinaryData(url, data) {
@@ -57,32 +60,29 @@
   }
 
   function getCams() {
+
+    fetch("/api/v1/cams")
+      .then((resp) => resp.json())
+      .then((state) => {
+      });
+
     fetchBinaryData("/api/v1/cam1", "")
   .then((binaryData) => {
     setcam0(binaryData);
-    setTimeout(() => {
-      fetchCam2();
-    }, 3000);
   })
   .catch((error) => {
     console.error('Error:', error);
   });
 
-
-  function fetchCam2() {
     fetchBinaryData("/api/v1/cam2", "")
       .then((binaryData) => {
         setcam1(binaryData);
-        setTimeout(() => {
-          fetchCam3();
-        }, 3000);
       })
       .catch((error) => {
         console.error('Error:', error);
       });
-  }
-
-  function fetchCam3() {
+ 
+  
     fetchBinaryData("/api/v1/cam3", "")
       .then((binaryData) => {
         setcam2(binaryData);
@@ -90,7 +90,6 @@
       .catch((error) => {
         console.error('Error:', error);
       });
-  }
 
   }
 
@@ -99,6 +98,14 @@
       .then((resp) => resp.json())
       .then((state) => {
         doorState.textContent = state.door;
+      });
+  }
+
+  function getLockState() {
+    fetch("/api/v1/status_lock")
+      .then((resp) => resp.json())
+      .then((state) => {
+        LockState.textContent = state.lock;
       });
   }
 
