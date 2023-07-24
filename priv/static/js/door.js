@@ -11,6 +11,9 @@
   getDoorState();
   setInterval(getDoorState, 1000);
 
+  getLockState();
+  setInterval(getLockState, 1000);
+
   getCams();
   setInterval(getCams, 4000);
 
@@ -95,6 +98,14 @@
       .then((resp) => resp.json())
       .then((state) => {
         doorState.textContent = state.door;
+      });
+  }
+
+  function getLockState() {
+    fetch("/api/v1/status_lock")
+      .then((resp) => resp.json())
+      .then((state) => {
+        LockState.textContent = state.lock;
       });
   }
 
