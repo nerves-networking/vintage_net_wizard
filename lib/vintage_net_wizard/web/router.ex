@@ -4,6 +4,12 @@ defmodule VintageNetWizard.Web.Router do
 
   use Plug.Router
   use Plug.Debugger, otp_app: :vintage_net_wizard
+  import Logger
+
+  # import Plug.BasicAuth
+  # plug :basic_auth, username: "admin", password: "adminadmin"
+
+  plug :auth
 
   alias VintageNetWizard.{
     BackendServer,
@@ -19,6 +25,17 @@ defmodule VintageNetWizard.Web.Router do
   plug(VintageNetWizard.Plugs.Activity, excluding: ["/api/v1/access_points"])
   plug(:match)
   plug(:dispatch, builder_opts())
+
+  ## Plug Auth usgin Plug.BasicAuth custom
+  defp auth(conn, _opts) do
+    with {user, pass} <- Plug.BasicAuth.parse_basic_auth(conn) do
+      ##process to authorize
+      Logger.info("Authorizing #{user} with #{pass}")
+      assign(conn, :current_user, :admin)
+    else
+      _ -> conn |> Plug.BasicAuth.request_basic_auth() |> halt()
+    end
+  end
 
   get "/" do
     case BackendServer.configurations() do
@@ -58,17 +75,15 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/ssid/:ssid" do
-    key_mgmt =
-      case BackendServer.access_points()
-           |> Enum.find(&(&1.ssid == ssid)) do
-        nil ->
-          BackendServer.configurations()
-          |> Enum.find(&(&1.ssid == ssid))
-          |> Map.get(:key_mgmt)
 
-        result ->
-          get_key_mgmt_from_ap(result)
-      end
+      key_mgmt =
+                case BackendServer.access_points()
+                     |> Enum.find(&(&1.ssid == ssid)) do
+                  nil ->    BackendServer.configurations()
+                            |> Enum.find(&(&1.ssid == ssid))
+                            |> Map.get(:key_mgmt)
+                  result -> get_key_mgmt_from_ap(result)
+                end
 
     render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
   end
