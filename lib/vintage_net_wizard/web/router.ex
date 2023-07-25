@@ -30,7 +30,7 @@ defmodule VintageNetWizard.Web.Router do
   defp auth(conn, _opts) do
     with {user, pass} <- Plug.BasicAuth.parse_basic_auth(conn) do
       ##process to authorize
-      Logger.info("Authorizing #{user} with #{pass}")
+      #Logger.info("Authorizing #{user} with #{pass}")
       assign(conn, :current_user, :admin)
     else
       _ -> conn |> Plug.BasicAuth.request_basic_auth() |> halt()
