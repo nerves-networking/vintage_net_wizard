@@ -21,7 +21,8 @@ defmodule VintageNetWizard.BackendServer do
               lock: false,
               door: %{},
               status_lock: %{},
-              cam: false
+              init_cam: false,
+              stop_cam: false
   end
 
   @spec child_spec(any(), any(), keyword()) :: map()
@@ -171,8 +172,12 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.cast(__MODULE__, {:change_lock, value})
   end
 
-  def set_cam(value) do
-    GenServer.cast(__MODULE__, {:set_cam, value})
+  def set_init_cam(value) do
+    GenServer.cast(__MODULE__, {:set_init_cam, value})
+  end
+
+  def set_stop_cam(value) do
+    GenServer.cast(__MODULE__, {:set_stop_cam, value})
   end
 
   def get_hwcheck() do
@@ -191,8 +196,12 @@ defmodule VintageNetWizard.BackendServer do
     GenServer.call(__MODULE__, :get_change_lock)
   end
 
-  def get_cam() do
-    GenServer.call(__MODULE__, :get_cam)
+  def init_cam() do
+    GenServer.call(__MODULE__, :init_cam)
+  end
+
+  def stop_cam() do
+    GenServer.call(__MODULE__, :stop_cam)
   end
 
   @impl GenServer
@@ -230,12 +239,22 @@ defmodule VintageNetWizard.BackendServer do
 
   @impl GenServer
   def handle_call(
-        :get_cam,
+        :init_cam,
         _from,
           state
       ) do
 
-        {:reply, state.cam, state}
+        {:reply, state.init_cam, state}
+  end
+
+  @impl GenServer
+  def handle_call(
+        :stop_cam,
+        _from,
+          state
+      ) do
+
+        {:reply, state.stop_cam, state}
   end
 
   @impl GenServer
@@ -468,11 +487,16 @@ defmodule VintageNetWizard.BackendServer do
     {:noreply, %{state | lock: value}}
   end
 
+  @impl GenServer
+  def handle_cast({:set_stop_cam, value}, state) do
+
+    {:noreply, %{state | stop_cam: value}}
+  end
 
   @impl GenServer
-  def handle_cast({:set_cam, value}, state) do
+  def handle_cast({:set_init_cam, value}, state) do
 
-    {:noreply, %{state | cam: value}}
+    {:noreply, %{state | init_cam: value}}
   end
 
   @impl GenServer

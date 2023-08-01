@@ -77,9 +77,16 @@ defmodule VintageNetWizard.Web.Api do
     send_json(conn, 200, json)
   end
 
-  get "/cams" do
+  get "/init_cams" do
 
-    BackendServer.set_cam(true)
+    BackendServer.set_init_cam(true)
+
+    send_json(conn, 200, "")
+  end
+
+  get "/stop_cams" do
+
+    BackendServer.set_stop_cam(true)
 
     send_json(conn, 200, "")
   end
