@@ -14,13 +14,44 @@
   getLockState();
   setInterval(getLockState, 1000);
 
-  initStream();
+  setTimeout(() => initStream(), 1000)
+
+  setTimeout(() => changeVideo("0", 1), 2000)
+
+  setTimeout(() => changeVideo("1", 1), 2000)
   
-  setTimeout(() => changeVideo("0", 1), 1500)
+  setTimeout(() => changeVideo("2", 1), 2000)
+
+  async function fetchBinaryData(url, data) {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   
-  changeVideo(() => changeVideo("1", 1), 1500)
+    if (!response.ok) {
+      throw new Error('Error al obtener el binary.');
+    }
   
-  changeVideo(() => changeVideo("2", 1), 1500)
+    return response.arrayBuffer();
+  }
+
+  function arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  }
+
+  function setcam(cam, binaryData) {
+    const base64Data = arrayBufferToBase64(binaryData);
+    cam.src = 'data:image/jpeg;base64,' + base64Data;
+  }
   
   function initStream() {
     fetch("/api/v1/init_cams")
@@ -51,7 +82,15 @@
     
     const format_index = index.toString().padStart(4, '0');
 
-    cam.setAttribute('src', `/root/cam${cam_index}/frame${format_index}.jpg`)
+    //cam.setAttribute('src', `/root/cam${cam_index}/frame${format_index}.jpg`)
+    
+    fetchBinaryData("/api/v1/cam", {cam_index: cam_index, format_index: format_index})
+  .then((binaryData) => {
+    setcam(cam, binaryData);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
    
     await sleep(1000)
 

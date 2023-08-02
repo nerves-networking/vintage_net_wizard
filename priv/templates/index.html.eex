@@ -58,10 +58,6 @@
        </div>
 
        <p><i>Drag the networks to change the order that they will be tried</i></p>
-
-        <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/hw">
-           Hardware Check
-        </a>
        <a class="btn btn-primary" style="background-color:<%= ui.button_color %>" href="/networks">
          Hardware Check
        </a>
