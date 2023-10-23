@@ -1,124 +1,87 @@
-version: 2
+version: 2.1
 
-defaults: &defaults
-  working_directory: ~/repo
-  environment:
-    LC_ALL: C.UTF-8
+latest: &latest
+  pattern: "^1.15.*-erlang-26.*$"
 
-install_hex_rebar: &install_hex_rebar
-  run:
-    name: Install hex and rebar
-    command: |
-      mix local.hex --force
-      mix local.rebar --force
-
-install_system_deps: &install_system_deps
-  run:
-    name: Install system dependencies
-    command: |
-        apk add build-base linux-headers libmnl-dev libnl3-dev
+tags:
+  &tags [
+    1.15.7-erlang-26.1.2-alpine-3.18.4,
+    1.14.5-erlang-25.3.2-alpine-3.18.0,
+    1.13.4-erlang-24.3.4-alpine-3.15.3,
+    1.12.3-erlang-24.3.4-alpine-3.15.3,
+    1.11.4-erlang-23.3.4.13-alpine-3.15.3,
+  ]
 
 jobs:
-  build_elixir_1_15_otp_26:
+  build-test:
+    parameters:
+      tag:
+        type: string
     docker:
-      - image: hexpm/elixir:1.15.4-erlang-26.0.2-alpine-3.18.2
-    <<: *defaults
+      - image: hexpm/elixir:<< parameters.tag >>
+    working_directory: ~/repo
+    environment:
+      LC_ALL: C.UTF-8
     steps:
+      - run:
+          name: Install system dependencies
+          command: apk add --no-cache build-base linux-headers libmnl-dev libnl3-dev git
       - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
+      - run:
+          name: Install hex and rebar
+          command: |
+            mix local.hex --force
+            mix local.rebar --force
       - restore_cache:
           keys:
-            - v1-mix-cache-{{ checksum "mix.lock" }}
+            - v1-mix-cache-<< parameters.tag >>-{{ checksum "mix.lock" }}
       - run: mix deps.get
       - run: mix test
-      - run: mix format --check-formatted
-      - run: mix deps.unlock --check-unused
-      - run: mix docs
-      - run: mix hex.build
-      - run: mix dialyzer
-      - run: mix coveralls.circle || true
+      - when:
+          condition:
+            matches: { <<: *latest, value: << parameters.tag >> }
+          steps:
+            - run: mix format --check-formatted
+            - run: mix deps.unlock --check-unused
+            - run: mix docs
+            - run: mix hex.build
+            - run: mix credo -a --strict
+            - run: mix dialyzer
       - save_cache:
-          key: v1-mix-cache-{{ checksum "mix.lock" }}
+          key: v1-mix-cache-<< parameters.tag >>-{{ checksum "mix.lock" }}
           paths:
             - _build
             - deps
 
-  build_elixir_1_14_otp_25:
+  automerge:
     docker:
-      - image: hexpm/elixir:1.14.2-erlang-25.1.2-alpine-3.16.2
-    <<: *defaults
+      - image: alpine:3.18.4
     steps:
-      - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix test
-
-  build_elixir_1_13_otp_24:
-    docker:
-      - image: hexpm/elixir:1.13.4-erlang-24.3.4-alpine-3.15.3
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix test
-
-  build_elixir_1_12_otp_24:
-    docker:
-      - image: hexpm/elixir:1.12.3-erlang-24.3.4.2-alpine-3.16.0
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix test
-
-  build_elixir_1_11_otp_23:
-    docker:
-      - image: hexpm/elixir:1.11.4-erlang-23.3.4.13-alpine-3.15.3
-    <<: *defaults
-    steps:
-      - checkout
-      - <<: *install_hex_rebar
-      - <<: *install_system_deps
-      - run: mix deps.get
-      - run: mix test
-
-  build_example_elixir_1_13_otp_25:
-    docker:
-      - image: nervesproject/nerves_system_br:1.20.4
-    environment:
-      MIX_TARGET: rpi0
-      MIX_ENV: prod
-      ELIXIR_VERSION: 1.13.4-otp-25
-      LC_ALL: C.UTF-8
-    working_directory: ~/repo/example
-    steps:
-      - checkout:
-          path: ~/repo
-      - run: wget https://repo.hex.pm/builds/elixir/v$ELIXIR_VERSION.zip
-      - run: unzip -d /usr/local/elixir v$ELIXIR_VERSION.zip
-      - run: echo 'export PATH=/usr/local/elixir/bin:$PATH' >> $BASH_ENV
-
-      - run: mkdir -p ~/.ssh && touch ~/.ssh/id_rsa.pub
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix archive.install hex nerves_bootstrap --force
-      - run: mix deps.get
-      - run: mix firmware
-      - run: mix format --check-formatted
+      - run:
+          name: Install GitHub CLI
+          command: apk add --no-cache build-base github-cli
+      - run:
+          name: Attempt PR automerge
+          command: |
+            author=$(gh pr view "${CIRCLE_PULL_REQUEST}" --json author --jq '.author.login' || true)
+            if [ "$author" = "app/dependabot" ]; then
+              gh pr merge "${CIRCLE_PULL_REQUEST}" --auto --rebase || echo "Failed trying to set automerge"
+            else
+              echo "Not a dependabot PR, skipping automerge"
+            fi
 
 workflows:
-  version: 2
-  build_test:
+  checks:
     jobs:
-      - build_elixir_1_15_otp_26
-      - build_elixir_1_14_otp_25
-      - build_elixir_1_13_otp_24
-      - build_elixir_1_12_otp_24
-      - build_elixir_1_11_otp_23
-      - build_example_elixir_1_13_otp_25
+      - build-test:
+          name: << matrix.tag >>
+          matrix:
+            parameters:
+              tag: *tags
+
+      - automerge:
+          requires: *tags
+          context: org-global
+          filters:
+            branches:
+              only: /^dependabot.*/
