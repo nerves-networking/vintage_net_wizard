@@ -104,15 +104,10 @@ defmodule VintageNetWizard.Web.Api do
 
   defp to_json(access_points) do
     access_points
-    |> Enum.filter(&non_empty_ssid/1)
-    |> Enum.sort(fn %{signal_percent: a}, %{signal_percent: b} -> a >= b end)
-    |> Enum.uniq_by(fn %{ssid: ssid} -> ssid end)
+    |> VintageNetWiFi.summarize_access_points()
     |> Enum.map(&Map.from_struct/1)
     |> Jason.encode()
   end
-
-  defp non_empty_ssid(%{ssid: ""}), do: false
-  defp non_empty_ssid(_other), do: true
 
   defp configuration_from_params(conn, ssid) do
     conn
