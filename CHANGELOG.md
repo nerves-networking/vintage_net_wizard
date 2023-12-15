@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.16 - 2023-12-15
+
+* Changed
+  * Use VintageNetWiFi's built-in WiFi access point summarization function since
+    it is more complete at removing APs that can't be connected to. (@LivInAbsurdism)
+
 ## v0.4.15 - 2023-07-19
 
 * Changed
