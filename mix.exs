@@ -60,7 +60,7 @@ defmodule VintageNetWizard.MixProject do
     [
       # Dependencies for all targets
       {:plug_cowboy, "~> 2.0"},
-      {:phoenix_html, "~> 2.13 or ~> 3.0"},
+      {:phoenix_html, "~> 2.13 or ~> 3.0 or ~> 4.0"},
       {:jason, "~> 1.0"},
       {:vintage_net, "~> 0.10.0 or ~> 0.11.0 or ~> 0.12.0 or ~> 0.13.0"},
       {:vintage_net_wifi, "~> 0.12.0"},
