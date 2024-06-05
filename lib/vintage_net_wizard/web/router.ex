@@ -18,7 +18,7 @@ defmodule VintageNetWizard.Web.Router do
   # it just polling this endpoint but still be inactive.
   plug(VintageNetWizard.Plugs.Activity, excluding: ["/api/v1/access_points"])
   plug(:match)
-  plug(:dispatch, builder_opts())
+  plug(:dispatch)
 
   get "/" do
     case BackendServer.configurations() do
