@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.17 - 2024-06-05
+
+* Changed
+  * Fix compiler warnings with Plug.Builder
+  * Update dependencies
+
 ## v0.4.16 - 2023-12-15
 
 * Changed
