@@ -8,9 +8,9 @@ defmodule VintageNetWizard.Web.Api do
   alias VintageNetWizard.Web.Endpoint
   alias VintageNetWizard.WiFiConfiguration
 
-  plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
-  plug(:match)
-  plug(:dispatch)
+  plug Plug.Parsers, parsers: [:json], json_decoder: Jason
+  plug :match
+  plug :dispatch
 
   get "/configuration/status" do
     with status <- BackendServer.configuration_status(),
