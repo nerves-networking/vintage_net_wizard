@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2020 Frank Hunleth
+# SPDX-FileCopyrightText: 2020 Matt Ludwigs
+# SPDX-FileCopyrightText: 2022 Jean-Francois Cloutier
+# SPDX-FileCopyrightText: 2022 Paul Wilson
+# SPDX-FileCopyrightText: 2023 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.BackendServer do
   @moduledoc """
   Server for managing a VintageNet.Backend implementation
