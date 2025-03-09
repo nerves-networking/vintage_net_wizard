@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2019 Frank Hunleth
+# SPDX-FileCopyrightText: 2019 Jon Carstens
+# SPDX-FileCopyrightText: 2019 Luca Ongaro
+# SPDX-FileCopyrightText: 2019 Matt Ludwigs
+# SPDX-FileCopyrightText: 2022 Jean-Francois Cloutier
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Backend.Default do
   @moduledoc """
   The default backend implementation for target devices

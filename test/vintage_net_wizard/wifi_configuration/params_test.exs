@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019 Matt Ludwigs
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.WiFiConfiguration.ParamsTest do
   use ExUnit.Case, async: true
 
