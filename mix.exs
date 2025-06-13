@@ -77,7 +77,7 @@ defmodule VintageNetWizard.MixProject do
 
   defp docs do
     [
-      assets: "assets",
+      assets: %{"assets" => "assets"},
       extras: ["README.md", "json-api.md", "CHANGELOG.md"],
       main: "readme",
       source_ref: "v#{@version}",
