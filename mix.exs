@@ -15,13 +15,7 @@ defmodule VintageNetWizard.MixProject do
       dialyzer: dialyzer(),
       docs: docs(),
       package: package(),
-      description: description(),
-      preferred_cli_env: [
-        docs: :docs,
-        "hex.publish": :docs,
-        "hex.build": :docs,
-        credo: :test
-      ]
+      description: description()
     ]
   end
 
@@ -30,6 +24,10 @@ defmodule VintageNetWizard.MixProject do
       mod: {VintageNetWizard.Application, []},
       extra_applications: [:logger, :eex]
     ]
+  end
+
+  def cli do
+    [preferred_envs: [docs: :docs, "hex.publish": :docs, "hex.build": :docs, credo: :test]]
   end
 
   defp description do

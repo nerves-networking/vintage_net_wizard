@@ -43,7 +43,7 @@ defmodule WizardExample.Button do
   defp get_device_info() do
     kv =
       Nerves.Runtime.KV.get_all_active()
-      |> kv_to_map
+      |> kv_to_map()
 
     mac_addr = VintageNet.get(["interface", "wlan0", "mac_address"])
 
