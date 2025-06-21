@@ -28,6 +28,8 @@ defmodule VintageNetWizard.Web.Endpoint do
           | {:ifname, VintageNet.ifname()}
           | {:ap_ifname, VintageNet.ifname()}
           | {:ui, [ui_opt()]}
+          | {:templates_path, String.t()}
+          | {:static_files_path, String.t()}
           | Backend.opt()
 
   @doc false
