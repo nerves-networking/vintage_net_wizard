@@ -118,15 +118,6 @@ defmodule VintageNetWizard.Web.Endpoint do
     DynamicSupervisor.init(strategy: :one_for_one, max_children: 4)
   end
 
-  defp dispatch(opts) do
-    [
-      {:_,
-       [
-         {:_, Plug.Cowboy.Handler, {Router, opts}}
-       ]}
-    ]
-  end
-
   defp get_port(use_ssl? \\ false) do
     default_port = if use_ssl?, do: 443, else: 80
     Application.get_env(:vintage_net_wizard, :port, default_port)
@@ -145,11 +136,10 @@ defmodule VintageNetWizard.Web.Endpoint do
         dns_name = Application.get_env(:vintage_net_wizard, :dns_name, "wifi.config")
 
         redirect_spec =
-          Plug.Cowboy.child_spec(
-            plug: {RedirectRouter, [scheme: scheme, dns_name: dns_name, port: port]},
-            scheme: :http,
-            options: [port: 80]
-          )
+          {Bandit,
+           plug: {RedirectRouter, [scheme: scheme, dns_name: dns_name, port: port]},
+           scheme: :http,
+           port: 80}
 
         DynamicSupervisor.start_child(__MODULE__, redirect_spec)
     end
@@ -159,24 +149,17 @@ defmodule VintageNetWizard.Web.Endpoint do
 
   defp maybe_use_ssl(true = use_ssl, opts) do
     ssl_options = Keyword.get(opts, :ssl)
-    options = [dispatch: dispatch(opts), port: get_port(use_ssl)]
 
-    Plug.Cowboy.child_spec(
-      plug: Router,
-      scheme: :https,
-      options: Keyword.merge(ssl_options, options)
-    )
+    {Bandit,
+     plug: {Router, opts},
+     scheme: :https,
+     port: get_port(use_ssl),
+     certfile: Keyword.get(ssl_options, :certfile),
+     keyfile: Keyword.get(ssl_options, :keyfile)}
   end
 
   defp maybe_use_ssl(_no_ssl, opts) do
-    Plug.Cowboy.child_spec(
-      plug: Router,
-      scheme: :http,
-      options: [
-        dispatch: dispatch(opts),
-        port: get_port()
-      ]
-    )
+    {Bandit, plug: {Router, opts}, scheme: :http, port: get_port()}
   end
 
   defp get_backend_spec(opts) do
