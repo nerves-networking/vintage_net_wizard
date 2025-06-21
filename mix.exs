@@ -71,7 +71,8 @@ defmodule VintageNetWizard.MixProject do
   defp dialyzer() do
     [
       flags: [:unmatched_returns, :error_handling, :underspecs],
-      list_unused_filters: true
+      list_unused_filters: true,
+      plt_add_apps: [:mix]
     ]
   end
 

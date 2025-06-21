@@ -23,7 +23,9 @@ defmodule VintageNetWizard do
     * `:inactivity_timeout` - Minutes to run before automatically stopping (defaults to 10 minutes) or `:infinity` to disable the timeout
     * `:on_exit` - `{module, function, args}` tuple specifying callback to perform after stopping the server.
     * `:ssl` - A Keyword list of `:ssl.tls_server_options`. See `Plug.SSL.configure/1`.
-    * `:ui` - a subset of UI configuration for title, title color, and button color.
+    * `:ui` - A subset of UI configuration for title, title color, and button color.
+    * `:templates_path` - Customize where to find the templates used by the wizard. See `Mix.Tasks.Wizard.Copy.Assets`.
+    * `:static_files_path` - Customize where static files are served from. See `Mix.Tasks.Wizard.Copy.Assets`.
   """
   @spec run_wizard([Endpoint.opt()]) :: :ok | {:error, String.t()}
   def run_wizard(opts \\ []) do

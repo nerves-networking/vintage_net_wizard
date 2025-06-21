@@ -1,17 +1,18 @@
 defmodule VintageNetWizard.Web.Router do
   @moduledoc false
 
-  use Plug.Router
+  use Plug.Router, copy_opts_to_assign: :init_opts
   use Plug.Debugger, otp_app: :vintage_net_wizard
 
   alias VintageNetWizard.{
     BackendServer,
+    Plugs.CustomStatic,
     Web.Endpoint,
     WiFiConfiguration
   }
 
   plug Plug.Logger, log: :debug
-  plug Plug.Static, from: {:vintage_net_wizard, "priv/static"}, at: "/"
+  plug CustomStatic
   plug Plug.Parsers, parsers: [Plug.Parsers.URLENCODED, :json], json_decoder: Jason
   # This route is polled by the front end to update its list of access points.
   # This can mean the user could potentially have the page open without knowing
@@ -26,7 +27,7 @@ defmodule VintageNetWizard.Web.Router do
         redirect(conn, "/networks")
 
       configs ->
-        render_page(conn, "index.html", opts,
+        render_page(conn, "index.html", conn.assigns.init_opts,
           configs: configs,
           configuration_status: configuration_status_details(),
           format_security: &WiFiConfiguration.security_name/1,
@@ -48,7 +49,7 @@ defmodule VintageNetWizard.Web.Router do
         {:ok, key_mgmt} = WiFiConfiguration.key_mgmt_from_string(conn.body_params["key_mgmt"])
         error_message = password_error_message(error)
 
-        render_password_page(conn, key_mgmt, opts,
+        render_password_page(conn, key_mgmt, conn.assigns.init_opts,
           ssid: ssid,
           error: error_message,
           password: password,
@@ -70,7 +71,12 @@ defmodule VintageNetWizard.Web.Router do
           get_key_mgmt_from_ap(result)
       end
 
-    render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
+    render_password_page(conn, key_mgmt, conn.assigns.init_opts,
+      ssid: ssid,
+      password: "",
+      error: "",
+      user: ""
+    )
   end
 
   get "/redirect" do
@@ -90,19 +96,25 @@ defmodule VintageNetWizard.Web.Router do
   end
 
   get "/hotspot-detect.html" do
-    render_page(conn, "apple_captive_portal.html", opts, dns_name: get_redirect_dnsname(conn))
+    render_page(conn, "apple_captive_portal.html", conn.assigns.init_opts,
+      dns_name: get_redirect_dnsname(conn)
+    )
   end
 
   get "/library/test/success.html" do
-    render_page(conn, "apple_captive_portal.html", opts, dns_name: get_redirect_dnsname(conn))
+    render_page(conn, "apple_captive_portal.html", conn.assigns.init_opts,
+      dns_name: get_redirect_dnsname(conn)
+    )
   end
 
   get "/networks" do
-    render_page(conn, "networks.html", opts, configuration_status: configuration_status_details())
+    render_page(conn, "networks.html", conn.assigns.init_opts,
+      configuration_status: configuration_status_details()
+    )
   end
 
   get "/networks/new" do
-    render_page(conn, "network_new.html", opts)
+    render_page(conn, "network_new.html", conn.assigns.init_opts)
   end
 
   post "/networks/new" do
@@ -117,12 +129,18 @@ defmodule VintageNetWizard.Web.Router do
 
       key_mgmt ->
         key_mgmt = String.to_existing_atom(key_mgmt)
-        render_password_page(conn, key_mgmt, opts, ssid: ssid, password: "", error: "", user: "")
+
+        render_password_page(conn, key_mgmt, conn.assigns.init_opts,
+          ssid: ssid,
+          password: "",
+          error: "",
+          user: ""
+        )
     end
   end
 
   get "/apply" do
-    render_page(conn, "apply.html", opts, ssid: VintageNetWizard.APMode.ssid())
+    render_page(conn, "apply.html", conn.assigns.init_opts, ssid: VintageNetWizard.APMode.ssid())
   end
 
   get "/complete" do
@@ -136,7 +154,7 @@ defmodule VintageNetWizard.Web.Router do
         Endpoint.stop_server(:shutdown)
       end)
 
-    render_page(conn, "complete.html", opts)
+    render_page(conn, "complete.html", conn.assigns.init_opts)
   end
 
   forward("/api/v1", to: VintageNetWizard.Web.Api)
@@ -165,12 +183,12 @@ defmodule VintageNetWizard.Web.Router do
     |> send_resp(302, "")
   end
 
-  defp render_page(conn, page, opts, info \\ []) do
-    info = [device_info: BackendServer.device_info(), ui: get_ui_config(opts)] ++ info
+  defp render_page(conn, page, init_opts, info \\ []) do
+    info = [device_info: BackendServer.device_info(), ui: get_ui_config(init_opts)] ++ info
 
     resp =
       page
-      |> template_file()
+      |> template_file(init_opts)
       |> EEx.eval_file(info, engine: Phoenix.HTML.Engine)
       # credo:disable-for-next-line
       |> Phoenix.HTML.Engine.encode_to_iodata!()
@@ -201,8 +219,12 @@ defmodule VintageNetWizard.Web.Router do
     render_page(conn, "configure_enterprise.html", opts, info)
   end
 
-  defp template_file(page) do
-    Application.app_dir(:vintage_net_wizard, ["priv", "templates", "#{page}.eex"])
+  defp template_file(page, opts) do
+    Keyword.get(
+      opts,
+      :templates_path,
+      Application.app_dir(:vintage_net_wizard, ["priv", "templates"])
+    ) <> "/#{page}.eex"
   end
 
   defp password_error_message({:error, :password_required}), do: "Password required."
