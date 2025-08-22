@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2019 Jon Carstens
+# SPDX-FileCopyrightText: 2023 Connor Rigby
+# SPDX-FileCopyrightText: 2023 Frank Hunleth
+# SPDX-FileCopyrightText: 2023 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Callbacks do
   @moduledoc false
   use Agent
