@@ -264,7 +264,7 @@ This is the WiFi radio band that the access point is using.
 Flags are reported by access points. They can be used to know whether a password
 is required to join the network. Example flags are `"wpa2"`, `"psk"`, and
 `"eap"`. Flags are documented in the [`vintage_net_wifi`
-documentation](https://hexdocs.pm/vintage_net_wifi/VintageNetWiFi.AccessPoint.html)
+documentation](https://vintage-net-wifi.hexdocs.pm/VintageNetWiFi.AccessPoint.html)
 
 ### KeyManagement
 
