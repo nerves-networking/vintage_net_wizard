@@ -11,7 +11,7 @@ Application.start(:nerves_bootstrap)
 config :example, target: Mix.target()
 
 # Customize non-Elixir parts of the firmware. See
-# https://hexdocs.pm/nerves/advanced-configuration.html for details.
+# https://nerves.hexdocs.pm/advanced-configuration.html for details.
 
 config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 
@@ -21,7 +21,7 @@ config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 config :nerves, source_date_epoch: "1611961839"
 
 # Use Ringlogger as the logger backend and remove :console.
-# See https://hexdocs.pm/ring_logger/readme.html for more information on
+# See https://ring-logger.hexdocs.pm/readme.html for more information on
 # configuring ring_logger.
 
 config :logger, backends: [RingLogger]

@@ -25,8 +25,8 @@ config :nerves,
 
 # Configure the device for SSH IEx prompt access and firmware updates
 #
-# * See https://hexdocs.pm/nerves_ssh/readme.html for general SSH configuration
-# * See https://hexdocs.pm/ssh_subsystem_fwup/readme.html for firmware updates
+# * See https://nerves-ssh.hexdocs.pm/readme.html for general SSH configuration
+# * See https://ssh-subsystem-fwup.hexdocs.pm/readme.html for firmware updates
 
 keys =
   [
