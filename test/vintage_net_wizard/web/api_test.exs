@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2019 Jon Carstens
+# SPDX-FileCopyrightText: 2019 Matt Ludwigs
+# SPDX-FileCopyrightText: 2020 Frank Hunleth
+# SPDX-FileCopyrightText: 2023 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Web.ApiTest do
   use ExUnit.Case, async: true
   use Plug.Test
