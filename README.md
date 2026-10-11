@@ -1,8 +1,9 @@
 # VintageNet WiFi Configuration Wizard
 
-[![CircleCI](https://circleci.com/gh/nerves-networking/vintage_net_wizard.svg?style=svg)](https://circleci.com/gh/nerves-networking/vintage_net_wizard)
-[![Coverage Status](https://coveralls.io/repos/github/nerves-networking/vintage_net_wizard/badge.svg?branch=master)](https://coveralls.io/github/nerves-networking/vintage_net_wizard?branch=master)
 [![Hex version](https://img.shields.io/hexpm/v/vintage_net_wizard.svg "Hex version")](https://hex.pm/packages/vintage_net_wizard)
+[![API docs](https://img.shields.io/hexpm/v/vintage_net_wizard.svg?label=hexdocs "API docs")](https://vintage-net-wizard.hexdocs.pm/VintageNetWizard.html)
+[![Nerves compatibility](https://compatibility.nerves-project.org/badge/vintage_net_wizard.svg)](https://compatibility.nerves-project.org/packages/vintage_net_wizard)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/nerves-networking/vintage_net_wizard/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/nerves-networking/vintage_net_wizard/tree/main)
 
 This is a WiFi configuration wizard that uses
 [VintageNet](https://github.com/nerves-networking/vintage_net). It is intended
