@@ -1,8 +1,10 @@
 # VintageNet WiFi Configuration Wizard
 
-[![CircleCI](https://circleci.com/gh/nerves-networking/vintage_net_wizard.svg?style=svg)](https://circleci.com/gh/nerves-networking/vintage_net_wizard)
-[![Coverage Status](https://coveralls.io/repos/github/nerves-networking/vintage_net_wizard/badge.svg?branch=master)](https://coveralls.io/github/nerves-networking/vintage_net_wizard?branch=master)
 [![Hex version](https://img.shields.io/hexpm/v/vintage_net_wizard.svg "Hex version")](https://hex.pm/packages/vintage_net_wizard)
+[![API docs](https://img.shields.io/hexpm/v/vintage_net_wizard.svg?label=hexdocs "API docs")](https://hexdocs.pm/vintage_net_wizard/VintageNetWizard.html)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/nerves-networking/vintage_net_wizard/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/nerves-networking/vintage_net_wizard/tree/main)
+[![Coverage Status](https://coveralls.io/repos/github/nerves-networking/vintage_net_wizard/badge.svg?branch=main)](https://coveralls.io/github/nerves-networking/vintage_net_wizard?branch=main)
+[![REUSE status](https://api.reuse.software/badge/github.com/nerves-networking/vintage_net_wizard)](https://api.reuse.software/info/github.com/nerves-networking/vintage_net_wizard)
 
 This is a WiFi configuration wizard that uses
 [VintageNet](https://github.com/nerves-networking/vintage_net). It is intended

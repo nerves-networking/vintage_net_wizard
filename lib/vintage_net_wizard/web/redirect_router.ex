@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2020 Jonathan Merriweather
+# SPDX-FileCopyrightText: 2023 Connor Rigby
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Web.RedirectRouter do
   @moduledoc false
   @behaviour Plug

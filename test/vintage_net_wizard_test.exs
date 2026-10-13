@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2019 Connor Rigby
+# SPDX-FileCopyrightText: 2019 Frank Hunleth
+# SPDX-FileCopyrightText: 2019 Jon Carstens
+# SPDX-FileCopyrightText: 2021 Matt Ludwigs
+# SPDX-FileCopyrightText: 2023 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizardTest do
   use ExUnit.Case
   doctest VintageNetWizard

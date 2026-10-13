@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2019 Frank Hunleth
+# SPDX-FileCopyrightText: 2019 Jon Carstens
+# SPDX-FileCopyrightText: 2019 Matt Ludwigs
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Application do
   @moduledoc false
 

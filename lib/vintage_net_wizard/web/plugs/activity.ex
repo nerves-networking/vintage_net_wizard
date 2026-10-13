@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Matt Ludwigs
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Plugs.Activity do
   @moduledoc false
 

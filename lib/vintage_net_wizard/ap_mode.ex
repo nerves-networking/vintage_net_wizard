@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2019 Frank Hunleth
+# SPDX-FileCopyrightText: 2019 Steve Newell
+# SPDX-FileCopyrightText: 2020 Jon Carstens
+# SPDX-FileCopyrightText: 2020 Matt Ludwigs
+# SPDX-FileCopyrightText: 2022 Jean-Francois Cloutier
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.APMode do
   @moduledoc """
   This module contains utilities for configuration VintageNet in AP Mode

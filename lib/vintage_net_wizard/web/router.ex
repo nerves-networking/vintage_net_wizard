@@ -1,3 +1,12 @@
+# SPDX-FileCopyrightText: 2019 Connor Rigby
+# SPDX-FileCopyrightText: 2019 Frank Hunleth
+# SPDX-FileCopyrightText: 2019 Jon Carstens
+# SPDX-FileCopyrightText: 2019 Jonathan Merriweather
+# SPDX-FileCopyrightText: 2019 Matt Ludwigs
+# SPDX-FileCopyrightText: 2023 Masatoshi Nishiguchi
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule VintageNetWizard.Web.Router do
   @moduledoc false
 
